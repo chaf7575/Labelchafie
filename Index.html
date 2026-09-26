@@ -3,69 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>منصة المخبري</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
   font-family:Tahoma,Arial,sans-serif;
-  background:#f1f5f9;
+  background:#f4f7fb;
   color:#172033;
 }
 
 header{
   background:linear-gradient(135deg,#123b5d,#176b87);
   color:white;
-  padding:20px;
-  text-align:center;
-  box-shadow:0 2px 8px #0002;
+  padding:18px;
+  position:sticky;
+  top:0;
+  z-index:1000;
+  box-shadow:0 3px 12px rgba(0,0,0,.15);
 }
 
-header h1{
-  margin:0 0 7px;
-  font-size:25px;
+.header-inner{
+  max-width:1400px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
 }
 
-header p{
-  margin:0;
+.logo{
+  font-size:24px;
+  font-weight:bold;
+}
+
+.subtitle{
+  font-size:13px;
   opacity:.9;
+  margin-top:5px;
+}
+
+.menu-btn{
+  display:none;
+  background:#fff;
+  color:#123b5d;
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  font-size:20px;
 }
 
 nav{
-  background:white;
-  padding:10px;
+  background:#fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+  position:sticky;
+  top:80px;
+  z-index:900;
+}
+
+.nav-inner{
+  max-width:1400px;
+  margin:auto;
   display:flex;
   flex-wrap:wrap;
-  gap:7px;
-  justify-content:center;
-  position:sticky;
-  top:0;
-  z-index:20;
-  box-shadow:0 2px 6px #0001;
 }
 
 nav button{
   border:0;
-  background:#e2e8f0;
-  color:#172033;
-  padding:10px 14px;
-  border-radius:8px;
+  background:white;
+  padding:13px 15px;
   cursor:pointer;
+  font-family:inherit;
+  color:#26384b;
   font-weight:bold;
 }
 
 nav button:hover,
 nav button.active{
-  background:#176b87;
-  color:white;
+  background:#e7f4f8;
+  color:#12627b;
 }
 
-main{
+.container{
   max-width:1400px;
-  margin:auto;
-  padding:18px;
+  margin:20px auto;
+  padding:0 15px;
 }
 
 .section{
@@ -78,57 +105,43 @@ main{
 
 .card{
   background:white;
-  border-radius:12px;
-  padding:18px;
-  margin-bottom:18px;
-  box-shadow:0 2px 8px #0001;
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 4px 16px rgba(15,23,42,.07);
+  border:1px solid #e4eaf0;
 }
 
-.card h2{
+h2{
   margin-top:0;
   color:#123b5d;
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:12px;
-}
-
-.stat{
-  background:white;
-  border-radius:12px;
-  padding:18px;
-  box-shadow:0 2px 7px #0001;
-  text-align:center;
-}
-
-.stat strong{
-  display:block;
-  font-size:28px;
+h3{
   color:#176b87;
-  margin-top:8px;
 }
 
 .form-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:10px;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
 }
 
 label{
   display:block;
   font-weight:bold;
-  margin-bottom:5px;
+  margin-bottom:6px;
 }
 
-input,select,textarea{
+input,
+select,
+textarea{
   width:100%;
-  padding:10px;
   border:1px solid #cbd5e1;
-  border-radius:7px;
-  background:white;
+  border-radius:8px;
+  padding:11px;
   font-family:inherit;
+  background:#fff;
 }
 
 textarea{
@@ -136,17 +149,14 @@ textarea{
   resize:vertical;
 }
 
-button{
-  font-family:inherit;
-}
-
 .btn{
   border:0;
-  border-radius:7px;
+  border-radius:8px;
   padding:10px 15px;
   cursor:pointer;
+  font-family:inherit;
   font-weight:bold;
-  margin-top:10px;
+  margin:4px;
 }
 
 .btn-primary{
@@ -155,7 +165,7 @@ button{
 }
 
 .btn-success{
-  background:#16845b;
+  background:#16804b;
   color:white;
 }
 
@@ -165,75 +175,385 @@ button{
 }
 
 .btn-warning{
-  background:#d97706;
+  background:#d88b00;
   color:white;
 }
 
-.btn-gray{
+.btn-secondary{
   background:#64748b;
   color:white;
+}
+
+.btn:hover{
+  opacity:.88;
+}
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+}
+
+.stat{
+  padding:20px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#fff,#eef7fa);
+  border:1px solid #d9e9ee;
+}
+
+.stat strong{
+  display:block;
+  font-size:30px;
+  color:#176b87;
+  margin-top:8px;
+}
+
+.table-wrap{
+  overflow-x:auto;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
-  margin-top:15px;
-  background:white;
+  min-width:800px;
 }
 
-th,td{
-  border:1px solid #dbe2ea;
+th,
+td{
+  border:1px solid #dbe3ea;
   padding:9px;
   text-align:right;
-  vertical-align:top;
 }
 
 th{
-  background:#eaf2f6;
-  color:#123b5d;
+  background:#123b5d;
+  color:white;
 }
 
-.actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:5px;
-}
-
-.actions button{
-  margin:0;
-  padding:6px 9px;
-  border:0;
-  border-radius:5px;
-  cursor:pointer;
+tr:nth-child(even){
+  background:#f8fafc;
 }
 
 .empty{
+  padding:30px;
   text-align:center;
   color:#64748b;
-  padding:20px;
+  background:#f8fafc;
+  border-radius:10px;
 }
 
-.notice{
-  background:#eff6ff;
+.actions{
+  white-space:nowrap;
+}
+
+.small{
+  font-size:13px;
+  color:#64748b;
+}
+
+/* =========================
+   الجرد المخبري
+========================= */
+
+.inventory-section{
+  position:relative;
+  overflow:hidden;
+  min-height:700px;
+}
+
+.inventory-section::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.075;
+
+  background-image:
+    radial-gradient(circle at 10% 15%,#176b87 0 2px,transparent 3px),
+    radial-gradient(circle at 80% 20%,#176b87 0 2px,transparent 3px),
+    radial-gradient(circle at 25% 80%,#176b87 0 2px,transparent 3px),
+    radial-gradient(circle at 90% 80%,#176b87 0 2px,transparent 3px);
+
+  background-size:180px 180px;
+}
+
+.inventory-bg{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+  z-index:0;
+}
+
+.inventory-bg span{
+  position:absolute;
+  font-size:90px;
+  opacity:.07;
+  color:#176b87;
+  filter:grayscale(1);
+}
+
+.inventory-bg span:nth-child(1){
+  top:60px;
+  left:3%;
+}
+
+.inventory-bg span:nth-child(2){
+  top:220px;
+  right:4%;
+  font-size:110px;
+}
+
+.inventory-bg span:nth-child(3){
+  bottom:80px;
+  left:12%;
+}
+
+.inventory-bg span:nth-child(4){
+  bottom:40px;
+  right:12%;
+}
+
+.inventory-bg span:nth-child(5){
+  top:420px;
+  left:45%;
+}
+
+.inventory-bg span:nth-child(6){
+  top:100px;
+  right:30%;
+}
+
+.inventory-bg span:nth-child(7){
+  bottom:180px;
+  right:45%;
+}
+
+.inventory-bg span:nth-child(8){
+  top:350px;
+  left:8%;
+}
+
+.inventory-panel{
+  position:relative;
+  z-index:2;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(2px);
+}
+
+.inventory-intro{
+  color:#64748b;
+}
+
+.inventory-categories{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-top:20px;
+}
+
+.inventory-categories button{
+  background:rgba(255,255,255,.96);
+  border:2px solid #d8e5eb;
+  border-radius:14px;
+  padding:18px;
+  cursor:pointer;
+  font-family:inherit;
+  text-align:center;
+  transition:.2s;
+}
+
+.inventory-categories button:hover,
+.inventory-categories button.selected{
+  border-color:#176b87;
+  background:#eef8fa;
+  transform:translateY(-2px);
+}
+
+.inventory-categories button strong{
+  display:block;
+  color:#123b5d;
+  margin-top:8px;
+}
+
+.inventory-categories button small{
+  display:block;
+  color:#64748b;
+  margin-top:5px;
+}
+
+.inventory-toolbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-top:25px;
+  border-top:1px solid #e2e8f0;
+  padding-top:15px;
+}
+
+.inventory-toolbar h3{
+  margin:0;
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  background:#e6f4f7;
+  color:#12627b;
+  font-size:12px;
+  font-weight:bold;
+}
+
+/* =========================
+   التقارير
+========================= */
+
+.report-box{
   border-right:5px solid #176b87;
-  padding:12px;
-  border-radius:7px;
-  margin-bottom:15px;
+  background:#f8fafc;
+  padding:15px;
+  margin-bottom:12px;
+  border-radius:8px;
 }
 
-footer{
-  text-align:center;
-  padding:25px;
-  color:#64748b;
+/* =========================
+   إعدادات
+========================= */
+
+.settings-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
 }
 
-@media(max-width:700px){
-  main{padding:10px}
-  header h1{font-size:20px}
-  nav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}
-  nav button{white-space:nowrap}
-  table{font-size:12px}
-  th,td{padding:6px}
+/* =========================
+   الطباعة
+========================= */
+
+@media print{
+
+  body{
+    background:white;
+  }
+
+  header,
+  nav,
+  .no-print,
+  .inventory-categories,
+  .inventory-toolbar button,
+  .btn{
+    display:none !important;
+  }
+
+  .container{
+    margin:0;
+    padding:0;
+  }
+
+  .section{
+    display:none !important;
+  }
+
+  #inventory{
+    display:block !important;
+  }
+
+  .inventory-bg{
+    display:none;
+  }
+
+  .card{
+    box-shadow:none;
+    border:0;
+  }
+
+  table{
+    min-width:0;
+  }
+
+  th{
+    background:#ddd !important;
+    color:#000 !important;
+  }
+}
+
+/* =========================
+   الهاتف
+========================= */
+
+@media(max-width:900px){
+
+  .dashboard-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .form-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .inventory-categories{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .settings-grid{
+    grid-template-columns:1fr;
+  }
+
+}
+
+@media(max-width:600px){
+
+  .header-inner{
+    align-items:flex-start;
+  }
+
+  .logo{
+    font-size:19px;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+
+  nav{
+    display:none;
+    top:70px;
+  }
+
+  nav.open{
+    display:block;
+  }
+
+  .nav-inner{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  nav button{
+    border-bottom:1px solid #edf2f7;
+    font-size:12px;
+  }
+
+  .dashboard-grid,
+  .form-grid,
+  .inventory-categories{
+    grid-template-columns:1fr;
+  }
+
+  .inventory-toolbar{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .inventory-bg span{
+    font-size:65px;
+  }
+
+  .card{
+    padding:14px;
+  }
 }
 </style>
 </head>
@@ -241,1753 +561,2545 @@ footer{
 <body>
 
 <header>
-  <h1>🔬 منصة المخبري</h1>
-  <p>منصة تسيير وتنظيم أعمال مخبر العلوم الفيزيائية</p>
+  <div class="header-inner">
+
+    <div>
+      <div class="logo">🔬 منصة المخبري</div>
+      <div class="subtitle">
+        منصة رقمية لتنظيم وتسيير أعمال المخبر
+      </div>
+    </div>
+
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+  </div>
 </header>
 
-<nav>
-  <button class="active" onclick="showSection('home',this)">🏠 الرئيسية</button>
-  <button onclick="showSection('teachers',this)">👨‍🏫 الأساتذة والأقسام</button>
-  <button onclick="showSection('requests',this)">📋 الطلبات</button>
-  <button onclick="showSection('progression',this)">📅 التدرج السنوي</button>
-  <button onclick="showSection('experiments',this)">🧪 التجارب</button>
-  <button onclick="showSection('preparation',this)">🧰 التحضير</button>
-  <button onclick="showSection('inventory',this)">📦 الجرد</button>
-  <button onclick="showSection('chemicals',this)">⚗️ المواد الكيميائية</button>
-  <button onclick="showSection('movements',this)">🔄 حركة الأدوات</button>
-  <button onclick="showSection('daily',this)">📝 التقارير اليومية</button>
-  <button onclick="showSection('reports',this)">📊 التقارير</button>
-  <button onclick="showSection('invoices',this)">🧾 الفواتير</button>
-  <button onclick="showSection('registers',this)">📚 السجلات</button>
-  <button onclick="showSection('settings',this)">⚙️ الإعدادات</button>
+<nav id="mainNav">
+  <div class="nav-inner">
+
+    <button onclick="showSection('home')">🏠 الرئيسية</button>
+    <button onclick="showSection('teachers')">👨‍🏫 الأساتذة</button>
+    <button onclick="showSection('requests')">📋 الطلبات</button>
+    <button onclick="showSection('progression')">📅 التدرج السنوي</button>
+    <button onclick="showSection('experiments')">🧪 التجارب</button>
+    <button onclick="showSection('preparation')">🧰 التحضير</button>
+    <button onclick="showSection('inventory')">📦 الجرد</button>
+    <button onclick="showSection('chemicals')">⚗️ المواد الكيميائية</button>
+    <button onclick="showSection('movements')">🔄 الحركات</button>
+    <button onclick="showSection('dailyReports')">📝 تقارير يومية</button>
+    <button onclick="showSection('reports')">📊 التقارير</button>
+    <button onclick="showSection('invoices')">🧾 الفواتير</button>
+    <button onclick="showSection('registers')">📚 السجلات</button>
+    <button onclick="showSection('settings')">⚙️ الإعدادات</button>
+
+  </div>
 </nav>
 
-<main>
+<div class="container">
 
-<!-- الرئيسية -->
+<!-- =========================
+     الرئيسية
+========================= -->
+
 <section id="home" class="section active">
 
-<div class="card">
-<h2>لوحة التحكم</h2>
-<div class="notice">
-مرحبًا بك في منصة المخبري. جميع البيانات تحفظ حاليًا على هذا الجهاز.
-</div>
+  <div class="card">
+    <h2>مرحبًا بك في منصة المخبري</h2>
+    <p>
+      نظام رقمي لتنظيم معدات وتجهيزات ومتابعة أعمال المخبر.
+    </p>
+  </div>
 
-<div class="grid">
+  <div class="dashboard-grid">
 
-<div class="stat">
-👨‍🏫 الأساتذة
-<strong id="countTeachers">0</strong>
-</div>
+    <div class="stat">
+      👨‍🏫 الأساتذة
+      <strong id="statTeachers">0</strong>
+    </div>
 
-<div class="stat">
-📋 الطلبات
-<strong id="countRequests">0</strong>
-</div>
+    <div class="stat">
+      📋 الطلبات
+      <strong id="statRequests">0</strong>
+    </div>
 
-<div class="stat">
-🧪 التجارب
-<strong id="countExperiments">0</strong>
-</div>
+    <div class="stat">
+      📦 معدات الجرد
+      <strong id="statInventory">0</strong>
+    </div>
 
-<div class="stat">
-📦 المعدات
-<strong id="countInventory">0</strong>
-</div>
+    <div class="stat">
+      ⚗️ المواد الكيميائية
+      <strong id="statChemicals">0</strong>
+    </div>
 
-<div class="stat">
-⚗️ المواد الكيميائية
-<strong id="countChemicals">0</strong>
-</div>
-
-<div class="stat">
-📝 التقارير
-<strong id="countReports">0</strong>
-</div>
-
-</div>
-</div>
-
-<div class="card">
-<h2>ℹ️ معلومات المنصة</h2>
-<p>اسم المؤسسة: <span id="schoolNameView">متوسطة قايد أحمد</span></p>
-<p>المستويات: الأولى، الثانية، الثالثة، الرابعة متوسط</p>
-<p>السنة الدراسية: <span id="schoolYearView">2026 / 2027</span></p>
-</div>
+  </div>
 
 </section>
 
+<!-- =========================
+     الأساتذة
+========================= -->
 
-<!-- الأساتذة والأقسام -->
 <section id="teachers" class="section">
 
-<div class="card">
-<h2>👨‍🏫 إضافة أستاذ أو قسم</h2>
+  <div class="card">
+    <h2>👨‍🏫 الأساتذة والأقسام</h2>
 
-<div class="form-grid">
+    <div class="form-grid">
 
-<div>
-<label>اسم الأستاذ</label>
-<input id="teacherName" placeholder="اسم الأستاذ">
-</div>
+      <div>
+        <label>اسم الأستاذ</label>
+        <input id="teacherName">
+      </div>
 
-<div>
-<label>المادة</label>
-<select id="teacherSubject">
-<option>العلوم الفيزيائية</option>
-<option>علوم الطبيعة والحياة</option>
-<option>اللغة العربية</option>
-<option>اللغة الفرنسية</option>
-<option>اللغة الإنجليزية</option>
-<option>التاريخ والجغرافيا</option>
-<option>الإعلام الآلي</option>
-<option>أخرى</option>
-</select>
-</div>
+      <div>
+        <label>المادة</label>
+        <input id="teacherSubject">
+      </div>
 
-<div>
-<label>القسم</label>
-<input id="teacherClass" placeholder="مثال: 3م1">
-</div>
+      <div>
+        <label>القسم</label>
+        <input id="teacherClass">
+      </div>
 
-</div>
+    </div>
 
-<button class="btn btn-primary" onclick="addTeacher()">➕ إضافة</button>
-</div>
+    <button class="btn btn-primary" onclick="addTeacher()">
+      ➕ إضافة أستاذ
+    </button>
 
-<div class="card">
-<h2>قائمة الأساتذة والأقسام</h2>
-<div id="teachersTable"></div>
-</div>
+  </div>
+
+  <div class="card">
+    <div id="teachersTable"></div>
+  </div>
 
 </section>
 
+<!-- =========================
+     الطلبات
+========================= -->
 
-<!-- الطلبات -->
 <section id="requests" class="section">
 
-<div class="card">
-<h2>📋 طلبات الأساتذة</h2>
+  <div class="card">
+    <h2>📋 طلبات الأساتذة</h2>
 
-<div class="form-grid">
+    <div class="form-grid">
 
-<div>
-<label>الأستاذ</label>
-<input id="requestTeacher">
-</div>
+      <div>
+        <label>الأستاذ</label>
+        <input id="requestTeacher">
+      </div>
 
-<div>
-<label>القسم</label>
-<input id="requestClass" placeholder="مثال: 2م3">
-</div>
+      <div>
+        <label>القسم</label>
+        <input id="requestClass">
+      </div>
 
-<div>
-<label>التجربة / الطلب</label>
-<input id="requestTitle">
-</div>
+      <div>
+        <label>التاريخ</label>
+        <input id="requestDate" type="date">
+      </div>
 
-<div>
-<label>التاريخ</label>
-<input id="requestDate" type="date">
-</div>
+    </div>
 
-</div>
+    <label>الطلب</label>
+    <textarea id="requestText"></textarea>
 
-<label>الملاحظات</label>
-<textarea id="requestNotes"></textarea>
+    <button class="btn btn-primary" onclick="addRequest()">
+      ➕ تسجيل الطلب
+    </button>
 
-<button class="btn btn-primary" onclick="addRequest()">➕ تسجيل الطلب</button>
-</div>
+  </div>
 
-<div class="card">
-<h2>سجل الطلبات</h2>
-<div id="requestsTable"></div>
-</div>
+  <div class="card">
+    <div id="requestsTable"></div>
+  </div>
 
 </section>
 
+<!-- =========================
+     التدرج
+========================= -->
 
-<!-- التدرج -->
 <section id="progression" class="section">
 
-<div class="card">
-<h2>📅 التدرج السنوي والبرنامج الأسبوعي</h2>
+  <div class="card">
+    <h2>📅 التدرج السنوي والأسبوعي</h2>
 
-<div class="form-grid">
+    <div class="form-grid">
 
-<div>
-<label>المستوى</label>
-<select id="progLevel">
-<option>الأولى متوسط</option>
-<option>الثانية متوسط</option>
-<option>الثالثة متوسط</option>
-<option>الرابعة متوسط</option>
-</select>
-</div>
+      <div>
+        <label>المستوى</label>
+        <select id="progLevel">
+          <option>1 متوسط</option>
+          <option>2 متوسط</option>
+          <option>3 متوسط</option>
+          <option>4 متوسط</option>
+        </select>
+      </div>
 
-<div>
-<label>الأسبوع</label>
-<input id="progWeek" placeholder="الأسبوع 1">
-</div>
+      <div>
+        <label>الأسبوع</label>
+        <input id="progWeek">
+      </div>
 
-<div>
-<label>الفصل</label>
-<select id="progTerm">
-<option>الفصل الأول</option>
-<option>الفصل الثاني</option>
-<option>الفصل الثالث</option>
-</select>
-</div>
+      <div>
+        <label>التاريخ</label>
+        <input id="progDate" type="date">
+      </div>
 
-<div>
-<label>الدرس</label>
-<input id="progLesson">
-</div>
+    </div>
 
-</div>
+    <label>الدرس</label>
+    <input id="progLesson">
 
-<label>ملاحظات</label>
-<textarea id="progNotes"></textarea>
+    <label>ملاحظات</label>
+    <textarea id="progNotes"></textarea>
 
-<button class="btn btn-primary" onclick="addProgression()">➕ إضافة</button>
-</div>
+    <button class="btn btn-primary" onclick="addProgression()">
+      ➕ إضافة
+    </button>
 
-<div class="card">
-<div id="progressionTable"></div>
-</div>
+  </div>
+
+  <div class="card">
+    <div id="progressionTable"></div>
+  </div>
 
 </section>
 
+<!-- =========================
+     التجارب
+========================= -->
 
-<!-- التجارب -->
 <section id="experiments" class="section">
 
-<div class="card">
-<h2>🧪 التجارب</h2>
+  <div class="card">
 
-<div class="form-grid">
+    <h2>🧪 التجارب</h2>
 
-<div>
-<label>عنوان التجربة</label>
-<input id="expTitle">
-</div>
+    <div class="form-grid">
 
-<div>
-<label>المستوى</label>
-<select id="expLevel">
-<option>الأولى متوسط</option>
-<option>الثانية متوسط</option>
-<option>الثالثة متوسط</option>
-<option>الرابعة متوسط</option>
-</select>
-</div>
+      <div>
+        <label>عنوان التجربة</label>
+        <input id="expTitle">
+      </div>
 
-<div>
-<label>المادة</label>
-<input id="expSubject" value="العلوم الفيزيائية">
-</div>
+      <div>
+        <label>المستوى</label>
+        <select id="expLevel">
+          <option>1 متوسط</option>
+          <option>2 متوسط</option>
+          <option>3 متوسط</option>
+          <option>4 متوسط</option>
+        </select>
+      </div>
 
-<div>
-<label>المدة</label>
-<input id="expDuration" placeholder="مثال: 45 دقيقة">
-</div>
+      <div>
+        <label>الأسبوع</label>
+        <input id="expWeek">
+      </div>
 
-</div>
+    </div>
 
-<label>المواد والأدوات المطلوبة</label>
-<textarea id="expMaterials"></textarea>
+    <label>المواد المطلوبة</label>
+    <textarea id="expMaterials"></textarea>
 
-<label>الهدف من التجربة</label>
-<textarea id="expGoal"></textarea>
+    <button class="btn btn-primary" onclick="addExperiment()">
+      ➕ إضافة تجربة
+    </button>
 
-<button class="btn btn-primary" onclick="addExperiment()">➕ إضافة التجربة</button>
-</div>
+  </div>
 
-<div class="card">
-<div id="experimentsTable"></div>
-</div>
+  <div class="card">
+    <div id="experimentsTable"></div>
+  </div>
 
 </section>
 
+<!-- =========================
+     التحضير
+========================= -->
 
-<!-- التحضير -->
 <section id="preparation" class="section">
 
-<div class="card">
-<h2>🧰 تحضير الأعمال التطبيقية</h2>
+  <div class="card">
 
-<div class="form-grid">
+    <h2>🧰 تحضير الأعمال التطبيقية</h2>
 
-<div>
-<label>التجربة</label>
-<input id="prepExperiment">
-</div>
+    <div class="form-grid">
 
-<div>
-<label>القسم</label>
-<input id="prepClass">
-</div>
+      <div>
+        <label>التاريخ</label>
+        <input id="prepDate" type="date">
+      </div>
 
-<div>
-<label>الأستاذ</label>
-<input id="prepTeacher">
-</div>
+      <div>
+        <label>الأستاذ</label>
+        <input id="prepTeacher">
+      </div>
 
-<div>
-<label>التاريخ</label>
-<input id="prepDate" type="date">
-</div>
+      <div>
+        <label>القسم</label>
+        <input id="prepClass">
+      </div>
 
-</div>
+    </div>
 
-<label>الأدوات المطلوبة</label>
-<textarea id="prepTools"></textarea>
+    <label>التجربة</label>
+    <input id="prepExperiment">
 
-<label>ملاحظات التحضير</label>
-<textarea id="prepNotes"></textarea>
+    <label>المعدات المطلوبة</label>
+    <textarea id="prepEquipment"></textarea>
 
-<button class="btn btn-primary" onclick="addPreparation()">➕ تسجيل التحضير</button>
-</div>
+    <button class="btn btn-primary" onclick="addPreparation()">
+      ➕ تسجيل التحضير
+    </button>
 
-<div class="card">
-<div id="preparationTable"></div>
-</div>
+  </div>
 
-</section>
-
-
-<!-- الجرد -->
-<section id="inventory" class="section">
-
-<div class="card">
-<h2>📦 جرد المعدات والأدوات</h2>
-
-<div class="form-grid">
-
-<div>
-<label>رقم الجرد</label>
-<input id="invNumber" placeholder="مثال: PH-001">
-</div>
-
-<div>
-<label>اسم المعدات</label>
-<input id="invName">
-</div>
-
-<div>
-<label>الصنف</label>
-<select id="invCategory">
-<option>فيزياء</option>
-<option>كيمياء</option>
-<option>علوم</option>
-<option>أدوات عامة</option>
-</select>
-</div>
-
-<div>
-<label>الكمية</label>
-<input id="invQuantity" type="number" min="0">
-</div>
-
-<div>
-<label>الحالة</label>
-<select id="invCondition">
-<option>جيدة</option>
-<option>متوسطة</option>
-<option>تحتاج إصلاح</option>
-<option>تالفة</option>
-</select>
-</div>
-
-</div>
-
-<label>ملاحظات</label>
-<textarea id="invNotes"></textarea>
-
-<button class="btn btn-primary" onclick="addInventory()">➕ إضافة إلى الجرد</button>
-</div>
-
-<div class="card">
-<div id="inventoryTable"></div>
-</div>
+  <div class="card">
+    <div id="preparationTable"></div>
+  </div>
 
 </section>
 
+<!-- =========================
+     الجرد
+========================= -->
 
-<!-- الكيميائيات -->
+<section id="inventory" class="section inventory-section">
+
+  <div class="inventory-bg">
+    <span>⚛</span>
+    <span>🔬</span>
+    <span>⚙</span>
+    <span>💻</span>
+    <span>🔊</span>
+    <span>📷</span>
+    <span>🧪</span>
+    <span>📡</span>
+  </div>
+
+  <div class="card inventory-panel">
+
+    <h2>📦 الجرد المخبري</h2>
+
+    <p class="inventory-intro">
+      سجل شامل لجميع المعدات والتجهيزات حسب نوعها.
+    </p>
+
+    <div class="inventory-categories">
+
+      <button onclick="selectInventoryCategory('معدات الفيزياء')">
+        ⚛️
+        <strong>معدات الفيزياء</strong>
+        <small id="count-physics">0 جهاز</small>
+      </button>
+
+      <button onclick="selectInventoryCategory('معدات العلوم')">
+        🔬
+        <strong>معدات العلوم</strong>
+        <small id="count-science">0 جهاز</small>
+      </button>
+
+      <button onclick="selectInventoryCategory('معدات الإعلام الآلي')">
+        💻
+        <strong>معدات الإعلام الآلي</strong>
+        <small id="count-computer">0 جهاز</small>
+      </button>
+
+      <button onclick="selectInventoryCategory('معدات الصوتيات')">
+        🔊
+        <strong>معدات الصوتيات</strong>
+        <small id="count-audio">0 جهاز</small>
+      </button>
+
+      <button onclick="selectInventoryCategory('الأجهزة السمعية البصرية')">
+        📷
+        <strong>الأجهزة السمعية البصرية</strong>
+        <small id="count-av">0 جهاز</small>
+      </button>
+
+      <button onclick="selectInventoryCategory('الأدوات والتجهيزات العامة')">
+        🧰
+        <strong>الأدوات والتجهيزات العامة</strong>
+        <small id="count-general">0 جهاز</small>
+      </button>
+
+    </div>
+
+    <div class="inventory-toolbar">
+
+      <h3 id="inventoryCurrentCategory">
+        اختر قسمًا من الجرد
+      </h3>
+
+      <button
+        class="btn btn-primary"
+        onclick="printInventoryCategory()">
+        🖨️ طباعة القسم
+      </button>
+
+    </div>
+
+    <div id="inventoryFormArea" style="display:none;">
+
+      <div class="form-grid">
+
+        <div>
+          <label>رقم الجرد</label>
+          <input id="invNumber" placeholder="مثال: PH-001">
+        </div>
+
+        <div>
+          <label>اسم المعدات أو الجهاز</label>
+          <input id="invName">
+        </div>
+
+        <div>
+          <label>الكمية</label>
+          <input id="invQuantity" type="number" min="0" value="1">
+        </div>
+
+        <div>
+          <label>الحالة</label>
+          <select id="invCondition">
+            <option>جيدة</option>
+            <option>متوسطة</option>
+            <option>تحتاج إصلاح</option>
+            <option>تالفة</option>
+          </select>
+        </div>
+
+        <div>
+          <label>مكان الحفظ</label>
+          <input id="invLocation">
+        </div>
+
+        <div>
+          <label>تاريخ الجرد</label>
+          <input id="invDate" type="date">
+        </div>
+
+      </div>
+
+      <label>ملاحظات</label>
+      <textarea id="invNotes"></textarea>
+
+      <button class="btn btn-primary" onclick="saveInventoryItem()">
+        💾 حفظ في الجرد
+      </button>
+
+      <button class="btn btn-secondary" onclick="cancelInventoryEdit()">
+        إلغاء
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="card inventory-panel">
+
+    <div id="inventoryTable">
+      <div class="empty">
+        اختر قسمًا لعرض الجرد
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- =========================
+     المواد الكيميائية
+========================= -->
+
 <section id="chemicals" class="section">
 
-<div class="card">
-<h2>⚗️ مخزون المواد الكيميائية</h2>
+  <div class="card">
 
-<div class="form-grid">
+    <h2>⚗️ مخزون المواد الكيميائية</h2>
 
-<div>
-<label>اسم المادة</label>
-<input id="chemName">
-</div>
+    <div class="form-grid">
 
-<div>
-<label>الكمية الأصلية</label>
-<input id="chemInitial" type="number" step="0.01">
-</div>
+      <div>
+        <label>اسم المادة</label>
+        <input id="chemName">
+      </div>
 
-<div>
-<label>الوحدة</label>
-<select id="chemUnit">
-<option>g</option>
-<option>kg</option>
-<option>ml</option>
-<option>L</option>
-<option>قطعة</option>
-</select>
-</div>
+      <div>
+        <label>الكمية الإجمالية</label>
+        <input id="chemTotal" type="number" min="0">
+      </div>
 
-<div>
-<label>الكمية المستعملة</label>
-<input id="chemUsed" type="number" step="0.01" value="0">
-</div>
+      <div>
+        <label>الوحدة</label>
+        <input id="chemUnit" placeholder="غ، مل، لتر...">
+      </div>
 
-</div>
+      <div>
+        <label>الكمية المستعملة</label>
+        <input id="chemUsed" type="number" min="0" value="0">
+      </div>
 
-<label>ملاحظات</label>
-<textarea id="chemNotes"></textarea>
+    </div>
 
-<button class="btn btn-primary" onclick="addChemical()">➕ إضافة مادة</button>
-</div>
+    <label>ملاحظات</label>
+    <textarea id="chemNotes"></textarea>
 
-<div class="card">
-<div id="chemicalsTable"></div>
-</div>
+    <button class="btn btn-primary" onclick="addChemical()">
+      ➕ إضافة مادة
+    </button>
+
+  </div>
+
+  <div class="card">
+    <div id="chemicalsTable"></div>
+  </div>
 
 </section>
 
+<!-- =========================
+     الحركات
+========================= -->
 
-<!-- حركة الأدوات -->
 <section id="movements" class="section">
 
-<div class="card">
-<h2>🔄 سجل دخول وخروج الأدوات</h2>
+  <div class="card">
 
-<div class="form-grid">
+    <h2>🔄 سجل حركات المعدات</h2>
 
-<div>
-<label>الأداة</label>
-<input id="moveTool">
-</div>
+    <div class="form-grid">
 
-<div>
-<label>رقم الجرد</label>
-<input id="moveNumber">
-</div>
+      <div>
+        <label>المعدات</label>
+        <input id="moveEquipment">
+      </div>
 
-<div>
-<label>النوع</label>
-<select id="moveType">
-<option>خروج</option>
-<option>دخول</option>
-</select>
-</div>
+      <div>
+        <label>الأستاذ</label>
+        <input id="moveTeacher">
+      </div>
 
-<div>
-<label>المستعمل / الأستاذ</label>
-<input id="movePerson">
-</div>
+      <div>
+        <label>نوع الحركة</label>
+        <select id="moveType">
+          <option>إخراج</option>
+          <option>إرجاع</option>
+        </select>
+      </div>
 
-<div>
-<label>القسم</label>
-<input id="moveClass">
-</div>
+      <div>
+        <label>التاريخ</label>
+        <input id="moveDate" type="date">
+      </div>
 
-</div>
+      <div>
+        <label>الوقت</label>
+        <input id="moveTime" type="time">
+      </div>
 
-<label>ملاحظات</label>
-<textarea id="moveNotes"></textarea>
+    </div>
 
-<button class="btn btn-primary" onclick="addMovement()">➕ تسجيل الحركة</button>
-</div>
+    <label>ملاحظات</label>
+    <textarea id="moveNotes"></textarea>
 
-<div class="card">
-<div id="movementsTable"></div>
-</div>
+    <button class="btn btn-primary" onclick="addMovement()">
+      ➕ تسجيل الحركة
+    </button>
 
-</section>
+  </div>
 
-
-<!-- التقارير اليومية -->
-<section id="daily" class="section">
-
-<div class="card">
-<h2>📝 التقرير اليومي للأستاذ</h2>
-
-<div class="form-grid">
-
-<div>
-<label>الأستاذ</label>
-<input id="dailyTeacher">
-</div>
-
-<div>
-<label>القسم</label>
-<input id="dailyClass">
-</div>
-
-<div>
-<label>التاريخ</label>
-<input id="dailyDate" type="date">
-</div>
-
-<div>
-<label>الساعة</label>
-<input id="dailyTime" type="time">
-</div>
-
-<div>
-<label>عنوان التجربة</label>
-<input id="dailyExperiment">
-</div>
-
-<div>
-<label>الأدوات المستعملة</label>
-<input id="dailyTools">
-</div>
-
-</div>
-
-<label>التقرير / الملاحظات</label>
-<textarea id="dailyNotes"></textarea>
-
-<button class="btn btn-primary" onclick="addDaily()">➕ حفظ التقرير</button>
-</div>
-
-<div class="card">
-<div id="dailyTable"></div>
-</div>
+  <div class="card">
+    <div id="movementsTable"></div>
+  </div>
 
 </section>
 
+<!-- =========================
+     التقارير اليومية
+========================= -->
 
-<!-- التقارير -->
+<section id="dailyReports" class="section">
+
+  <div class="card">
+
+    <h2>📝 التقرير اليومي للأستاذ</h2>
+
+    <div class="form-grid">
+
+      <div>
+        <label>التاريخ</label>
+        <input id="dailyDate" type="date">
+      </div>
+
+      <div>
+        <label>الوقت</label>
+        <input id="dailyTime" type="time">
+      </div>
+
+      <div>
+        <label>الأستاذ</label>
+        <input id="dailyTeacher">
+      </div>
+
+      <div>
+        <label>القسم</label>
+        <input id="dailyClass">
+      </div>
+
+    </div>
+
+    <label>عنوان التجربة</label>
+    <input id="dailyExperiment">
+
+    <label>المعدات المستعملة</label>
+    <textarea id="dailyEquipment"></textarea>
+
+    <label>ملاحظات</label>
+    <textarea id="dailyNotes"></textarea>
+
+    <button class="btn btn-primary" onclick="addDailyReport()">
+      ➕ حفظ التقرير
+    </button>
+
+  </div>
+
+  <div class="card">
+    <div id="dailyReportsTable"></div>
+  </div>
+
+</section>
+
+<!-- =========================
+     التقارير
+========================= -->
+
 <section id="reports" class="section">
 
-<div class="card">
-<h2>📊 التقارير الفصلية والسنوية</h2>
+  <div class="card">
 
-<div class="form-grid">
+    <h2>📊 التقارير والإحصائيات</h2>
 
-<div>
-<label>نوع التقرير</label>
-<select id="reportType">
-<option>تقرير فصلي</option>
-<option>تقرير سنوي</option>
-<option>تقرير الجرد</option>
-<option>تقرير المواد الكيميائية</option>
-<option>تقرير النشاطات</option>
-</select>
-</div>
+    <div id="reportsContent"></div>
 
-<div>
-<label>الفصل</label>
-<select id="reportTerm">
-<option>الفصل الأول</option>
-<option>الفصل الثاني</option>
-<option>الفصل الثالث</option>
-<option>سنوي</option>
-</select>
-</div>
-
-<div>
-<label>التاريخ</label>
-<input id="reportDate" type="date">
-</div>
-
-</div>
-
-<label>محتوى التقرير</label>
-<textarea id="reportContent"></textarea>
-
-<button class="btn btn-primary" onclick="addReport()">➕ حفظ التقرير</button>
-</div>
-
-<div class="card">
-<div id="reportsTable"></div>
-</div>
+  </div>
 
 </section>
 
+<!-- =========================
+     الفواتير
+========================= -->
 
-<!-- الفواتير -->
 <section id="invoices" class="section">
 
-<div class="card">
-<h2>🧾 الفواتير</h2>
+  <div class="card">
 
-<div class="form-grid">
+    <h2>🧾 الفواتير والمشتريات</h2>
 
-<div>
-<label>رقم الفاتورة</label>
-<input id="invoiceNumber">
-</div>
+    <div class="form-grid">
 
-<div>
-<label>المورد</label>
-<input id="invoiceSupplier">
-</div>
+      <div>
+        <label>رقم الفاتورة</label>
+        <input id="invoiceNumber">
+      </div>
 
-<div>
-<label>التاريخ</label>
-<input id="invoiceDate" type="date">
-</div>
+      <div>
+        <label>التاريخ</label>
+        <input id="invoiceDate" type="date">
+      </div>
 
-<div>
-<label>المبلغ</label>
-<input id="invoiceAmount" type="number" step="0.01">
-</div>
+      <div>
+        <label>المورد</label>
+        <input id="invoiceSupplier">
+      </div>
 
-</div>
+      <div>
+        <label>المبلغ</label>
+        <input id="invoiceAmount" type="number" min="0">
+      </div>
 
-<label>المحتويات</label>
-<textarea id="invoiceItems"></textarea>
+    </div>
 
-<button class="btn btn-primary" onclick="addInvoice()">➕ إضافة الفاتورة</button>
-</div>
+    <label>البيان</label>
+    <textarea id="invoiceDescription"></textarea>
 
-<div class="card">
-<div id="invoicesTable"></div>
-</div>
+    <button class="btn btn-primary" onclick="addInvoice()">
+      ➕ إضافة فاتورة
+    </button>
+
+  </div>
+
+  <div class="card">
+    <div id="invoicesTable"></div>
+  </div>
 
 </section>
 
+<!-- =========================
+     السجلات
+========================= -->
 
-<!-- السجلات -->
 <section id="registers" class="section">
 
-<div class="card">
-<h2>📚 السجلات الأخرى</h2>
+  <div class="card">
 
-<div class="form-grid">
+    <h2>📚 السجلات الأخرى</h2>
 
-<div>
-<label>نوع السجل</label>
-<select id="registerType">
-<option>التاريخ والجغرافيا</option>
-<option>اللغة العربية</option>
-<option>اللغة الفرنسية</option>
-<option>اللغة الإنجليزية</option>
-<option>الإعلام الآلي</option>
-<option>الخرائط والوسائل</option>
-<option>أخرى</option>
-</select>
-</div>
+    <div class="form-grid">
 
-<div>
-<label>العنوان</label>
-<input id="registerTitle">
-</div>
+      <div>
+        <label>نوع السجل</label>
+        <select id="registerType">
+          <option>التاريخ والجغرافيا</option>
+          <option>اللغة الفرنسية</option>
+          <option>اللغة الإنجليزية</option>
+          <option>اللغة العربية</option>
+          <option>الإعلام الآلي</option>
+          <option>الخرائط والوسائل</option>
+          <option>سجل عام</option>
+        </select>
+      </div>
 
-<div>
-<label>التاريخ</label>
-<input id="registerDate" type="date">
-</div>
+      <div>
+        <label>التاريخ</label>
+        <input id="registerDate" type="date">
+      </div>
 
-</div>
+    </div>
 
-<label>المحتوى</label>
-<textarea id="registerContent"></textarea>
+    <label>الموضوع</label>
+    <input id="registerTitle">
 
-<button class="btn btn-primary" onclick="addRegister()">➕ إضافة</button>
-</div>
+    <label>الملاحظات</label>
+    <textarea id="registerNotes"></textarea>
 
-<div class="card">
-<div id="registersTable"></div>
-</div>
+    <button class="btn btn-primary" onclick="addRegister()">
+      ➕ إضافة للسجل
+    </button>
+
+  </div>
+
+  <div class="card">
+    <div id="registersTable"></div>
+  </div>
 
 </section>
 
+<!-- =========================
+     الإعدادات
+========================= -->
 
-<!-- الإعدادات -->
 <section id="settings" class="section">
 
-<div class="card">
-<h2>⚙️ إعدادات المنصة</h2>
+  <div class="card">
 
-<div class="form-grid">
+    <h2>⚙️ إعدادات المنصة</h2>
 
-<div>
-<label>اسم المؤسسة</label>
-<input id="settingSchool">
-</div>
+    <div class="settings-grid">
 
-<div>
-<label>السنة الدراسية</label>
-<input id="settingYear">
-</div>
+      <div>
+        <label>اسم المؤسسة</label>
+        <input id="schoolName">
+      </div>
 
-<div>
-<label>اسم المخبري</label>
-<input id="settingLab">
-</div>
+      <div>
+        <label>اسم المخبري</label>
+        <input id="labWorker">
+      </div>
 
-</div>
+      <div>
+        <label>السنة الدراسية</label>
+        <input id="schoolYear">
+      </div>
 
-<button class="btn btn-success" onclick="saveSettings()">💾 حفظ الإعدادات</button>
-</div>
+    </div>
 
-<div class="card">
-<h2>💾 إدارة البيانات</h2>
+    <button class="btn btn-success" onclick="saveSettings()">
+      💾 حفظ الإعدادات
+    </button>
 
-<button class="btn btn-warning" onclick="exportData()">📤 تصدير نسخة احتياطية</button>
+  </div>
 
-<button class="btn btn-danger" onclick="deleteAllData()">🗑️ حذف جميع البيانات</button>
+  <div class="card">
 
-<p style="color:#64748b">
-النسخة الحالية تحفظ البيانات داخل المتصفح. سنضيف Supabase بعد التأكد من أن هذه النسخة تعمل بشكل صحيح.
-</p>
-</div>
+    <h3>💾 النسخ الاحتياطي</h3>
+
+    <button class="btn btn-primary" onclick="exportBackup()">
+      📥 تصدير نسخة احتياطية
+    </button>
+
+    <button class="btn btn-danger" onclick="deleteAllData()">
+      🗑️ حذف جميع البيانات
+    </button>
+
+  </div>
 
 </section>
 
-</main>
-
-<footer>
-منصة المخبري © 2026
-</footer>
-
+</div>
 
 <script>
 
-const STORAGE_KEY="LAB_PLATFORM_FULL_V1";
+/* =====================================================
+   البيانات
+===================================================== */
 
-const defaultData={
- teachers:[],
- requests:[],
- progression:[],
- experiments:[],
- preparation:[],
- inventory:[],
- chemicals:[],
- movements:[],
- daily:[],
- reports:[],
- invoices:[],
- registers:[],
- settings:{
-   school:"متوسطة قايد أحمد",
-   year:"2026 / 2027",
-   lab:"مخبر العلوم الفيزيائية"
- }
+const STORAGE_KEY = "LAB_PLATFORM_FULL_V2";
+
+let data = {
+  teachers: [],
+  requests: [],
+  progression: [],
+  experiments: [],
+  preparation: [],
+  inventory: [],
+  chemicals: [],
+  movements: [],
+  dailyReports: [],
+  invoices: [],
+  registers: [],
+  settings: {
+    schoolName: "",
+    labWorker: "",
+    schoolYear: ""
+  }
 };
 
-let data=loadData();
+let selectedInventoryCategory = "";
+let editingInventoryId = null;
 
-function loadData(){
 
- try{
-
-   const saved=localStorage.getItem(STORAGE_KEY);
-
-   if(!saved){
-     return JSON.parse(JSON.stringify(defaultData));
-   }
-
-   const parsed=JSON.parse(saved);
-
-   return {
-     ...JSON.parse(JSON.stringify(defaultData)),
-     ...parsed,
-     settings:{
-       ...defaultData.settings,
-       ...(parsed.settings||{})
-     }
-   };
-
- }catch(error){
-
-   console.error(error);
-
-   return JSON.parse(JSON.stringify(defaultData));
- }
-}
-
-function saveData(){
- localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
- updateDashboard();
-}
+/* =====================================================
+   أدوات عامة
+===================================================== */
 
 function uid(){
- return Date.now().toString(36)+Math.random().toString(36).substring(2,8);
+  return Date.now().toString(36) +
+         Math.random().toString(36).slice(2);
 }
 
 function today(){
- return new Date().toISOString().split("T")[0];
+  return new Date().toISOString().slice(0,10);
 }
 
 function currentTime(){
- const d=new Date();
- return d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+  return new Date().toTimeString().slice(0,5);
 }
 
 function val(id){
- return document.getElementById(id).value.trim();
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : "";
 }
 
 function setVal(id,value){
- const el=document.getElementById(id);
- if(el) el.value=value||"";
+  const el = document.getElementById(id);
+  if(el) el.value = value ?? "";
 }
 
 function esc(value){
- return String(value??"")
- .replace(/&/g,"&amp;")
- .replace(/</g,"&lt;")
- .replace(/>/g,"&gt;")
- .replace(/"/g,"&quot;")
- .replace(/'/g,"&#039;");
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
 
-function showSection(id,button){
 
- document.querySelectorAll(".section")
- .forEach(s=>s.classList.remove("active"));
+/* =====================================================
+   التخزين
+===================================================== */
 
- document.getElementById(id).classList.add("active");
+function saveData(){
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(data)
+  );
 
- document.querySelectorAll("nav button")
- .forEach(b=>b.classList.remove("active"));
-
- if(button) button.classList.add("active");
-
- window.scrollTo({top:0,behavior:"smooth"});
+  updateDashboard();
 }
 
-function removeItem(collection,id){
+function loadData(){
 
- if(!confirm("هل تريد حذف هذا السجل؟")) return;
+  try{
 
- data[collection]=data[collection].filter(x=>x.id!==id);
+    const saved =
+      localStorage.getItem(STORAGE_KEY);
 
- saveData();
+    if(saved){
 
- renderAll();
+      const parsed = JSON.parse(saved);
+
+      data = {
+        ...data,
+        ...parsed
+      };
+
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+    alert("حدث خطأ أثناء قراءة البيانات.");
+
+  }
+
 }
+
+
+/* =====================================================
+   التنقل
+===================================================== */
+
+function showSection(id){
+
+  document
+    .querySelectorAll(".section")
+    .forEach(section=>{
+      section.classList.remove("active");
+    });
+
+  const target =
+    document.getElementById(id);
+
+  if(target){
+    target.classList.add("active");
+  }
+
+  document
+    .querySelectorAll("nav button")
+    .forEach(button=>{
+      button.classList.remove("active");
+    });
+
+  if(id === "inventory"){
+    updateInventoryCounts();
+  }
+
+  if(id === "reports"){
+    renderReports();
+  }
+
+  document
+    .getElementById("mainNav")
+    .classList.remove("open");
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+}
+
+function toggleMenu(){
+
+  document
+    .getElementById("mainNav")
+    .classList.toggle("open");
+
+}
+
+
+/* =====================================================
+   الرئيسية
+===================================================== */
 
 function updateDashboard(){
 
- document.getElementById("countTeachers").textContent=data.teachers.length;
- document.getElementById("countRequests").textContent=data.requests.length;
- document.getElementById("countExperiments").textContent=data.experiments.length;
- document.getElementById("countInventory").textContent=data.inventory.length;
- document.getElementById("countChemicals").textContent=data.chemicals.length;
- document.getElementById("countReports").textContent=data.reports.length;
+  setVal("statTeachers",data.teachers.length);
+  setVal("statRequests",data.requests.length);
+  setVal("statInventory",data.inventory.length);
+  setVal("statChemicals",data.chemicals.length);
 
- document.getElementById("schoolNameView").textContent=data.settings.school;
- document.getElementById("schoolYearView").textContent=data.settings.year;
+  const a =
+    document.getElementById("statTeachers");
+
+  if(a) a.textContent = data.teachers.length;
+
+  const b =
+    document.getElementById("statRequests");
+
+  if(b) b.textContent = data.requests.length;
+
+  const c =
+    document.getElementById("statInventory");
+
+  if(c) c.textContent = data.inventory.length;
+
+  const d =
+    document.getElementById("statChemicals");
+
+  if(d) d.textContent = data.chemicals.length;
 }
 
 
-/* الأساتذة */
+/* =====================================================
+   الأساتذة
+===================================================== */
 
 function addTeacher(){
 
- const name=val("teacherName");
+  if(!val("teacherName")){
+    alert("اكتب اسم الأستاذ");
+    return;
+  }
 
- if(!name){
-   alert("اكتب اسم الأستاذ");
-   return;
- }
+  data.teachers.push({
+    id:uid(),
+    name:val("teacherName"),
+    subject:val("teacherSubject"),
+    className:val("teacherClass")
+  });
 
- data.teachers.push({
-   id:uid(),
-   name,
-   subject:val("teacherSubject"),
-   className:val("teacherClass"),
-   date:today()
- });
+  saveData();
 
- saveData();
+  setVal("teacherName","");
+  setVal("teacherSubject","");
+  setVal("teacherClass","");
 
- setVal("teacherName","");
- setVal("teacherClass","");
-
- renderTeachers();
+  renderTeachers();
 }
 
 function renderTeachers(){
 
- const box=document.getElementById("teachersTable");
+  const box =
+    document.getElementById("teachersTable");
 
- if(!data.teachers.length){
-   box.innerHTML='<div class="empty">لا توجد بيانات</div>';
-   return;
- }
+  if(!data.teachers.length){
+    box.innerHTML =
+      '<div class="empty">لا توجد بيانات</div>';
+    return;
+  }
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>الأستاذ</th>
-<th>المادة</th>
-<th>القسم</th>
-<th>التاريخ</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.teachers.map(x=>`
-<tr>
-<td>${esc(x.name)}</td>
-<td>${esc(x.subject)}</td>
-<td>${esc(x.className)}</td>
-<td>${esc(x.date)}</td>
-<td>
-<button class="btn btn-danger" onclick="removeItem('teachers','${x.id}')">حذف</button>
-</td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+  box.innerHTML = `
+  <div class="table-wrap">
+  <table>
+  <thead>
+  <tr>
+    <th>الأستاذ</th>
+    <th>المادة</th>
+    <th>القسم</th>
+    <th>إجراء</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.teachers.map(x=>`
+
+    <tr>
+
+      <td>${esc(x.name)}</td>
+
+      <td>${esc(x.subject)}</td>
+
+      <td>${esc(x.className)}</td>
+
+      <td class="actions">
+
+        <button
+          class="btn btn-danger"
+          onclick="removeItem('teachers','${x.id}')">
+          حذف
+        </button>
+
+      </td>
+
+    </tr>
+
+  `).join("")}
+
+  </tbody>
+  </table>
+  </div>
+  `;
 }
 
 
-/* الطلبات */
+/* =====================================================
+   الطلبات
+===================================================== */
 
 function addRequest(){
 
- if(!val("requestTitle")){
-   alert("اكتب عنوان الطلب");
-   return;
- }
+  if(!val("requestText")){
+    alert("اكتب الطلب");
+    return;
+  }
 
- data.requests.push({
-   id:uid(),
-   teacher:val("requestTeacher"),
-   className:val("requestClass"),
-   title:val("requestTitle"),
-   date:val("requestDate")||today(),
-   notes:val("requestNotes")
- });
+  data.requests.push({
+    id:uid(),
+    teacher:val("requestTeacher"),
+    className:val("requestClass"),
+    date:val("requestDate") || today(),
+    text:val("requestText")
+  });
 
- saveData();
+  saveData();
 
- setVal("requestTeacher","");
- setVal("requestClass","");
- setVal("requestTitle","");
- setVal("requestNotes","");
+  setVal("requestTeacher","");
+  setVal("requestClass","");
+  setVal("requestDate",today());
+  setVal("requestText","");
 
- renderRequests();
+  renderRequests();
 }
 
 function renderRequests(){
 
- const box=document.getElementById("requestsTable");
+  const box =
+    document.getElementById("requestsTable");
 
- if(!data.requests.length){
-   box.innerHTML='<div class="empty">لا توجد طلبات</div>';
-   return;
- }
+  if(!data.requests.length){
+    box.innerHTML =
+      '<div class="empty">لا توجد طلبات</div>';
+    return;
+  }
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>الأستاذ</th>
-<th>القسم</th>
-<th>الطلب</th>
-<th>التاريخ</th>
-<th>الملاحظات</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.requests.map(x=>`
-<tr>
-<td>${esc(x.teacher)}</td>
-<td>${esc(x.className)}</td>
-<td>${esc(x.title)}</td>
-<td>${esc(x.date)}</td>
-<td>${esc(x.notes)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('requests','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+  box.innerHTML = `
+  <div class="table-wrap">
+  <table>
+  <thead>
+  <tr>
+    <th>التاريخ</th>
+    <th>الأستاذ</th>
+    <th>القسم</th>
+    <th>الطلب</th>
+    <th>إجراء</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.requests.map(x=>`
+
+  <tr>
+
+    <td>${esc(x.date)}</td>
+
+    <td>${esc(x.teacher)}</td>
+
+    <td>${esc(x.className)}</td>
+
+    <td>${esc(x.text)}</td>
+
+    <td>
+      <button
+        class="btn btn-danger"
+        onclick="removeItem('requests','${x.id}')">
+        حذف
+      </button>
+    </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+  </table>
+  </div>
+  `;
 }
 
 
-/* التدرج */
+/* =====================================================
+   التدرج
+===================================================== */
 
 function addProgression(){
 
- if(!val("progLesson")){
-   alert("اكتب عنوان الدرس");
-   return;
- }
+  data.progression.push({
+    id:uid(),
+    level:val("progLevel"),
+    week:val("progWeek"),
+    date:val("progDate") || today(),
+    lesson:val("progLesson"),
+    notes:val("progNotes")
+  });
 
- data.progression.push({
-   id:uid(),
-   level:val("progLevel"),
-   week:val("progWeek"),
-   term:val("progTerm"),
-   lesson:val("progLesson"),
-   notes:val("progNotes")
- });
+  saveData();
 
- saveData();
+  setVal("progWeek","");
+  setVal("progDate",today());
+  setVal("progLesson","");
+  setVal("progNotes","");
 
- setVal("progWeek","");
- setVal("progLesson","");
- setVal("progNotes","");
-
- renderProgression();
+  renderProgression();
 }
 
 function renderProgression(){
 
- const box=document.getElementById("progressionTable");
+  const box =
+    document.getElementById("progressionTable");
 
- if(!data.progression.length){
-   box.innerHTML='<div class="empty">لا يوجد تدرج مسجل</div>';
-   return;
- }
+  if(!data.progression.length){
+    box.innerHTML =
+      '<div class="empty">لا توجد بيانات</div>';
+    return;
+  }
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>المستوى</th>
-<th>الأسبوع</th>
-<th>الفصل</th>
-<th>الدرس</th>
-<th>الملاحظات</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.progression.map(x=>`
-<tr>
-<td>${esc(x.level)}</td>
-<td>${esc(x.week)}</td>
-<td>${esc(x.term)}</td>
-<td>${esc(x.lesson)}</td>
-<td>${esc(x.notes)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('progression','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+  box.innerHTML = `
+  <div class="table-wrap">
+  <table>
+
+  <thead>
+  <tr>
+    <th>المستوى</th>
+    <th>الأسبوع</th>
+    <th>التاريخ</th>
+    <th>الدرس</th>
+    <th>الملاحظات</th>
+    <th>إجراء</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.progression.map(x=>`
+
+  <tr>
+
+    <td>${esc(x.level)}</td>
+    <td>${esc(x.week)}</td>
+    <td>${esc(x.date)}</td>
+    <td>${esc(x.lesson)}</td>
+    <td>${esc(x.notes)}</td>
+
+    <td>
+      <button
+        class="btn btn-danger"
+        onclick="removeItem('progression','${x.id}')">
+        حذف
+      </button>
+    </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+  </div>
+  `;
 }
 
 
-/* التجارب */
+/* =====================================================
+   التجارب
+===================================================== */
 
 function addExperiment(){
 
- if(!val("expTitle")){
-   alert("اكتب عنوان التجربة");
-   return;
- }
+  if(!val("expTitle")){
+    alert("اكتب عنوان التجربة");
+    return;
+  }
 
- data.experiments.push({
-   id:uid(),
-   title:val("expTitle"),
-   level:val("expLevel"),
-   subject:val("expSubject"),
-   duration:val("expDuration"),
-   materials:val("expMaterials"),
-   goal:val("expGoal")
- });
+  data.experiments.push({
+    id:uid(),
+    title:val("expTitle"),
+    level:val("expLevel"),
+    week:val("expWeek"),
+    materials:val("expMaterials")
+  });
 
- saveData();
+  saveData();
 
- setVal("expTitle","");
- setVal("expDuration","");
- setVal("expMaterials","");
- setVal("expGoal","");
+  setVal("expTitle","");
+  setVal("expWeek","");
+  setVal("expMaterials","");
 
- renderExperiments();
+  renderExperiments();
 }
 
 function renderExperiments(){
 
- const box=document.getElementById("experimentsTable");
+  const box =
+    document.getElementById("experimentsTable");
 
- if(!data.experiments.length){
-   box.innerHTML='<div class="empty">لا توجد تجارب</div>';
-   return;
- }
+  if(!data.experiments.length){
+    box.innerHTML =
+      '<div class="empty">لا توجد تجارب</div>';
+    return;
+  }
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>التجربة</th>
-<th>المستوى</th>
-<th>المادة</th>
-<th>المدة</th>
-<th>المواد والأدوات</th>
-<th>الهدف</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.experiments.map(x=>`
-<tr>
-<td>${esc(x.title)}</td>
-<td>${esc(x.level)}</td>
-<td>${esc(x.subject)}</td>
-<td>${esc(x.duration)}</td>
-<td>${esc(x.materials)}</td>
-<td>${esc(x.goal)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('experiments','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+  box.innerHTML = `
+  <div class="table-wrap">
+  <table>
+
+  <thead>
+  <tr>
+    <th>التجربة</th>
+    <th>المستوى</th>
+    <th>الأسبوع</th>
+    <th>المواد المطلوبة</th>
+    <th>إجراء</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.experiments.map(x=>`
+
+  <tr>
+
+    <td>${esc(x.title)}</td>
+    <td>${esc(x.level)}</td>
+    <td>${esc(x.week)}</td>
+    <td>${esc(x.materials)}</td>
+
+    <td>
+      <button
+        class="btn btn-danger"
+        onclick="removeItem('experiments','${x.id}')">
+        حذف
+      </button>
+    </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+  </div>
+  `;
 }
 
 
-/* التحضير */
+/* =====================================================
+   التحضير
+===================================================== */
 
 function addPreparation(){
 
- if(!val("prepExperiment")){
-   alert("اكتب اسم التجربة");
-   return;
- }
+  data.preparation.push({
+    id:uid(),
+    date:val("prepDate") || today(),
+    teacher:val("prepTeacher"),
+    className:val("prepClass"),
+    experiment:val("prepExperiment"),
+    equipment:val("prepEquipment")
+  });
 
- data.preparation.push({
-   id:uid(),
-   experiment:val("prepExperiment"),
-   className:val("prepClass"),
-   teacher:val("prepTeacher"),
-   date:val("prepDate")||today(),
-   tools:val("prepTools"),
-   notes:val("prepNotes")
- });
+  saveData();
 
- saveData();
+  setVal("prepDate",today());
+  setVal("prepTeacher","");
+  setVal("prepClass","");
+  setVal("prepExperiment","");
+  setVal("prepEquipment","");
 
- setVal("prepExperiment","");
- setVal("prepClass","");
- setVal("prepTeacher","");
- setVal("prepTools","");
- setVal("prepNotes","");
-
- renderPreparation();
+  renderPreparation();
 }
 
 function renderPreparation(){
 
- const box=document.getElementById("preparationTable");
+  const box =
+    document.getElementById("preparationTable");
 
- if(!data.preparation.length){
-   box.innerHTML='<div class="empty">لا توجد تحضيرات</div>';
-   return;
- }
+  if(!data.preparation.length){
+    box.innerHTML =
+      '<div class="empty">لا توجد عمليات تحضير</div>';
+    return;
+  }
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>التجربة</th>
-<th>القسم</th>
-<th>الأستاذ</th>
-<th>التاريخ</th>
-<th>الأدوات</th>
-<th>الملاحظات</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.preparation.map(x=>`
-<tr>
-<td>${esc(x.experiment)}</td>
-<td>${esc(x.className)}</td>
-<td>${esc(x.teacher)}</td>
-<td>${esc(x.date)}</td>
-<td>${esc(x.tools)}</td>
-<td>${esc(x.notes)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('preparation','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+  box.innerHTML = `
+  <div class="table-wrap">
+  <table>
+
+  <thead>
+  <tr>
+    <th>التاريخ</th>
+    <th>الأستاذ</th>
+    <th>القسم</th>
+    <th>التجربة</th>
+    <th>المعدات</th>
+    <th>إجراء</th>
+  </tr>
+  </thead>
+
+  <tbody>
+
+  ${data.preparation.map(x=>`
+
+  <tr>
+
+    <td>${esc(x.date)}</td>
+    <td>${esc(x.teacher)}</td>
+    <td>${esc(x.className)}</td>
+    <td>${esc(x.experiment)}</td>
+    <td>${esc(x.equipment)}</td>
+
+    <td>
+      <button
+        class="btn btn-danger"
+        onclick="removeItem('preparation','${x.id}')">
+        حذف
+      </button>
+    </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+  </table>
+  </div>
+  `;
 }
 
 
-/* الجرد */
+/* =====================================================
+   الجرد
+===================================================== */
 
-function addInventory(){
+function selectInventoryCategory(category){
 
- if(!val("invName")){
-   alert("اكتب اسم المعدات");
-   return;
- }
+  selectedInventoryCategory = category;
+  editingInventoryId = null;
 
- data.inventory.push({
-   id:uid(),
-   number:val("invNumber"),
-   name:val("invName"),
-   category:val("invCategory"),
-   quantity:Number(val("invQuantity"))||0,
-   condition:val("invCondition"),
-   notes:val("invNotes")
- });
+  document
+    .querySelectorAll(".inventory-categories button")
+    .forEach(button=>{
+      button.classList.remove("selected");
+    });
 
- saveData();
+  const buttons =
+    document.querySelectorAll(
+      ".inventory-categories button"
+    );
 
- setVal("invNumber","");
- setVal("invName","");
- setVal("invQuantity","");
- setVal("invNotes","");
+  buttons.forEach(button=>{
+    if(button.innerText.includes(category)){
+      button.classList.add("selected");
+    }
+  });
 
- renderInventory();
+  const title =
+    document.getElementById(
+      "inventoryCurrentCategory"
+    );
+
+  title.textContent = category;
+
+  document.getElementById(
+    "inventoryFormArea"
+  ).style.display = "block";
+
+  setVal("invDate",today());
+
+  renderInventory();
+}
+
+function saveInventoryItem(){
+
+  if(!selectedInventoryCategory){
+    alert("اختر قسم الجرد أولاً");
+    return;
+  }
+
+  if(!val("invName")){
+    alert("اكتب اسم المعدات");
+    return;
+  }
+
+  const item = {
+    number:val("invNumber"),
+    name:val("invName"),
+    category:selectedInventoryCategory,
+    quantity:Number(val("invQuantity")) || 0,
+    condition:val("invCondition"),
+    location:val("invLocation"),
+    date:val("invDate") || today(),
+    notes:val("invNotes")
+  };
+
+  if(editingInventoryId){
+
+    const index =
+      data.inventory.findIndex(
+        x=>x.id === editingInventoryId
+      );
+
+    if(index !== -1){
+
+      data.inventory[index] = {
+        ...data.inventory[index],
+        ...item
+      };
+
+    }
+
+  }else{
+
+    data.inventory.push({
+      id:uid(),
+      ...item
+    });
+
+  }
+
+  saveData();
+
+  cancelInventoryEdit();
+
+  renderInventory();
+  updateInventoryCounts();
+}
+
+function editInventory(id){
+
+  const item =
+    data.inventory.find(
+      x=>x.id === id
+    );
+
+  if(!item) return;
+
+  selectedInventoryCategory =
+    item.category;
+
+  editingInventoryId =
+    item.id;
+
+  document.getElementById(
+    "inventoryFormArea"
+  ).style.display = "block";
+
+  document.getElementById(
+    "inventoryCurrentCategory"
+  ).textContent = item.category;
+
+  setVal("invNumber",item.number);
+  setVal("invName",item.name);
+  setVal("invQuantity",item.quantity);
+  setVal("invCondition",item.condition);
+  setVal("invLocation",item.location);
+  setVal("invDate",item.date);
+  setVal("invNotes",item.notes);
+
+  renderInventory();
+}
+
+function cancelInventoryEdit(){
+
+  editingInventoryId = null;
+
+  setVal("invNumber","");
+  setVal("invName","");
+  setVal("invQuantity","1");
+  setVal("invCondition","جيدة");
+  setVal("invLocation","");
+  setVal("invDate",today());
+  setVal("invNotes","");
 }
 
 function renderInventory(){
 
- const box=document.getElementById("inventoryTable");
+  const box =
+    document.getElementById("inventoryTable");
 
- if(!data.inventory.length){
-   box.innerHTML='<div class="empty">لا توجد معدات في الجرد</div>';
-   return;
- }
+  if(!selectedInventoryCategory){
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>رقم الجرد</th>
-<th>المعدات</th>
-<th>الصنف</th>
-<th>الكمية</th>
-<th>الحالة</th>
-<th>الملاحظات</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.inventory.map(x=>`
-<tr>
-<td>${esc(x.number)}</td>
-<td>${esc(x.name)}</td>
-<td>${esc(x.category)}</td>
-<td>${esc(x.quantity)}</td>
-<td>${esc(x.condition)}</td>
-<td>${esc(x.notes)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('inventory','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+    box.innerHTML =
+      '<div class="empty">اختر قسمًا لعرض الجرد</div>';
+
+    return;
+  }
+
+  const items =
+    data.inventory.filter(
+      x=>x.category === selectedInventoryCategory
+    );
+
+  if(!items.length){
+
+    box.innerHTML = `
+      <div class="empty">
+        لا توجد معدات مسجلة في قسم
+        <strong>${esc(selectedInventoryCategory)}</strong>
+      </div>
+    `;
+
+    return;
+  }
+
+  box.innerHTML = `
+
+  <div class="table-wrap">
+
+  <table id="inventoryPrintTable">
+
+  <thead>
+
+  <tr>
+
+    <th>رقم الجرد</th>
+    <th>المعدات أو الجهاز</th>
+    <th>الكمية</th>
+    <th>الحالة</th>
+    <th>مكان الحفظ</th>
+    <th>التاريخ</th>
+    <th>الملاحظات</th>
+    <th class="no-print">إجراء</th>
+
+  </tr>
+
+  </thead>
+
+  <tbody>
+
+  ${items.map(x=>`
+
+  <tr>
+
+    <td>${esc(x.number)}</td>
+
+    <td>${esc(x.name)}</td>
+
+    <td>${esc(x.quantity)}</td>
+
+    <td>
+      <span class="badge">
+        ${esc(x.condition)}
+      </span>
+    </td>
+
+    <td>${esc(x.location)}</td>
+
+    <td>${esc(x.date)}</td>
+
+    <td>${esc(x.notes)}</td>
+
+    <td class="actions no-print">
+
+      <button
+        class="btn btn-warning"
+        onclick="editInventory('${x.id}')">
+        تعديل
+      </button>
+
+      <button
+        class="btn btn-danger"
+        onclick="removeItem('inventory','${x.id}')">
+        حذف
+      </button>
+
+    </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+
+  </div>
+  `;
+}
+
+function updateInventoryCounts(){
+
+  const categories = {
+
+    "معدات الفيزياء":
+      "count-physics",
+
+    "معدات العلوم":
+      "count-science",
+
+    "معدات الإعلام الآلي":
+      "count-computer",
+
+    "معدات الصوتيات":
+      "count-audio",
+
+    "الأجهزة السمعية البصرية":
+      "count-av",
+
+    "الأدوات والتجهيزات العامة":
+      "count-general"
+
+  };
+
+  Object.entries(categories)
+    .forEach(([category,id])=>{
+
+      const count =
+        data.inventory.filter(
+          x=>x.category === category
+        ).length;
+
+      const el =
+        document.getElementById(id);
+
+      if(el){
+
+        el.textContent =
+          count + (count === 1 ? " جهاز" : " أجهزة");
+
+      }
+
+    });
+}
+
+function printInventoryCategory(){
+
+  if(!selectedInventoryCategory){
+
+    alert("اختر قسم الجرد أولاً");
+
+    return;
+  }
+
+  window.print();
 }
 
 
-/* الكيميائيات */
+/* =====================================================
+   المواد الكيميائية
+===================================================== */
 
 function addChemical(){
 
- if(!val("chemName")){
-   alert("اكتب اسم المادة الكيميائية");
-   return;
- }
+  if(!val("chemName")){
+    alert("اكتب اسم المادة");
+    return;
+  }
 
- const initial=Number(val("chemInitial"))||0;
- const used=Number(val("chemUsed"))||0;
+  data.chemicals.push({
 
- data.chemicals.push({
-   id:uid(),
-   name:val("chemName"),
-   initial,
-   unit:val("chemUnit"),
-   used,
-   remaining:Math.max(0,initial-used),
-   notes:val("chemNotes")
- });
+    id:uid(),
 
- saveData();
+    name:val("chemName"),
 
- setVal("chemName","");
- setVal("chemInitial","");
- setVal("chemUsed","0");
- setVal("chemNotes","");
+    total:Number(
+      val("chemTotal")
+    ) || 0,
 
- renderChemicals();
+    unit:val("chemUnit"),
+
+    used:Number(
+      val("chemUsed")
+    ) || 0,
+
+    notes:val("chemNotes")
+
+  });
+
+  saveData();
+
+  setVal("chemName","");
+  setVal("chemTotal","");
+  setVal("chemUnit","");
+  setVal("chemUsed","0");
+  setVal("chemNotes","");
+
+  renderChemicals();
 }
 
 function renderChemicals(){
 
- const box=document.getElementById("chemicalsTable");
+  const box =
+    document.getElementById(
+      "chemicalsTable"
+    );
 
- if(!data.chemicals.length){
-   box.innerHTML='<div class="empty">لا توجد مواد كيميائية</div>';
-   return;
- }
+  if(!data.chemicals.length){
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>المادة</th>
-<th>الكمية الأصلية</th>
-<th>الوحدة</th>
-<th>المستعمل</th>
-<th>المتبقي</th>
-<th>الملاحظات</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.chemicals.map(x=>`
-<tr>
-<td>${esc(x.name)}</td>
-<td>${esc(x.initial)}</td>
-<td>${esc(x.unit)}</td>
-<td>${esc(x.used)}</td>
-<td><strong>${esc(x.remaining)}</strong></td>
-<td>${esc(x.notes)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('chemicals','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+    box.innerHTML =
+      '<div class="empty">لا توجد مواد كيميائية</div>';
+
+    return;
+  }
+
+  box.innerHTML = `
+
+  <div class="table-wrap">
+
+  <table>
+
+  <thead>
+
+  <tr>
+
+    <th>المادة</th>
+    <th>الإجمالي</th>
+    <th>المستعمل</th>
+    <th>المتبقي</th>
+    <th>الوحدة</th>
+    <th>ملاحظات</th>
+    <th>إجراء</th>
+
+  </tr>
+
+  </thead>
+
+  <tbody>
+
+  ${data.chemicals.map(x=>{
+
+    const remaining =
+      Math.max(
+        0,
+        Number(x.total) -
+        Number(x.used)
+      );
+
+    return `
+
+    <tr>
+
+      <td>${esc(x.name)}</td>
+
+      <td>${esc(x.total)}</td>
+
+      <td>${esc(x.used)}</td>
+
+      <td>
+        <strong>${remaining}</strong>
+      </td>
+
+      <td>${esc(x.unit)}</td>
+
+      <td>${esc(x.notes)}</td>
+
+      <td>
+
+        <button
+          class="btn btn-danger"
+          onclick="removeItem('chemicals','${x.id}')">
+          حذف
+        </button>
+
+      </td>
+
+    </tr>
+
+    `;
+
+  }).join("")}
+
+  </tbody>
+
+  </table>
+
+  </div>
+  `;
 }
 
 
-/* حركة الأدوات */
+/* =====================================================
+   الحركات
+===================================================== */
 
 function addMovement(){
 
- if(!val("moveTool")){
-   alert("اكتب اسم الأداة");
-   return;
- }
+  data.movements.push({
 
- data.movements.push({
-   id:uid(),
-   tool:val("moveTool"),
-   number:val("moveNumber"),
-   type:val("moveType"),
-   person:val("movePerson"),
-   className:val("moveClass"),
-   date:today(),
-   time:currentTime(),
-   notes:val("moveNotes")
- });
+    id:uid(),
 
- saveData();
+    equipment:val("moveEquipment"),
 
- setVal("moveTool","");
- setVal("moveNumber","");
- setVal("movePerson","");
- setVal("moveClass","");
- setVal("moveNotes","");
+    teacher:val("moveTeacher"),
 
- renderMovements();
+    type:val("moveType"),
+
+    date:val("moveDate") || today(),
+
+    time:val("moveTime") || currentTime(),
+
+    notes:val("moveNotes")
+
+  });
+
+  saveData();
+
+  setVal("moveEquipment","");
+  setVal("moveTeacher","");
+  setVal("moveDate",today());
+  setVal("moveTime",currentTime());
+  setVal("moveNotes","");
+
+  renderMovements();
 }
 
 function renderMovements(){
 
- const box=document.getElementById("movementsTable");
+  const box =
+    document.getElementById(
+      "movementsTable"
+    );
 
- if(!data.movements.length){
-   box.innerHTML='<div class="empty">لا توجد حركات</div>';
-   return;
- }
+  if(!data.movements.length){
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>الأداة</th>
-<th>رقم الجرد</th>
-<th>الحركة</th>
-<th>المستعمل</th>
-<th>القسم</th>
-<th>التاريخ</th>
-<th>الساعة</th>
-<th>الملاحظات</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.movements.map(x=>`
-<tr>
-<td>${esc(x.tool)}</td>
-<td>${esc(x.number)}</td>
-<td>${esc(x.type)}</td>
-<td>${esc(x.person)}</td>
-<td>${esc(x.className)}</td>
-<td>${esc(x.date)}</td>
-<td>${esc(x.time)}</td>
-<td>${esc(x.notes)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('movements','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+    box.innerHTML =
+      '<div class="empty">لا توجد حركات</div>';
+
+    return;
+  }
+
+  box.innerHTML = `
+
+  <div class="table-wrap">
+
+  <table>
+
+  <thead>
+
+  <tr>
+
+    <th>التاريخ</th>
+    <th>الوقت</th>
+    <th>المعدات</th>
+    <th>الأستاذ</th>
+    <th>الحركة</th>
+    <th>ملاحظات</th>
+    <th>إجراء</th>
+
+  </tr>
+
+  </thead>
+
+  <tbody>
+
+  ${data.movements.map(x=>`
+
+  <tr>
+
+    <td>${esc(x.date)}</td>
+    <td>${esc(x.time)}</td>
+    <td>${esc(x.equipment)}</td>
+    <td>${esc(x.teacher)}</td>
+    <td>${esc(x.type)}</td>
+    <td>${esc(x.notes)}</td>
+
+    <td>
+
+      <button
+        class="btn btn-danger"
+        onclick="removeItem('movements','${x.id}')">
+        حذف
+      </button>
+
+    </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+
+  </div>
+  `;
 }
 
 
-/* التقرير اليومي */
+/* =====================================================
+   التقارير اليومية
+===================================================== */
 
-function addDaily(){
+function addDailyReport(){
 
- if(!val("dailyTeacher") && !val("dailyExperiment")){
-   alert("أدخل الأستاذ أو عنوان التجربة");
-   return;
- }
+  data.dailyReports.push({
 
- data.daily.push({
-   id:uid(),
-   teacher:val("dailyTeacher"),
-   className:val("dailyClass"),
-   date:val("dailyDate")||today(),
-   time:val("dailyTime")||currentTime(),
-   experiment:val("dailyExperiment"),
-   tools:val("dailyTools"),
-   notes:val("dailyNotes")
- });
+    id:uid(),
 
- saveData();
+    date:val("dailyDate") || today(),
 
- setVal("dailyTeacher","");
- setVal("dailyClass","");
- setVal("dailyExperiment","");
- setVal("dailyTools","");
- setVal("dailyNotes","");
+    time:val("dailyTime") || currentTime(),
 
- renderDaily();
+    teacher:val("dailyTeacher"),
+
+    className:val("dailyClass"),
+
+    experiment:val("dailyExperiment"),
+
+    equipment:val("dailyEquipment"),
+
+    notes:val("dailyNotes")
+
+  });
+
+  saveData();
+
+  setVal("dailyDate",today());
+  setVal("dailyTime",currentTime());
+  setVal("dailyTeacher","");
+  setVal("dailyClass","");
+  setVal("dailyExperiment","");
+  setVal("dailyEquipment","");
+  setVal("dailyNotes","");
+
+  renderDailyReports();
 }
 
-function renderDaily(){
+function renderDailyReports(){
 
- const box=document.getElementById("dailyTable");
+  const box =
+    document.getElementById(
+      "dailyReportsTable"
+    );
 
- if(!data.daily.length){
-   box.innerHTML='<div class="empty">لا توجد تقارير يومية</div>';
-   return;
- }
+  if(!data.dailyReports.length){
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>الأستاذ</th>
-<th>القسم</th>
-<th>التاريخ</th>
-<th>الساعة</th>
-<th>التجربة</th>
-<th>الأدوات</th>
-<th>الملاحظات</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.daily.map(x=>`
-<tr>
-<td>${esc(x.teacher)}</td>
-<td>${esc(x.className)}</td>
-<td>${esc(x.date)}</td>
-<td>${esc(x.time)}</td>
-<td>${esc(x.experiment)}</td>
-<td>${esc(x.tools)}</td>
-<td>${esc(x.notes)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('daily','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+    box.innerHTML =
+      '<div class="empty">لا توجد تقارير</div>';
+
+    return;
+  }
+
+  box.innerHTML = `
+
+  <div class="table-wrap">
+
+  <table>
+
+  <thead>
+
+  <tr>
+
+    <th>التاريخ</th>
+    <th>الوقت</th>
+    <th>الأستاذ</th>
+    <th>القسم</th>
+    <th>التجربة</th>
+    <th>المعدات</th>
+    <th>الملاحظات</th>
+    <th>إجراء</th>
+
+  </tr>
+
+  </thead>
+
+  <tbody>
+
+  ${data.dailyReports.map(x=>`
+
+  <tr>
+
+    <td>${esc(x.date)}</td>
+    <td>${esc(x.time)}</td>
+    <td>${esc(x.teacher)}</td>
+    <td>${esc(x.className)}</td>
+    <td>${esc(x.experiment)}</td>
+    <td>${esc(x.equipment)}</td>
+    <td>${esc(x.notes)}</td>
+
+    <td>
+
+      <button
+        class="btn btn-danger"
+        onclick="removeItem('dailyReports','${x.id}')">
+        حذف
+      </button>
+
+    </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+
+  </div>
+  `;
 }
 
 
-/* التقارير */
-
-function addReport(){
-
- if(!val("reportContent")){
-   alert("اكتب محتوى التقرير");
-   return;
- }
-
- data.reports.push({
-   id:uid(),
-   type:val("reportType"),
-   term:val("reportTerm"),
-   date:val("reportDate")||today(),
-   content:val("reportContent")
- });
-
- saveData();
-
- setVal("reportContent","");
-
- renderReports();
-}
+/* =====================================================
+   التقارير والإحصائيات
+===================================================== */
 
 function renderReports(){
 
- const box=document.getElementById("reportsTable");
+  const box =
+    document.getElementById(
+      "reportsContent"
+    );
 
- if(!data.reports.length){
-   box.innerHTML='<div class="empty">لا توجد تقارير</div>';
-   return;
- }
+  const categories = [
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>النوع</th>
-<th>الفصل</th>
-<th>التاريخ</th>
-<th>المحتوى</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.reports.map(x=>`
-<tr>
-<td>${esc(x.type)}</td>
-<td>${esc(x.term)}</td>
-<td>${esc(x.date)}</td>
-<td>${esc(x.content)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('reports','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+    "معدات الفيزياء",
+    "معدات العلوم",
+    "معدات الإعلام الآلي",
+    "معدات الصوتيات",
+    "الأجهزة السمعية البصرية",
+    "الأدوات والتجهيزات العامة"
+
+  ];
+
+  box.innerHTML = `
+
+  <div class="report-box">
+    <strong>عدد الأساتذة:</strong>
+    ${data.teachers.length}
+  </div>
+
+  <div class="report-box">
+    <strong>عدد الطلبات:</strong>
+    ${data.requests.length}
+  </div>
+
+  <div class="report-box">
+    <strong>عدد معدات الجرد:</strong>
+    ${data.inventory.length}
+  </div>
+
+  <div class="report-box">
+    <strong>عدد المواد الكيميائية:</strong>
+    ${data.chemicals.length}
+  </div>
+
+  <div class="report-box">
+    <strong>عدد التجارب:</strong>
+    ${data.experiments.length}
+  </div>
+
+  <h3>توزيع الجرد</h3>
+
+  ${categories.map(category=>{
+
+    const count =
+      data.inventory.filter(
+        x=>x.category === category
+      ).length;
+
+    return `
+
+    <div class="report-box">
+
+      ${esc(category)}
+
+      <strong>
+        ${count}
+      </strong>
+
+    </div>
+
+    `;
+
+  }).join("")}
+
+  `;
 }
 
 
-/* الفواتير */
+/* =====================================================
+   الفواتير
+===================================================== */
 
 function addInvoice(){
 
- if(!val("invoiceNumber") && !val("invoiceSupplier")){
-   alert("أدخل رقم الفاتورة أو اسم المورد");
-   return;
- }
+  data.invoices.push({
 
- data.invoices.push({
-   id:uid(),
-   number:val("invoiceNumber"),
-   supplier:val("invoiceSupplier"),
-   date:val("invoiceDate")||today(),
-   amount:Number(val("invoiceAmount"))||0,
-   items:val("invoiceItems")
- });
+    id:uid(),
 
- saveData();
+    number:val("invoiceNumber"),
 
- setVal("invoiceNumber","");
- setVal("invoiceSupplier","");
- setVal("invoiceAmount","");
- setVal("invoiceItems","");
+    date:val("invoiceDate") || today(),
 
- renderInvoices();
+    supplier:val("invoiceSupplier"),
+
+    amount:Number(
+      val("invoiceAmount")
+    ) || 0,
+
+    description:
+      val("invoiceDescription")
+
+  });
+
+  saveData();
+
+  setVal("invoiceNumber","");
+  setVal("invoiceDate",today());
+  setVal("invoiceSupplier","");
+  setVal("invoiceAmount","");
+  setVal("invoiceDescription","");
+
+  renderInvoices();
 }
 
 function renderInvoices(){
 
- const box=document.getElementById("invoicesTable");
+  const box =
+    document.getElementById(
+      "invoicesTable"
+    );
 
- if(!data.invoices.length){
-   box.innerHTML='<div class="empty">لا توجد فواتير</div>';
-   return;
- }
+  if(!data.invoices.length){
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>رقم الفاتورة</th>
-<th>المورد</th>
-<th>التاريخ</th>
-<th>المبلغ</th>
-<th>المحتويات</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.invoices.map(x=>`
-<tr>
-<td>${esc(x.number)}</td>
-<td>${esc(x.supplier)}</td>
-<td>${esc(x.date)}</td>
-<td>${esc(x.amount)}</td>
-<td>${esc(x.items)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('invoices','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+    box.innerHTML =
+      '<div class="empty">لا توجد فواتير</div>';
+
+    return;
+  }
+
+  box.innerHTML = `
+
+  <div class="table-wrap">
+
+  <table>
+
+  <thead>
+
+  <tr>
+
+    <th>رقم الفاتورة</th>
+    <th>التاريخ</th>
+    <th>المورد</th>
+    <th>المبلغ</th>
+    <th>البيان</th>
+    <th>إجراء</th>
+
+  </tr>
+
+  </thead>
+
+  <tbody>
+
+  ${data.invoices.map(x=>`
+
+  <tr>
+
+    <td>${esc(x.number)}</td>
+    <td>${esc(x.date)}</td>
+    <td>${esc(x.supplier)}</td>
+    <td>${esc(x.amount)}</td>
+    <td>${esc(x.description)}</td>
+
+    <td>
+
+      <button
+        class="btn btn-danger"
+        onclick="removeItem('invoices','${x.id}')">
+        حذف
+      </button>
+
+    </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+
+  </div>
+  `;
 }
 
 
-/* السجلات */
+/* =====================================================
+   السجلات
+===================================================== */
 
 function addRegister(){
 
- if(!val("registerTitle")){
-   alert("اكتب عنوان السجل");
-   return;
- }
+  data.registers.push({
 
- data.registers.push({
-   id:uid(),
-   type:val("registerType"),
-   title:val("registerTitle"),
-   date:val("registerDate")||today(),
-   content:val("registerContent")
- });
+    id:uid(),
 
- saveData();
+    type:val("registerType"),
 
- setVal("registerTitle","");
- setVal("registerContent","");
+    date:val("registerDate") || today(),
 
- renderRegisters();
+    title:val("registerTitle"),
+
+    notes:val("registerNotes")
+
+  });
+
+  saveData();
+
+  setVal("registerDate",today());
+  setVal("registerTitle","");
+  setVal("registerNotes","");
+
+  renderRegisters();
 }
 
 function renderRegisters(){
 
- const box=document.getElementById("registersTable");
+  const box =
+    document.getElementById(
+      "registersTable"
+    );
 
- if(!data.registers.length){
-   box.innerHTML='<div class="empty">لا توجد سجلات</div>';
-   return;
- }
+  if(!data.registers.length){
 
- box.innerHTML=`
-<table>
-<thead>
-<tr>
-<th>نوع السجل</th>
-<th>العنوان</th>
-<th>التاريخ</th>
-<th>المحتوى</th>
-<th>إجراء</th>
-</tr>
-</thead>
-<tbody>
-${data.registers.map(x=>`
-<tr>
-<td>${esc(x.type)}</td>
-<td>${esc(x.title)}</td>
-<td>${esc(x.date)}</td>
-<td>${esc(x.content)}</td>
-<td><button class="btn btn-danger" onclick="removeItem('registers','${x.id}')">حذف</button></td>
-</tr>
-`).join("")}
-</tbody>
-</table>`;
+    box.innerHTML =
+      '<div class="empty">لا توجد سجلات</div>';
+
+    return;
+  }
+
+  box.innerHTML = `
+
+  <div class="table-wrap">
+
+  <table>
+
+  <thead>
+
+  <tr>
+
+    <th>نوع السجل</th>
+    <th>التاريخ</th>
+    <th>الموضوع</th>
+    <th>الملاحظات</th>
+    <th>إجراء</th>
+
+  </tr>
+
+  </thead>
+
+  <tbody>
+
+  ${data.registers.map(x=>`
+
+  <tr>
+
+    <td>${esc(x.type)}</td>
+    <td>${esc(x.date)}</td>
+    <td>${esc(x.title)}</td>
+    <td>${esc(x.notes)}</td>
+
+    <td>
+
+      <button
+        class="btn btn-danger"
+        onclick="removeItem('registers','${x.id}')">
+        حذف
+      </button>
+
+    </td>
+
+  </tr>
+
+  `).join("")}
+
+  </tbody>
+
+  </table>
+
+  </div>
+  `;
 }
 
 
-/* الإعدادات */
+/* =====================================================
+   الإعدادات
+===================================================== */
 
 function saveSettings(){
 
- data.settings.school=val("settingSchool");
- data.settings.year=val("settingYear");
- data.settings.lab=val("settingLab");
+  data.settings = {
 
- saveData();
+    schoolName:
+      val("schoolName"),
 
- alert("تم حفظ الإعدادات");
+    labWorker:
+      val("labWorker"),
+
+    schoolYear:
+      val("schoolYear")
+
+  };
+
+  saveData();
+
+  alert("تم حفظ الإعدادات");
 }
 
 function loadSettings(){
 
- setVal("settingSchool",data.settings.school);
- setVal("settingYear",data.settings.year);
- setVal("settingLab",data.settings.lab);
+  setVal(
+    "schoolName",
+    data.settings.schoolName
+  );
+
+  setVal(
+    "labWorker",
+    data.settings.labWorker
+  );
+
+  setVal(
+    "schoolYear",
+    data.settings.schoolYear
+  );
 }
 
 
-/* تصدير البيانات */
+/* =====================================================
+   حذف
+===================================================== */
 
-function exportData(){
+function removeItem(type,id){
 
- const blob=new Blob(
-   [JSON.stringify(data,null,2)],
-   {type:"application/json"}
- );
+  if(!confirm("هل تريد حذف هذا العنصر؟")){
+    return;
+  }
 
- const url=URL.createObjectURL(blob);
+  if(!Array.isArray(data[type])){
+    return;
+  }
 
- const a=document.createElement("a");
+  data[type] =
+    data[type].filter(
+      x=>x.id !== id
+    );
 
- a.href=url;
- a.download="منصة-المخبري-نسخة-احتياطية.json";
+  saveData();
 
- document.body.appendChild(a);
- a.click();
- a.remove();
+  renderAll();
 
- URL.revokeObjectURL(url);
 }
 
 
-/* حذف البيانات */
+/* =====================================================
+   النسخ الاحتياطي
+===================================================== */
+
+function exportBackup(){
+
+  const backup =
+    JSON.stringify(
+      data,
+      null,
+      2
+    );
+
+  const blob =
+    new Blob(
+      [backup],
+      {
+        type:"application/json"
+      }
+    );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const a =
+    document.createElement("a");
+
+  a.href = url;
+
+  a.download =
+    "منصة-المخبري-نسخة-احتياطية-" +
+    today() +
+    ".json";
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+
+/* =====================================================
+   حذف جميع البيانات
+===================================================== */
 
 function deleteAllData(){
 
- const answer=confirm(
- "تحذير: سيتم حذف جميع بيانات المنصة من هذا الجهاز. هل أنت متأكد؟"
- );
+  const ok =
+    confirm(
+      "تحذير: سيتم حذف جميع بيانات المنصة من هذا الجهاز. هل أنت متأكد؟"
+    );
 
- if(!answer) return;
+  if(!ok){
+    return;
+  }
 
- localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(
+    STORAGE_KEY
+  );
 
- data=JSON.parse(JSON.stringify(defaultData));
-
- renderAll();
-
- alert("تم حذف البيانات");
+  location.reload();
 }
 
 
-/* تشغيل جميع الجداول */
+/* =====================================================
+   تحديث كل الجداول
+===================================================== */
 
 function renderAll(){
 
- renderTeachers();
- renderRequests();
- renderProgression();
- renderExperiments();
- renderPreparation();
- renderInventory();
- renderChemicals();
- renderMovements();
- renderDaily();
- renderReports();
- renderInvoices();
- renderRegisters();
+  renderTeachers();
+  renderRequests();
+  renderProgression();
+  renderExperiments();
+  renderPreparation();
+  renderInventory();
+  renderChemicals();
+  renderMovements();
+  renderDailyReports();
+  renderReports();
+  renderInvoices();
+  renderRegisters();
 
- loadSettings();
+  updateInventoryCounts();
+  updateDashboard();
+  loadSettings();
 
- updateDashboard();
 }
 
 
-/* تشغيل المنصة */
+/* =====================================================
+   التشغيل
+===================================================== */
 
-document.addEventListener("DOMContentLoaded",function(){
+function initializeDates(){
 
- document.getElementById("requestDate").value=today();
- document.getElementById("prepDate").value=today();
- document.getElementById("dailyDate").value=today();
- document.getElementById("dailyTime").value=currentTime();
- document.getElementById("reportDate").value=today();
- document.getElementById("invoiceDate").value=today();
- document.getElementById("registerDate").value=today();
+  setVal("requestDate",today());
 
- renderAll();
+  setVal("progDate",today());
 
-});
+  setVal("prepDate",today());
+
+  setVal("invDate",today());
+
+  setVal("moveDate",today());
+
+  setVal("moveTime",currentTime());
+
+  setVal("dailyDate",today());
+
+  setVal("dailyTime",currentTime());
+
+  setVal("invoiceDate",today());
+
+  setVal("registerDate",today());
+
+}
+
+loadData();
+
+initializeDates();
+
+renderAll();
+
+showSection("home");
 
 </script>
 
