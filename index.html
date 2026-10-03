@@ -218,43 +218,10 @@ const supabaseClient = window.supabase.createClient(
 </head>
 <body>
 <script>
-window.addEventListener("DOMContentLoaded", function(){
-  if (new URLSearchParams(location.search).get("teacher") === "1") {
 
-    document.getElementById("activationBox").style.display = "none";
-    document.getElementById("loginBox").style.display = "none";
-
-    const nav = document.getElementById("mainNav");
-
-    if (nav) {
-      nav.querySelectorAll("button").forEach(function(btn){
-        if (
-          !btn.textContent.includes("الطلبات") &&
-          !btn.textContent.includes("التدرج") &&
-          !btn.textContent.includes("منوعات")
-        ) {
-          btn.style.display = "none";
-        }
-      });
-      document.querySelectorAll(".section").forEach(function(sec){
-      sec.style.display = "none";
-    });
-
-    document.getElementById("requests").style.display = "block";
-
-document.querySelector("header h1").textContent = "👨‍🏫 فضاء الأستاذ";
-    document.getElementById("progress").style.display = "block";
-    document.getElementById("various").style.display = "block";
-    }
-  }
-});
 </script>
 <script>
-if (new URLSearchParams(location.search).get("teacher") === "1") {
-  document.getElementById("activationBox").style.display = "none";
-  document.querySelector("header h1").textContent = "👨‍🏫 فضاء الأستاذ";
-  document.getElementById("loginBox").style.display = "none";
-}
+
 </script>
 <div id="activationBox" style="position:fixed;inset:0;background:#f4f7fb;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px">
   <div style="background:white;padding:25px;border-radius:15px;max-width:420px;width:100%;text-align:center;box-shadow:0 4px 20px #0002">
@@ -2775,23 +2742,70 @@ async function loginUser(){
   }
 
   document.getElementById("loginBox").style.display = "none";
-await loadUserRole();
-await hideTeacherSections();
+await applyTeacherAccess();
 message.textContent = "";
 }
 </script> 
   <script>
 async function loadUserRole(){
 
-  const { data, error } = await supabaseClient.rpc("get_my_role");
+  const { data, error } =
+    await supabaseClient.rpc("get_my_role");
 
   if(error){
     console.error(error);
-    return;
+    return null;
   }
 
-  alert("صلاحية المستخدم: " + data);
+  return data;
+}
+    async function applyTeacherAccess(){
+
+  const role = await loadUserRole();
+
+  if(role !== "teacher") return;
+
+  const allowed = ["requests", "progress", "various"];
+
+  document.querySelectorAll(".section").forEach(function(sec){
+
+    if(!allowed.includes(sec.id)){
+      sec.classList.add("teacher-hidden");
+      sec.classList.remove("active");
+    }else{
+      sec.classList.remove("teacher-hidden");
     }
+
+  });
+
+  const nav = document.getElementById("mainNav");
+
+  if(nav){
+
+    nav.querySelectorAll("button").forEach(function(btn){
+
+      const text = btn.textContent;
+
+      const allowedButton =
+        text.includes("الطلبات") ||
+        text.includes("التدرج") ||
+        text.includes("منوعات");
+
+      btn.style.display =
+        allowedButton ? "" : "none";
+
+    });
+
+  }
+
+  const title = document.querySelector("header h1");
+
+  if(title){
+    title.textContent = "👨‍🏫 فضاء الأستاذ";
+  }
+
+  show("requests");
+}
 </script>
  <script>
 async function logoutUser(){
@@ -2800,31 +2814,7 @@ async function logoutUser(){
 }
 </script> 
 <script>
-async function applyRoleAccess(){
 
-  const { data: role } = await supabaseClient.rpc("get_my_role");
-
-  if(role !== "teacher") return;
-
-  const nav = document.getElementById("mainNav");
-  if(!nav) return;
-
-  nav.querySelectorAll("button").forEach(function(btn){
-
-    if(
-  !btn.textContent.includes("الطلبات") &&
-  !btn.textContent.includes("التدرج") &&
-  !btn.textContent.includes("منوعات")
-){
-  btn.style.display = "none";
-}
-
-  });
-
-  show("requests");
-}
-
-applyRoleAccess();
 </script>  
  <script>
 async function sendTeacherRequest(){
@@ -3095,26 +3085,7 @@ async function renderRequests(){
 
   }).join("");
 }
-async function hideTeacherSections(){
-  const { data: role } =
-    await supabaseClient.rpc("get_my_role");
 
-  if(role !== "teacher") return;
-
-  const allowed = ["requests", "progress", "various"];
-
-  document.querySelectorAll(".section").forEach(function(sec){
-
-    if(!allowed.includes(sec.id)){
-      sec.style.display = "none";
-    }
-
-  });
-
-  show("requests");
-}
-
-hideTeacherSections();
 </script> 
 </body>
 </html> 
