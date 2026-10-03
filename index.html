@@ -2962,7 +2962,8 @@ async function sendTeacherRequest(){
           request_date:
             new Date().toISOString().slice(0,10),
           status: "جديد",
-          notes: notes
+is_read: false,
+notes:
         });
 
     if(error){
