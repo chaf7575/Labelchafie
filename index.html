@@ -282,6 +282,45 @@ const supabaseClient = window.supabase.createClient(
 <p class="small">إدارة أعمال المخبر.</p>
 </div>
 </div>
+ <!-- إشعار طلبات الأساتذة -->
+<div id="requestsNotification" style="
+  background:linear-gradient(135deg,#fff8e1,#ffffff);
+  border:1px solid #f0c36d;
+  border-right:6px solid #e6a700;
+  border-radius:14px;
+  padding:18px;
+  margin:18px 0;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+">
+
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="font-size:32px;">🔔</div>
+
+    <div>
+      <h3 style="margin:0 0 6px;">
+        طلبات الأساتذة
+      </h3>
+
+      <p id="requestsNotificationText" style="margin:0;">
+        جارٍ التحقق من الطلبات...
+      </p>
+    </div>
+  </div>
+
+  <button
+    onclick="show('requests')"
+    style="
+      margin-top:14px;
+      padding:10px 18px;
+      border:0;
+      border-radius:8px;
+      cursor:pointer;
+    "
+  >
+    📨 عرض الطلبات
+  </button>
+
+</div> 
 
 <div class="stats">
 
