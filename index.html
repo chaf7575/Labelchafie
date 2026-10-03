@@ -2657,7 +2657,31 @@ function renderStats(){
 
 
 function renderAll(){
+async function updateRequestsNotification(){
 
+  const box = document.getElementById("requestsNotificationText");
+
+  if(!box) return;
+
+  const { count, error } = await supabaseClient
+    .from("requests")
+    .select("*", { count: "exact", head: true });
+
+  if(error){
+    console.error("Requests notification error:", error);
+    box.textContent = "تعذر التحقق من الطلبات";
+    return;
+  }
+
+  if(count === 0){
+    box.textContent = "لا توجد طلبات من الأساتذة حاليًا";
+  }else if(count === 1){
+    box.textContent = "لديك طلب واحد من الأساتذة";
+  }else{
+    box.textContent = "لديك " + count + " طلبات من الأساتذة";
+  }
+
+}
   renderStats();
 
   renderCats();
@@ -2677,7 +2701,7 @@ function renderAll(){
   renderAV();
 
   renderProgress();
-
+updateRequestsNotification();
 }
 
 
