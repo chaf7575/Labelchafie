@@ -2851,9 +2851,15 @@ async function loadUserRole(){
     await supabaseClient.rpc("get_my_role");
 
   if(error){
+
     console.error(error);
+
+    alert("خطأ في معرفة صلاحية الحساب: " + error.message);
+
     return null;
   }
+
+  alert("صلاحية الحساب: " + data);
 
   return data;
 }
