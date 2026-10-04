@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>طلب الوسائل المخبرية</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f4f7fb;
+  color:#1f2937;
+}
+
+.container{
+  max-width:600px;
+  margin:30px auto;
+  padding:20px;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 5px 20px rgba(0,0,0,.08);
+}
+
+h1{
+  text-align:center;
+  color:#14532d;
+  margin-bottom:25px;
+}
+
+label{
+  display:block;
+  margin-top:15px;
+  font-weight:bold;
+}
+
+input, textarea{
+  width:100%;
+  box-sizing:border-box;
+  margin-top:7px;
+  padding:13px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+  font-size:16px;
+}
+
+textarea{
+  min-height:120px;
+  resize:vertical;
+}
+
+button{
+  width:100%;
+  margin-top:22px;
+  padding:15px;
+  border:0;
+  border-radius:12px;
+  background:#15803d;
+  color:white;
+  font-size:18px;
+  font-weight:bold;
+}
+
+button:active{
+  transform:scale(.98);
+}
+
+#message{
+  text-align:center;
+  margin-top:15px;
+  font-weight:bold;
+}
+</style></head><body><div class="container"><div class="card"><h1>🧪 طلب الوسائل المخبرية</h1><label>
+اسم الأستاذ
+<input id="teacher" type="text" placeholder="اكتب اسمك">
+</label><label>
+القسم
+<input id="className" type="text" placeholder="مثال: 1 متوسط">
+</label><label>
+الوسائل المطلوبة
+<textarea id="requestText"
+placeholder="اكتب الوسائل التي تحتاجها..."></textarea>
+</label><button onclick="sendRequest()">
+📨 إرسال الطلب
+</button><div id="message"></div></div></div><script>
+
+const SUPABASE_URL =
+"https://niedzlyvricaofqasohe.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_iDvPZL5m8A_bfItO0Q9muA_VHJU5-V_";
+
+const supabaseClient =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+async function sendRequest(){
+
+  const teacher =
+    document.getElementById("teacher").value.trim();
+
+  const className =
+    document.getElementById("className").value.trim();
+
+  const requestText =
+    document.getElementById("requestText").value.trim();
+
+  const message =
+    document.getElementById("message");
+
+  if(!teacher || !className || !requestText){
+
+    message.textContent =
+      "⚠️ يرجى ملء جميع المعلومات";
+
+    return;
+  }
+
+  message.textContent =
+    "جارٍ إرسال الطلب...";
+
+  const { error } =
+    await supabaseClient
+      .from("requests")
+      .insert({
+
+        teacher: teacher,
+
+        class_name: className,
+
+        request_text: requestText,
+
+        request_date:
+          new Date().toISOString().slice(0,10)
+
+      });
+
+  if(error){
+
+    console.error(error);
+
+    message.textContent =
+      "❌ حدث خطأ أثناء إرسال الطلب";
+
+    return;
+  }
+
+  message.textContent =
+    "✅ تم إرسال طلبك بنجاح";
+
+  document.getElementById("teacher").value = "";
+  document.getElementById("className").value = "";
+  document.getElementById("requestText").value = "";
+
+}
+
+</script></body>
+</html>
