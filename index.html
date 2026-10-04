@@ -2710,7 +2710,16 @@ async function updateRequestsNotification(){
   }
 
 }
+const activated =
+  localStorage.getItem("LAB_ACTIVATED") === "true";
 
+if(activated){
+
+  document.getElementById("activationBox").style.display = "none";
+
+  document.getElementById("loginBox").style.display = "flex";
+
+}
 /* =========================
    تشغيل أولي
 ========================= */
