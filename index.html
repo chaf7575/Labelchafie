@@ -2002,6 +2002,50 @@ function saveDaily(){
     return;
   }
 
+  if(editingDailyId){
+
+    const x=db.daily.find(y=>y.id===editingDailyId);
+
+    if(!x)return;
+
+    x.date=
+      document.getElementById('ddate').value||today();
+
+    x.rows=
+      JSON.parse(JSON.stringify(dailyRows));
+
+    x.general=
+      document.getElementById('dgen').value.trim();
+
+    x.needs=
+      document.getElementById('dneeds').value.trim();
+
+    save();
+
+    document.getElementById('rno').textContent=
+      x.number;
+
+    document.getElementById('rdate').textContent=
+      x.date;
+
+    document.getElementById('pgen').textContent=
+      x.general;
+
+    document.getElementById('pneeds').textContent=
+      x.needs;
+
+    editingDailyId=null;
+
+    dailyRows=[];
+
+    renderDailyRows();
+    renderSavedDaily();
+
+    alert('تم تعديل التقرير بنجاح');
+
+    return;
+  }
+
   const x={
 
     id:id(),
@@ -2068,6 +2112,11 @@ function renderSavedDaily(){
             فتح
           </button>
 
+          <button
+            onclick="editDaily('${x.id}')">
+            ✏️ تعديل
+          </button>
+
           <button class="danger"
             onclick="delDaily('${x.id}')">
             حذف
@@ -2081,12 +2130,14 @@ function renderSavedDaily(){
 
 }
 
-
+let editingDailyId = null;
 function loadDaily(id){
 
   const x=db.daily.find(y=>y.id===id);
 
   if(!x)return;
+
+  editingDailyId=id;
 
   document.getElementById('rno').textContent=
     x.number;
@@ -2100,6 +2151,15 @@ function loadDaily(id){
   document.getElementById('pneeds').textContent=
     x.needs||'';
 
+  document.getElementById('ddate').value=
+    x.date||'';
+
+  document.getElementById('dgen').value=
+    x.general||'';
+
+  document.getElementById('dneeds').value=
+    x.needs||'';
+
   dailyRows=
     JSON.parse(JSON.stringify(x.rows||[]));
 
@@ -2108,7 +2168,31 @@ function loadDaily(id){
   show('daily');
 }
 
+function editDaily(id){
 
+  const x=db.daily.find(y=>y.id===id);
+
+  if(!x)return;
+
+  editingDailyId=id;
+
+  document.getElementById('ddate').value=
+    x.date||'';
+
+  document.getElementById('dgen').value=
+    x.general||'';
+
+  document.getElementById('dneeds').value=
+    x.needs||'';
+
+  dailyRows=
+    JSON.parse(JSON.stringify(x.rows||[]));
+
+  renderDailyRows();
+
+  show('daily');
+
+}
 function delDaily(id){
 
   if(!confirm('حذف التقرير؟'))return;
