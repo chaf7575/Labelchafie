@@ -196,18 +196,35 @@ footer{
 }
 
 @media print{
+
   header,nav,.no-print,footer{
     display:none!important
   }
+
   .section{
     display:none!important
   }
+
   .section.printing{
     display:block!important
   }
+
   .card{
     box-shadow:none
   }
+
+  .daily-signatures{
+    display:flex!important;
+    justify-content:space-between!important;
+    align-items:flex-start!important;
+    width:100%!important;
+  }
+
+  .daily-signatures > div{
+    width:45%!important;
+    text-align:center!important;
+  }
+
 }
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
@@ -2219,7 +2236,6 @@ function printDaily(){
     s.classList.remove('printing');
   },500);
 }
-
 
 function mailDaily(){
 
