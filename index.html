@@ -2121,7 +2121,35 @@ function renderDailyRows(){
   `).join('');
 
 }
+function editDailyRow(index){
 
+  const x = dailyRows[index];
+
+  if(!x) return;
+
+  document.getElementById('dteach').value =
+    x.teacher || '';
+
+  document.getElementById('dclass').value =
+    x.class_name || '';
+
+  document.getElementById('dtime').value =
+    x.time || '';
+
+  document.getElementById('dexp').value =
+    x.experiment || '';
+
+  document.getElementById('dequip').value =
+    x.equipment || '';
+
+  document.getElementById('dnote').value =
+    x.notes || '';
+
+  dailyRows.splice(index,1);
+
+  renderDailyRows();
+
+}
 function renderSavedDaily(){
 
   document.getElementById('savedDaily').innerHTML=
