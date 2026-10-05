@@ -1979,23 +1979,6 @@ function addDailyRow(){
 }
 
 
-function renderDailyRows(){
-
-  document.getElementById('dailyBody').innerHTML=
-    dailyRows.map(x=>`
-
-      <tr>
-        <td>${esc(x.teacher)}</td>
-        <td>${esc(x.class_name)}</td>
-        <td>${esc(x.time)}</td>
-        <td>${esc(x.experiment)}</td>
-        <td>${esc(x.equipment)}</td>
-        <td>${esc(x.notes)}</td>
-      </tr>
-
-    `).join('');
-
-}
 
 
 function saveDaily(){
@@ -2095,7 +2078,49 @@ function saveDaily(){
 
   alert('تم حفظ التقرير');
 }
+function renderDailyRows(){
 
+  const body =
+    document.getElementById('dailyBody');
+
+  if(!body) return;
+
+  if(!dailyRows || dailyRows.length === 0){
+
+    body.innerHTML =
+      '<tr><td colspan="9">لا توجد صفوف</td></tr>';
+
+    return;
+  }
+
+  body.innerHTML = dailyRows.map((x,index)=>`
+
+    <tr>
+
+      <td>${esc(x.teacher || '')}</td>
+      <td>${esc(x.class_name || '')}</td>
+      <td>${esc(x.date || '')}</td>
+      <td>${esc(x.time || '')}</td>
+      <td>${esc(x.experiment || '')}</td>
+      <td>${esc(x.equipment || '')}</td>
+      <td>${esc(x.notes || '')}</td>
+      <td>${esc(x.status || '')}</td>
+
+      <td class="no-print">
+
+        <button
+          class="primary"
+          onclick="editDailyRow(${index})">
+          ✏️ تعديل
+        </button>
+
+      </td>
+
+    </tr>
+
+  `).join('');
+
+}
 
 function renderSavedDaily(){
 
