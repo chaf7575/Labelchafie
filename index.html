@@ -2990,11 +2990,20 @@ async function loginUser(){
     return;
   }
 
-  document.getElementById("loginBox").style.display = "none";
+document.getElementById("loginBox").style.display = "none";
+
+document.querySelectorAll(".section").forEach(function(sec){
+  sec.classList.remove("teacher-hidden");
+  sec.classList.add("active");
+});
+
+document.querySelectorAll("#mainNav button").forEach(function(btn){
+  btn.style.display = "";
+});
 
 message.textContent = "";
 }
-</script> 
+</script>
   <script>
 async function loadUserRole(){
 
