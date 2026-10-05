@@ -900,20 +900,22 @@ if (new URLSearchParams(location.search).get("teacher") === "1") {
 
 <table>
 
+<table>
+
 <thead>
 <tr>
 <th>الأستاذ</th>
 <th>القسم</th>
-<th>التاريخ</th>
-<th>الوقت</th>
-<th>التجربة</th>
-<th>الوسائل</th>
+<th>عنوان التجربة</th>
+<th>تاريخ الاحتياج</th>
+<th>تاريخ الطلب</th>
+<th>النوع</th>
+<th>الوسائل المطلوبة</th>
 <th>ملاحظة</th>
 <th>الحالة</th>
 <th class="no-print">إجراء</th>
 </tr>
 </thead>
-
 <tbody id="reqBody"></tbody>
 
 </table>
@@ -1156,17 +1158,16 @@ if (new URLSearchParams(location.search).get("teacher") === "1") {
 
 <thead>
 <tr>
-<th>الرقم</th>
-<th>التاريخ</th>
-<th>الجهاز</th>
+<th>الأستاذ</th>
+<th>القسم</th>
+<th>عنوان التجربة</th>
+<th>تاريخ الاحتياج</th>
+<th>تاريخ الطلب</th>
 <th>النوع</th>
-<th>رقم الجرد</th>
-<th>الكمية</th>
+<th>الوسائل المطلوبة</th>
+<th>الوسائل</th>
+<th>ملاحظة</th>
 <th>الحالة</th>
-<th>المكان</th>
-<th>المستعمل</th>
-<th>الغرض</th>
-<th>ملاحظات</th>
 <th class="no-print">إجراء</th>
 </tr>
 </thead>
@@ -2293,6 +2294,8 @@ async function renderRequests(){
     <tr>
       <td>${esc(x.teacher || "")}</td>
       <td>${esc(x.class_name || "")}</td>
+      <td>${esc(x.experiment_title || "")}</td>
+<td>${esc(x.need_date || "")}</td>
       <td>${esc(x.request_date || "")}</td>
       <td>—</td>
       <td>${esc(x.request_text || "")}</td>
