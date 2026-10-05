@@ -3019,11 +3019,8 @@ async function loadUserRole(){
   document.querySelectorAll(".section").forEach(function(sec){
 
     if(!allowed.includes(sec.id)){
-      sec.classList.add("teacher-hidden");
-      sec.classList.remove("active");
-    }else{
-      sec.classList.remove("teacher-hidden");
-    }
+  sec.classList.remove("teacher-hidden");
+}
 
   });
 
