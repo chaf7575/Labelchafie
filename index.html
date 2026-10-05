@@ -2317,134 +2317,56 @@ function renderProgress(){
    الطلبات
 ========================= */
 
-async function sendRequest(){
+function sendRequest(){
 
-  const teacher =
-    document.getElementById('tname').value.trim();
+  const x={
 
-  const className =
-    document.getElementById('tclass').value.trim();
+    id:id(),
 
-  const requestDate =
-    document.getElementById('tdate').value || today();
+    teacher:
+      document.getElementById('tname').value.trim(),
 
-  const time =
-    document.getElementById('ttime').value || nowTime();
+    class_name:
+      document.getElementById('tclass').value.trim(),
 
-  const experiment =
-    document.getElementById('texp').value.trim();
+    date:
+      document.getElementById('tdate').value||today(),
 
-  const tools =
-    document.getElementById('ttools').value.trim();
+    time:
+      document.getElementById('ttime').value||nowTime(),
 
-  const notes =
-    document.getElementById('tnote').value.trim();
+    experiment:
+      document.getElementById('texp').value.trim(),
 
-  const message =
-    document.getElementById('tmsg');
+    tools:
+      document.getElementById('ttools').value.trim(),
 
-  if(!teacher || !className || !experiment){
+    notes:
+      document.getElementById('tnote').value.trim(),
 
-    message.textContent =
-      '⚠️ أكمل اسم الأستاذ والقسم والتجربة';
+    status:'جديد'
 
+  };
+
+  if(!x.teacher){
+    alert('أدخل اسم الأستاذ');
     return;
   }
 
-  message.textContent =
-    'جارٍ إرسال الطلب...';
+  db.requests.push(x);
 
-  const allNotes =
-    tools +
-    (notes ? ' | ' + notes : '') +
-    (time ? ' | الوقت: ' + time : '');
+  save();
 
-  const { error } =
-    await supabaseClient
-      .from('requests')
-      .insert({
+  document.getElementById('tmsg').innerHTML=
+    '<div class="success">تم إرسال الطلب بنجاح.</div>';
 
-async function sendRequest(){
-
-  const teacher =
-    document.getElementById('tname').value.trim();
-
-  const className =
-    document.getElementById('tclass').value.trim();
-
-  const needDate =
-    document.getElementById('tdate').value || today();
-
-  const time =
-    document.getElementById('ttime').value || nowTime();
-
-  const experiment =
-    document.getElementById('texp').value.trim();
-
-  const tools =
-    document.getElementById('ttools').value.trim();
-
-  const notes =
-    document.getElementById('tnote').value.trim();
-
-  const message =
-    document.getElementById('tmsg');
-
-  if(!teacher || !className || !experiment){
-
-    message.textContent =
-      '⚠️ أكمل اسم الأستاذ والقسم والتجربة';
-
-    return;
-  }
-
-  message.textContent =
-    'جارٍ إرسال الطلب...';
-
-  const { error } =
-    await supabaseClient
-      .from('requests')
-      .insert({
-
-        teacher: teacher,
-
-        class_name: className,
-
-        need_date: needDate,
-
-        request_text: experiment,
-
-        tools: tools,
-
-        notes: notes,
-
-        status: 'جديد',
-
-        is_read: false
-
-      });
-
-  if(error){
-
-    console.error(error);
-
-    message.textContent =
-      '❌ حدث خطأ أثناء إرسال الطلب';
-
-    return;
-  }
-
-  message.innerHTML =
-    '<div class="success">✅ تم إرسال الطلب بنجاح</div>';
-
-  document.getElementById('tname').value = '';
-  document.getElementById('tclass').value = '';
-  document.getElementById('texp').value = '';
-  document.getElementById('ttools').value = '';
-  document.getElementById('tnote').value = '';
-
-  await renderRequests();
+  document.getElementById('tname').value='';
+  document.getElementById('tclass').value='';
+  document.getElementById('texp').value='';
+  document.getElementById('ttools').value='';
+  document.getElementById('tnote').value='';
 }
+
 
 
 async function renderRequests(){
@@ -2990,20 +2912,11 @@ async function loginUser(){
     return;
   }
 
-document.getElementById("loginBox").style.display = "none";
-
-document.querySelectorAll(".section").forEach(function(sec){
-  sec.classList.remove("teacher-hidden");
-  sec.classList.add("active");
-});
-
-document.querySelectorAll("#mainNav button").forEach(function(btn){
-  btn.style.display = "";
-});
-
+  document.getElementById("loginBox").style.display = "none";
+await applyTeacherAccess();
 message.textContent = "";
 }
-</script>
+</script> 
   <script>
 async function loadUserRole(){
 
@@ -3028,8 +2941,11 @@ async function loadUserRole(){
   document.querySelectorAll(".section").forEach(function(sec){
 
     if(!allowed.includes(sec.id)){
-  sec.classList.remove("teacher-hidden");
-}
+      sec.classList.add("teacher-hidden");
+      sec.classList.remove("active");
+    }else{
+      sec.classList.remove("teacher-hidden");
+    }
 
   });
 
