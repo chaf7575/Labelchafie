@@ -2317,54 +2317,89 @@ function renderProgress(){
    الطلبات
 ========================= */
 
-function sendRequest(){
+async function sendRequest(){
 
-  const x={
+  const teacher =
+    document.getElementById('tname').value.trim();
 
-    id:id(),
+  const className =
+    document.getElementById('tclass').value.trim();
 
-    teacher:
-      document.getElementById('tname').value.trim(),
+  const requestDate =
+    document.getElementById('tdate').value || today();
 
-    class_name:
-      document.getElementById('tclass').value.trim(),
+  const time =
+    document.getElementById('ttime').value || nowTime();
 
-    date:
-      document.getElementById('tdate').value||today(),
+  const experiment =
+    document.getElementById('texp').value.trim();
 
-    time:
-      document.getElementById('ttime').value||nowTime(),
+  const tools =
+    document.getElementById('ttools').value.trim();
 
-    experiment:
-      document.getElementById('texp').value.trim(),
+  const notes =
+    document.getElementById('tnote').value.trim();
 
-    tools:
-      document.getElementById('ttools').value.trim(),
+  const message =
+    document.getElementById('tmsg');
 
-    notes:
-      document.getElementById('tnote').value.trim(),
+  if(!teacher || !className || !experiment){
 
-    status:'جديد'
+    message.textContent =
+      '⚠️ أكمل اسم الأستاذ والقسم والتجربة';
 
-  };
-
-  if(!x.teacher){
-    alert('أدخل اسم الأستاذ');
     return;
   }
 
-  db.requests.push(x);
+  message.textContent =
+    'جارٍ إرسال الطلب...';
 
-  save();
+  const allNotes =
+    tools +
+    (notes ? ' | ' + notes : '') +
+    (time ? ' | الوقت: ' + time : '');
 
-  document.getElementById('tmsg').innerHTML=
-    '<div class="success">تم إرسال الطلب بنجاح.</div>';
+  const { error } =
+    await supabaseClient
+      .from('requests')
+      .insert({
 
-  document.getElementById('tname').value='';
-  document.getElementById('tclass').value='';
-  document.getElementById('texp').value='';
-  document.getElementById('ttools').value='';
-  document.getElementById('tnote').value='';
+        teacher: teacher,
+
+        class_name: className,
+
+        request_date: requestDate,
+
+        request_text: experiment,
+
+        notes: allNotes,
+
+        status: 'جديد',
+
+        is_read: false
+
+      });
+
+  if(error){
+
+    console.error(error);
+
+    message.textContent =
+      '❌ حدث خطأ أثناء إرسال الطلب';
+
+    return;
+  }
+
+  message.innerHTML =
+    '<div class="success">✅ تم إرسال الطلب بنجاح</div>';
+
+  document.getElementById('tname').value = '';
+  document.getElementById('tclass').value = '';
+  document.getElementById('texp').value = '';
+  document.getElementById('ttools').value = '';
+  document.getElementById('tnote').value = '';
+
+  await renderRequests();
 }
 
 
