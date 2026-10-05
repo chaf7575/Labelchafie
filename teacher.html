@@ -76,7 +76,19 @@ button:active{
 <input id="teacher" type="text" placeholder="اكتب اسمك">
 </label><label>
 القسم
+<label>
+القسم
 <input id="className" type="text" placeholder="مثال: 1 متوسط">
+</label>
+
+<label>
+عنوان التجربة
+<input id="experimentTitle" type="text" placeholder="مثال: قانون أوم">
+</label>
+
+<label>
+تاريخ الاحتياج
+<input id="needDate" type="date">
 </label><label>
 الوسائل المطلوبة
 <textarea id="requestText"
@@ -107,16 +119,21 @@ async function sendRequest(){
 
   const requestText =
     document.getElementById("requestText").value.trim();
+const experimentTitle =
+  document.getElementById("experimentTitle").value.trim();
 
+const needDate =
+  document.getElementById("needDate").value;
   const message =
     document.getElementById("message");
 
-  if(!teacher || !className || !requestText){
+  if(!teacher || !className || !experimentTitle || !needDate || !requestText){
 
-    message.textContent =
-      "⚠️ يرجى ملء جميع المعلومات";
+  message.textContent =
+    "⚠️ يرجى ملء جميع المعلومات";
 
-    return;
+  return;
+}
   }
 
   message.textContent =
@@ -127,16 +144,20 @@ async function sendRequest(){
       .from("requests")
       .insert({
 
-        teacher: teacher,
+  teacher: teacher,
 
-        class_name: className,
+  class_name: className,
 
-        request_text: requestText,
+  experiment_title: experimentTitle,
 
-        request_date:
-          new Date().toISOString().slice(0,10)
+  need_date: needDate,
 
-      });
+  request_text: requestText,
+
+  request_date:
+    new Date().toISOString().slice(0,10)
+
+});
 
   if(error){
 
