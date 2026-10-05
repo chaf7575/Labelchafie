@@ -2364,15 +2364,59 @@ async function sendRequest(){
       .from('requests')
       .insert({
 
+async function sendRequest(){
+
+  const teacher =
+    document.getElementById('tname').value.trim();
+
+  const className =
+    document.getElementById('tclass').value.trim();
+
+  const needDate =
+    document.getElementById('tdate').value || today();
+
+  const time =
+    document.getElementById('ttime').value || nowTime();
+
+  const experiment =
+    document.getElementById('texp').value.trim();
+
+  const tools =
+    document.getElementById('ttools').value.trim();
+
+  const notes =
+    document.getElementById('tnote').value.trim();
+
+  const message =
+    document.getElementById('tmsg');
+
+  if(!teacher || !className || !experiment){
+
+    message.textContent =
+      '⚠️ أكمل اسم الأستاذ والقسم والتجربة';
+
+    return;
+  }
+
+  message.textContent =
+    'جارٍ إرسال الطلب...';
+
+  const { error } =
+    await supabaseClient
+      .from('requests')
+      .insert({
+
         teacher: teacher,
 
         class_name: className,
 
-        request_date: requestDate,
+        need_date: needDate,
 
         request_text: experiment,
 
-        notes: allNotes,
+        tools: tools,
+
+        notes: notes,
 
         status: 'جديد',
 
@@ -2401,7 +2445,6 @@ async function sendRequest(){
 
   await renderRequests();
 }
-
 
 
 async function renderRequests(){
