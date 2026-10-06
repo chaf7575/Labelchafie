@@ -3464,37 +3464,55 @@ async function renderRequests(){
 
     console.error(error);
 
-    body.innerHTML = data.map(x => `
+    body.innerHTML =
+      '<tr><td colspan="9">❌ تعذر تحميل الطلبات</td></tr>';
 
-  <tr>
+    return;
+  }
 
-    <td>${esc(x.teacher || "")}</td>
+  if(!data || data.length === 0){
 
-    <td>${esc(x.class_name || "")}</td>
+    body.innerHTML =
+      '<tr><td colspan="9">لا توجد طلبات</td></tr>';
 
-    <td>${esc(x.request_date || "")}</td>
+    return;
+  }
 
-    <td>${esc(x.request_text || "")}</td>
+  body.innerHTML = data.map(x => `
 
-    <td>${esc(x.tools || "")}</td>
+    <tr>
 
-    <td>${esc(x.notes || "")}</td>
+      <td>${esc(x.teacher || "")}</td>
 
-    <td>${esc(x.execution_date || "—")}</td>
+      <td>${esc(x.class_name || "")}</td>
 
-    <td>${esc(x.execution_time || "—")}</td>
+      <td>${esc(x.request_date || "")}</td>
 
-    <td class="no-print">
-      <button
-        type="button"
-        onclick="deleteRequest('${x.id}')">
-        🗑️ حذف
-      </button>
-    </td>
+      <td>${esc(x.request_text || "")}</td>
 
-  </tr>
+      <td>${esc(x.tools || "")}</td>
 
-`).join("");
+      <td>${esc(x.notes || "")}</td>
+
+      <td>${esc(x.execution_date || "—")}</td>
+
+      <td>${esc(x.execution_time || "—")}</td>
+
+      <td class="no-print">
+
+        <button
+          type="button"
+          onclick="deleteRequest('${x.id}')">
+          🗑️ حذف
+        </button>
+
+      </td>
+
+    </tr>
+
+  `).join("");
+
+}
 }
 async function deleteRequest(id){
 
