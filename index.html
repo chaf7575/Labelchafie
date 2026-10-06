@@ -2461,49 +2461,92 @@ function renderProgress(){
 /* =========================
    الطلبات
 ========================= */
+async function sendTeacherRequest(){
 
-function sendRequest(){
+  const teacher =
+    document.getElementById('reqTeacher').value.trim();
 
-  const x={
+  const className =
+    document.getElementById('reqClass').value.trim();
 
-    id:id(),
+  const requestText =
+    document.getElementById('reqText').value.trim();
 
-    teacher:
-      document.getElementById('tname').value.trim(),
+  const tools =
+    document.getElementById('reqTools').value.trim();
 
-    class_name:
-      document.getElementById('tclass').value.trim(),
+  const notes =
+    document.getElementById('reqNote').value.trim();
 
-    date:
-      document.getElementById('tdate').value||today(),
+  const message =
+    document.getElementById('reqMessage');
 
-    time:
-      document.getElementById('ttime').value||nowTime(),
+  if(!teacher){
 
-    experiment:
-      document.getElementById('texp').value.trim(),
+    message.innerHTML =
+      '<div class="error">أدخل اسم الأستاذ</div>';
 
-    tools:
-      document.getElementById('ttools').value.trim(),
-
-    notes:
-      document.getElementById('tnote').value.trim(),
-
-    status:'جديد'
-
-  };
-
-  if(!x.teacher){
-    alert('أدخل اسم الأستاذ');
     return;
   }
 
-  db.requests.push(x);
+  if(!requestText){
 
-  save();
+    message.innerHTML =
+      '<div class="error">أدخل التجربة أو النشاط المطلوب</div>';
 
-  document.getElementById('tmsg').innerHTML=
-    '<div class="success">تم إرسال الطلب بنجاح.</div>';
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .from('requests')
+      .insert({
+
+        teacher: teacher,
+
+        class_name: className,
+
+        request_text: requestText,
+
+        tools: tools,
+
+        request_date:
+          new Date().toISOString().slice(0,10),
+
+        status: 'جديد',
+
+        is_read: false,
+
+        notes: notes
+
+      });
+
+  if(error){
+
+    console.error(error);
+
+    message.innerHTML =
+      '<div class="error">❌ حدث خطأ أثناء إرسال الطلب</div>';
+
+    return;
+  }
+
+  message.innerHTML =
+    '<div class="success">✅ تم إرسال الطلب بنجاح</div>';
+
+  document.getElementById('reqTeacher').value = '';
+  document.getElementById('reqClass').value = '';
+  document.getElementById('reqText').value = '';
+  document.getElementById('reqTools').value = '';
+  document.getElementById('reqNote').value = '';
+
+  if(typeof renderRequests === 'function'){
+
+    await renderRequests();
+
+  }
+
+}
 
   document.getElementById('tname').value='';
   document.getElementById('tclass').value='';
