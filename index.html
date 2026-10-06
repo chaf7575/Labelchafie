@@ -2077,6 +2077,30 @@ async function saveDaily(){
 
   alert('تم حفظ التقرير');
 }
+  async function loadDailyFromSupabase(){
+
+  const { data, error } =
+    await supabaseClient
+      .from('daily_reports')
+      .select('*')
+      .order('report_date', { ascending:false })
+      .order('report_time', { ascending:false });
+
+  if(error){
+
+    console.error(error);
+
+    alert(
+      '❌ تعذر جلب التقارير من Supabase\n' +
+      error.message
+    );
+
+    return;
+  }
+
+  console.log('التقارير المحفوظة:', data);
+}
+  loadDailyFromSupabase();
 function renderDailyRows(){
 
   const body =
