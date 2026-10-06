@@ -3464,21 +3464,7 @@ async function renderRequests(){
 
     console.error(error);
 
-    body.innerHTML =
-      '<tr><td colspan="8">❌ تعذر تحميل الطلبات</td></tr>';
-
-    return;
-  }
-
-  if(!data || data.length === 0){
-
-    body.innerHTML =
-      '<tr><td colspan="8">لا توجد طلبات</td></tr>';
-
-    return;
-  }
-
-  body.innerHTML = data.map(x => `
+    body.innerHTML = data.map(x => `
 
   <tr>
 
@@ -3499,12 +3485,11 @@ async function renderRequests(){
     <td>${esc(x.execution_time || "—")}</td>
 
     <td class="no-print">
-
       <button
+        type="button"
         onclick="deleteRequest('${x.id}')">
         🗑️ حذف
       </button>
-
     </td>
 
   </tr>
