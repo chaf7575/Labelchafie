@@ -2219,17 +2219,38 @@ async function saveDailyToSupabase(){
     return false;
   }
 
+  // عند تعديل تقرير موجود لا ننشئ نسخة جديدة في Supabase الآن
+  if(editingDailyId){
+    return true;
+  }
+
   const reportDate =
     document.getElementById('ddate').value || today();
 
+  const reportNumber =
+    db.daily.length + 1;
+
+  const reportId =
+    crypto.randomUUID();
+
+  const general =
+    document.getElementById('dgen').value.trim();
+
+  const needs =
+    document.getElementById('dneeds').value.trim();
+
   const rows = dailyRows.map(x => ({
-    teacher: x.teacher || '',
-    casse_name: x.class_name || '',
+    report_id: reportId,
+    report_number: reportNumber,
+    Teacher: x.teacher || '',
+    "Class-name": x.class_name || '',
     experiment: x.experiment || '',
     equipment: x.equipment || '',
     report_date: reportDate,
     report_time: x.time || '',
-    note: x.notes || ''
+    notes: x.notes || '',
+    general: general,
+    needs: needs
   }));
 
   const { error } =
@@ -2238,49 +2259,18 @@ async function saveDailyToSupabase(){
       .insert(rows);
 
   if(error){
+
     console.error(error);
-    alert('❌ لم يتم حفظ التقرير في Supabase');
+
+    alert(
+      '❌ لم يتم حفظ التقرير في Supabase\n' +
+      error.message
+    );
+
     return false;
   }
 
   return true;
-}
-let editingDailyId = null;
-function loadDaily(id){
-
-  const x=db.daily.find(y=>y.id===id);
-
-  if(!x)return;
-
-  editingDailyId=id;
-
-  document.getElementById('rno').textContent=
-    x.number;
-
-  document.getElementById('rdate').textContent=
-    x.date;
-
-  document.getElementById('pgen').textContent=
-    x.general||'';
-
-  document.getElementById('pneeds').textContent=
-    x.needs||'';
-
-  document.getElementById('ddate').value=
-    x.date||'';
-
-  document.getElementById('dgen').value=
-    x.general||'';
-
-  document.getElementById('dneeds').value=
-    x.needs||'';
-
-  dailyRows=
-    JSON.parse(JSON.stringify(x.rows||[]));
-
-  renderDailyRows();
-
-  show('daily');
 }
 
 function editDaily(id){
