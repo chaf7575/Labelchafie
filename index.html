@@ -48,8 +48,7 @@ nav button{
   color:#fff
 }
 
-.danger{
-  background:#b42318;
+.danger{  background:#b42318;
   color:#fff
 }
 
@@ -1936,10 +1935,9 @@ function addMove(){
 
 let dailyRows=[];
 
-
 function addDailyRow(){
 
-  const x={
+  const x = {
 
     teacher:
       document.getElementById('dteach').value.trim(),
@@ -1947,8 +1945,11 @@ function addDailyRow(){
     class_name:
       document.getElementById('dclass').value.trim(),
 
+    date:
+      document.getElementById('ddate').value || today(),
+
     time:
-      document.getElementById('dtime').value||nowTime(),
+      document.getElementById('dtime').value || nowTime(),
 
     experiment:
       document.getElementById('dexp').value.trim(),
@@ -1962,7 +1963,9 @@ function addDailyRow(){
   };
 
   if(!x.teacher && !x.experiment){
+
     alert('أدخل بيانات الصف');
+
     return;
   }
 
@@ -1970,12 +1973,13 @@ function addDailyRow(){
 
   renderDailyRows();
 
-  document.getElementById('dteach').value='';
-  document.getElementById('dclass').value='';
-  document.getElementById('dtime').value='';
-  document.getElementById('dexp').value='';
-  document.getElementById('dequip').value='';
-  document.getElementById('dnote').value='';
+  document.getElementById('dteach').value = '';
+  document.getElementById('dclass').value = '';
+  document.getElementById('dtime').value = '';
+  document.getElementById('dexp').value = '';
+  document.getElementById('dequip').value = '';
+  document.getElementById('dnote').value = '';
+
 }
 
 
