@@ -3480,30 +3480,57 @@ async function renderRequests(){
 
   body.innerHTML = data.map(x => `
 
-    <tr>
+  <tr>
 
-      <td>${esc(x.teacher || "")}</td>
+    <td>${esc(x.teacher || "")}</td>
 
-      <td>${esc(x.class_name || "")}</td>
+    <td>${esc(x.class_name || "")}</td>
 
-      <td>${esc(x.request_date || "")}</td>
+    <td>${esc(x.request_date || "")}</td>
 
-      <td>${esc(x.request_text || "")}</td>
+    <td>${esc(x.request_text || "")}</td>
 
-      <td>${esc(x.tools || "")}</td>
+    <td>${esc(x.tools || "")}</td>
 
-      <td>${esc(x.notes || "")}</td>
+    <td>${esc(x.notes || "")}</td>
 
-      <td>${esc(x.execution_date || "—")}</td>
+    <td>${esc(x.execution_date || "—")}</td>
 
-      <td>${esc(x.execution_time || "—")}</td>
+    <td>${esc(x.execution_time || "—")}</td>
 
-    </tr>
+    <td class="no-print">
 
-  `).join("");
+      <button
+        onclick="deleteRequest('${x.id}')">
+        🗑️ حذف
+      </button>
+
+    </td>
+
+  </tr>
+
+`).join("");
+}
+async function deleteRequest(id){
+
+  const { error } =
+    await supabaseClient
+      .from("requests")
+      .delete()
+      .eq("id", id);
+
+  if(error){
+
+    console.error(error);
+
+    alert("❌ تعذر حذف الطلب");
+
+    return;
+  }
+
+  await renderRequests();
 
 }
-
 </script> 
 </body>
 </html> 
