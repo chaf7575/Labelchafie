@@ -956,19 +956,18 @@ const supabaseClient = window.supabase.createClient(
       <table>
 
         <thead>
-          <tr>
+<tr>
 
-            <th>الأستاذ</th>
-            <th>القسم</th>
-            <th>التاريخ</th>
-            <th>الوقت</th>
-            <th>التجربة</th>
-            <th>الوسائل</th>
-            <th>ملاحظة</th>
-            <th>الحالة</th>
-            <th class="no-print">إجراء</th>
+  <th>الأستاذ</th>
+  <th>القسم</th>
+  <th>التاريخ</th>
+  <th>التجربة</th>
+  <th>الوسائل</th>
+  <th>ملاحظة</th>
+  <th>تاريخ التنفيذ</th>
+  <th>وقت التنفيذ</th>
 
-          </tr>
+</tr>
         </thead>
 
         <tbody id="reqBody"></tbody>
@@ -3452,18 +3451,19 @@ async function renderRequests(){
 
   const body = document.getElementById("reqBody");
 
-  const { data, error } =
-    await supabaseClient
-      .from("requests")
-      .select("*")
-      .order("request_date", { ascending:false });
+  if(!body) return;
+
+  const { data, error } = await supabaseClient
+    .from("requests")
+    .select("*")
+    .order("request_date", { ascending: false });
 
   if(error){
 
     console.error(error);
 
     body.innerHTML =
-      '<tr><td colspan="9">❌ تعذر تحميل الطلبات</td></tr>';
+      '<tr><td colspan="8">❌ تعذر تحميل الطلبات</td></tr>';
 
     return;
   }
@@ -3471,56 +3471,35 @@ async function renderRequests(){
   if(!data || data.length === 0){
 
     body.innerHTML =
-      '<tr><td colspan="9">لا توجد طلبات</td></tr>';
+      '<tr><td colspan="8">لا توجد طلبات</td></tr>';
 
     return;
   }
 
-  body.innerHTML = data.map(x => {
+  body.innerHTML = data.map(x => `
 
-    const parts =
-      String(x.notes || "").split(" | ");
+    <tr>
 
-    const tools = parts[0] || "";
-    const note = parts.slice(1).join(" | ");
+      <td>${esc(x.teacher || "")}</td>
 
-    return `
-      <tr>
+      <td>${esc(x.class_name || "")}</td>
 
-        <td>${esc(x.teacher || "")}</td>
+      <td>${esc(x.request_date || "")}</td>
 
-        <td>${esc(x.class_name || "")}</td>
+      <td>${esc(x.request_text || "")}</td>
 
-        <td>${esc(x.request_date || "")}</td>
+      <td>${esc(x.tools || "")}</td>
 
-        <td>—</td>
+      <td>${esc(x.notes || "")}</td>
 
-        <td>${esc(x.request_text || "")}</td>
+      <td>${esc(x.execution_date || "—")}</td>
 
-        <td>${esc(tools)}</td>
+      <td>${esc(x.execution_time || "—")}</td>
 
-        <td>${esc(note)}</td>
+    </tr>
 
-        <td>${esc(x.status || "جديد")}</td>
+  `).join("");
 
-        <td class="no-print">
-
-          <button class="primary"
-            onclick="editReq('${x.id}')">
-            ✏️ تعديل
-          </button>
-
-          <button class="danger"
-            onclick="deleteReq('${x.id}')">
-            🗑️ حذف
-          </button>
-
-        </td>
-
-      </tr>
-    `;
-
-  }).join("");
 }
 
 </script> 
