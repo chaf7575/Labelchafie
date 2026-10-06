@@ -1989,7 +1989,7 @@ function saveDaily(){
 
     return;
   }
-
+  saveDailyToSupabase();
   if(editingDailyId){
 
     const x=db.daily.find(y=>y.id===editingDailyId);
@@ -2188,7 +2188,39 @@ function renderSavedDaily(){
     `).join('');
 
 }
+async function saveDailyToSupabase(){
 
+  if(!dailyRows.length){
+    alert('لا توجد صفوف لإرسالها');
+    return false;
+  }
+
+  const reportDate =
+    document.getElementById('ddate').value || today();
+
+  const rows = dailyRows.map(x => ({
+    teacher: x.teacher || '',
+    casse_name: x.class_name || '',
+    experiment: x.experiment || '',
+    equipment: x.equipment || '',
+    report_date: reportDate,
+    report_time: x.time || '',
+    note: x.notes || ''
+  }));
+
+  const { error } =
+    await supabaseClient
+      .from('daily_reports')
+      .insert(rows);
+
+  if(error){
+    console.error(error);
+    alert('❌ لم يتم حفظ التقرير في Supabase');
+    return false;
+  }
+
+  return true;
+}
 let editingDailyId = null;
 function loadDaily(id){
 
