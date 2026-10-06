@@ -2547,19 +2547,11 @@ async function sendTeacherRequest(){
   }
 
 }
-
-  document.getElementById('tname').value='';
-  document.getElementById('tclass').value='';
-  document.getElementById('texp').value='';
-  document.getElementById('ttools').value='';
-  document.getElementById('tnote').value='';
-}
-
-
-
 async function renderRequests(){
 
   const body = document.getElementById("reqBody");
+
+  if(!body) return;
 
   const { data, error } = await supabaseClient
     .from("requests")
@@ -2567,32 +2559,76 @@ async function renderRequests(){
     .order("request_date", { ascending: false });
 
   if(error){
+
     console.error(error);
+
     body.innerHTML =
-      '<tr><td colspan="9">❌ تعذر تحميل الطلبات</td></tr>';
+      '<tr><td colspan="10">❌ تعذر تحميل الطلبات</td></tr>';
+
     return;
   }
 
   if(!data || data.length === 0){
+
     body.innerHTML =
-      '<tr><td colspan="9">لا توجد طلبات</td></tr>';
+      '<tr><td colspan="10">لا توجد طلبات</td></tr>';
+
     return;
   }
 
   body.innerHTML = data.map(x => `
+
     <tr>
-      <td>${esc(x.teacher || "")}</td>
-      <td>${esc(x.class_name || "")}</td>
-      <td>${esc(x.request_date || "")}</td>
-      <td>—</td>
-      <td>${esc(x.request_text || "")}</td>
-      <td>${esc(x.notes || "")}</td>
-      <td>${esc(x.notes || "")}</td>
-      <td>${esc(x.status || "جديد")}</td>
-      <td class="no-print">—</td>
+
+      <td>
+        ${esc(x.teacher || "")}
+      </td>
+
+      <td>
+        ${esc(x.class_name || "")}
+      </td>
+
+      <td>
+        ${esc(x.request_date || "")}
+      </td>
+
+      <td>
+        ${esc(x.request_text || "")}
+      </td>
+
+      <td>
+        ${esc(x.tools || "")}
+      </td>
+
+      <td>
+        ${esc(x.notes || "")}
+      </td>
+
+      <td>
+        ${esc(x.status || "جديد")}
+      </td>
+
+      <td>
+        ${esc(x.execution_date || "—")}
+      </td>
+
+      <td>
+        ${esc(x.execution_time || "—")}
+      </td>
+
+      <td class="no-print">
+        —
+      </td>
+
     </tr>
+
   `).join("");
+
 }
+  }
+
+
+
 
 
 
