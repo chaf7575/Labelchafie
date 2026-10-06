@@ -2626,7 +2626,38 @@ async function renderRequests(){
 
 }
 
+async function executeRequest(id){
 
+  const now = new Date();
+
+  const executionDate =
+    now.toISOString().slice(0,10);
+
+  const executionTime =
+    now.toTimeString().slice(0,5);
+
+  const { error } =
+    await supabaseClient
+      .from("requests")
+      .update({
+        status: "تم التنفيذ",
+        execution_date: executionDate,
+        execution_time: executionTime
+      })
+      .eq("id", id);
+
+  if(error){
+
+    console.error(error);
+
+    alert("❌ تعذر تسجيل تنفيذ الطلب");
+
+    return;
+  }
+
+  await renderRequests();
+
+}
 
 
 
