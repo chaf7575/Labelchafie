@@ -2617,9 +2617,20 @@ async function renderRequests(){
       </td>
 
       <td class="no-print">
-        —
-      </td>
 
+  ${
+    x.status === "تم التنفيذ"
+      ? "✅ تم التنفيذ"
+      : `
+        <button
+          class="primary"
+          onclick="executeRequest('${x.id}')">
+          ▶️ تنفيذ
+        </button>
+      `
+  }
+
+</td>
     </tr>
 
   `).join("");
