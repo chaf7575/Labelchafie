@@ -880,67 +880,104 @@ const supabaseClient = window.supabase.createClient(
 
 <section id="requests" class="section">
 
-<div class="head">
+  <div class="head">
 
-<h2>📨 طلبات الأساتذة</h2>
+    <h2>📨 طلبات الأساتذة</h2>
 
-<button onclick="printSec('requests')">
-🖨️ طباعة
-</button>
+    <button onclick="printSec('requests')">
+      🖨️ طباعة
+    </button>
 
-</div>
-<div id="teacherRequestForm" style="background:#f8fafc;padding:15px;border-radius:12px;margin:15px 0">
+  </div>
 
-<h3 id="requestFormTitle">📝 إرسال طلب جديد</h3>
+  <div id="teacherRequestForm"
+       style="background:#f8fafc;padding:15px;border-radius:12px;margin:15px 0">
 
-<input id="reqId" type="hidden">
+    <h3 id="requestFormTitle">
+      📝 إرسال طلب جديد
+    </h3>
 
-<input id="reqTeacher" placeholder="اسم الأستاذ">
+    <input id="reqId" type="hidden">
 
-<input id="reqClass" placeholder="القسم">
+    <div class="grid">
 
-<input id="reqText" placeholder="التجربة أو النشاط المطلوب">
+      <label>
+        الأستاذ
+        <input id="reqTeacher" placeholder="اسم الأستاذ">
+      </label>
 
-<input id="reqTools" placeholder="الوسائل والأدوات المطلوبة">
+      <label>
+        القسم
+        <input id="reqClass" placeholder="القسم">
+      </label>
 
-<textarea id="reqNote" placeholder="ملاحظة"></textarea>
+      <label>
+        التجربة أو النشاط
+        <input id="reqText" placeholder="التجربة أو النشاط المطلوب">
+      </label>
 
-<div class="actions">
+      <label>
+        الوسائل والأدوات
+        <input id="reqTools" placeholder="الوسائل والأدوات المطلوبة">
+      </label>
 
-<button class="primary" onclick="sendTeacherRequest()">
-📨 إرسال الطلب
-</button>
+      <label>
+        ملاحظة
+        <textarea id="reqNote" placeholder="ملاحظة"></textarea>
+      </label>
 
-<button id="cancelReqEdit" class="hidden" onclick="cancelReqEdit()">
-إلغاء التعديل
-</button>
+    </div>
 
-</div>
+    <div class="actions">
 
-<div id="reqMessage"></div>
-<div class="tablewrap">
+      <button class="primary" onclick="sendTeacherRequest()">
+        📨 إرسال الطلب
+      </button>
 
-<table>
+      <button id="cancelReqEdit"
+              class="hidden"
+              onclick="cancelReqEdit()">
+        إلغاء التعديل
+      </button>
 
-<thead>
-<tr>
-<th>الأستاذ</th>
-<th>القسم</th>
-<th>التاريخ</th>
-<th>الوقت</th>
-<th>التجربة</th>
-<th>الوسائل</th>
-<th>ملاحظة</th>
-<th>الحالة</th>
-<th class="no-print">إجراء</th>
-</tr>
-</thead>
+    </div>
 
-<tbody id="reqBody"></tbody>
+    <div id="reqMessage"></div>
 
-</table>
+  </div>
 
-</div>
+
+  <div class="card">
+
+    <h3>📋 سجل الطلبات</h3>
+
+    <div class="tablewrap">
+
+      <table>
+
+        <thead>
+          <tr>
+
+            <th>الأستاذ</th>
+            <th>القسم</th>
+            <th>التاريخ</th>
+            <th>الوقت</th>
+            <th>التجربة</th>
+            <th>الوسائل</th>
+            <th>ملاحظة</th>
+            <th>الحالة</th>
+            <th class="no-print">إجراء</th>
+
+          </tr>
+        </thead>
+
+        <tbody id="reqBody"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
 
 </section>
 
@@ -3096,7 +3133,7 @@ async function logoutUser(){
 
 </script>  
  <script>
-async function sendTeacherRequest(){
+ function sendTeacherRequest(){
 
   const idValue =
     document.getElementById("reqId").value.trim();
