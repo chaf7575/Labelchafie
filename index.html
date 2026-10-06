@@ -1980,8 +1980,7 @@ function addDailyRow(){
 
 
 
-
-function saveDaily(){
+async function saveDaily(){
 
   if(!dailyRows.length){
 
@@ -1989,7 +1988,7 @@ function saveDaily(){
 
     return;
   }
-  saveDailyToSupabase();
+  await saveDailyToSupabase();
   if(editingDailyId){
 
     const x=db.daily.find(y=>y.id===editingDailyId);
