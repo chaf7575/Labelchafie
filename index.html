@@ -1741,27 +1741,172 @@ function addDailyRow(){
 /* =========================
    حفظ التقرير
 ========================= */
-
 async function saveDaily(){
 
-  alert('تم تشغيل زر الحفظ');
+  try {
 
-  if(!dailyRows.length){
+    if(!dailyRows || !dailyRows.length){
+      alert('أضف صفًا واحدًا على الأقل');
+      return;
+    }
 
-    alert('أضف صفًا واحدًا على الأقل');
+    const remoteSaved = await saveDailyToSupabase();
 
-    return;
+    if(remoteSaved === false){
+      return;
+    }
+
+    const dateEl = document.getElementById('ddate');
+    const generalEl = document.getElementById('dgen');
+    const needsEl = document.getElementById('dneeds');
+
+    const reportDate =
+      dateEl ? (dateEl.value || today()) : today();
+
+    const general =
+      generalEl ? generalEl.value.trim() : '';
+
+    const needs =
+      needsEl ? needsEl.value.trim() : '';
+
+    /* =========================
+       تعديل تقرير موجود
+    ========================= */
+
+    if(editingDailyId){
+
+      const x = db.daily.find(y => y.id === editingDailyId);
+
+      if(!x){
+        alert('تعذر العثور على التقرير المراد تعديله');
+        return;
+      }
+
+      x.date = reportDate;
+
+      x.rows =
+        JSON.parse(JSON.stringify(dailyRows));
+
+      x.general = general;
+      x.needs = needs;
+
+      save();
+
+      const rno = document.getElementById('rno');
+      const rdate = document.getElementById('rdate');
+      const pgen = document.getElementById('pgen');
+      const pneeds = document.getElementById('pneeds');
+
+      if(rno) {
+        rno.textContent =
+          x.number || x.report_number || '';
+      }
+
+      if(rdate) {
+        rdate.textContent =
+          x.date || '';
+      }
+
+      if(pgen) {
+        pgen.textContent =
+          x.general || '';
+      }
+
+      if(pneeds) {
+        pneeds.textContent =
+          x.needs || '';
+      }
+
+      editingDailyId = null;
+
+      dailyRows = [];
+
+      renderDailyRows();
+      renderSavedDaily();
+
+      alert('تم تعديل التقرير بنجاح');
+
+      return;
+    }
+
+    /* =========================
+       إنشاء تقرير جديد
+    ========================= */
+
+    const reportNumber =
+      db.daily.length + 1;
+
+    const reportId =
+      crypto.randomUUID();
+
+    const x = {
+
+      id: id(),
+
+      report_id: reportId,
+
+      report_number: reportNumber,
+
+      number: reportNumber,
+
+      date: reportDate,
+
+      rows:
+        JSON.parse(JSON.stringify(dailyRows)),
+
+      general: general,
+
+      needs: needs
+
+    };
+
+    db.daily.push(x);
+
+    save();
+
+    const rno = document.getElementById('rno');
+    const rdate = document.getElementById('rdate');
+    const pgen = document.getElementById('pgen');
+    const pneeds = document.getElementById('pneeds');
+
+    if(rno) {
+      rno.textContent =
+        reportNumber;
+    }
+
+    if(rdate) {
+      rdate.textContent =
+        reportDate;
+    }
+
+    if(pgen) {
+      pgen.textContent =
+        general;
+    }
+
+    if(pneeds) {
+      pneeds.textContent =
+        needs;
+    }
+
+    dailyRows = [];
+
+    renderDailyRows();
+    renderSavedDaily();
+
+    alert('تم حفظ التقرير بنجاح');
+
+  } catch(error) {
+
+    console.error('saveDaily error:', error);
+
+    alert(
+      '❌ حدث خطأ أثناء حفظ التقرير:\n' +
+      (error.message || error)
+    );
+
   }
-
-  const remoteSaved =
-    await saveDailyToSupabase();
-
-  if(remoteSaved === false){
-
-    return;
-  }
-
-
+}
   /* =========================
      تعديل تقرير موجود
   ========================= */
