@@ -1677,12 +1677,21 @@ function delChem(cid){
 
 
 /* =========================
+ /* =========================
    التقارير اليومية
 ========================= */
 
-let dailyRows=[];
+let dailyRows = [];
+
+
+/* =========================
+   إضافة صف للتقرير
+========================= */
 
 function addDailyRow(){
+
+  const reportDate =
+    document.getElementById('ddate').value || today();
 
   const x = {
 
@@ -1692,26 +1701,26 @@ function addDailyRow(){
     class_name:
       document.getElementById('dclass').value.trim(),
 
-    date:
-      document.getElementById('ddate').value || today(),
-
-    time:
-      document.getElementById('dtime').value || nowTime(),
-
     experiment:
       document.getElementById('dexp').value.trim(),
 
     equipment:
       document.getElementById('dequip').value.trim(),
 
-    notes:
+    report_date:
+      reportDate,
+
+    report_time:
+      document.getElementById('dtime').value || nowTime(),
+
+    note:
       document.getElementById('dnote').value.trim()
 
   };
 
   if(!x.teacher && !x.experiment){
 
-    alert('أدخل بيانات الصف');
+    alert('أدخل اسم الأستاذ أو التجربة');
 
     return;
   }
@@ -1730,6 +1739,9 @@ function addDailyRow(){
 }
 
 
+/* =========================
+   حفظ التقرير
+========================= */
 
 async function saveDaily(){
 
@@ -1739,45 +1751,90 @@ async function saveDaily(){
 
     return;
   }
-  const remoteSaved=await saveDailyToSupabase();
-  if(remoteSaved===false){ return; }
+
+  const remoteSaved =
+    await saveDailyToSupabase();
+
+  if(remoteSaved === false){
+
+    return;
+  }
+
+
+  /* =========================
+     تعديل تقرير موجود
+  ========================= */
+
   if(editingDailyId){
 
-    const x=db.daily.find(y=>y.id===editingDailyId);
+    const x =
+      db.daily.find(
+        y => y.id === editingDailyId
+      );
 
-    if(!x)return;
+    if(!x) return;
 
-    x.date=
-      document.getElementById('ddate').value||today();
 
-    x.rows=
-      JSON.parse(JSON.stringify(dailyRows));
+    x.date =
+      document.getElementById('ddate').value || today();
 
-    x.general=
+    x.rows =
+      JSON.parse(
+        JSON.stringify(dailyRows)
+      );
+
+    x.general =
       document.getElementById('dgen').value.trim();
 
-    x.needs=
+    x.needs =
       document.getElementById('dneeds').value.trim();
+
 
     save();
 
-    document.getElementById('rno').textContent=
-      x.number;
 
-    document.getElementById('rdate').textContent=
-      x.date;
+    const rno =
+      document.getElementById('rno');
 
-    document.getElementById('pgen').textContent=
-      x.general;
+    if(rno){
+      rno.textContent =
+        x.number;
+    }
 
-    document.getElementById('pneeds').textContent=
-      x.needs;
 
-    editingDailyId=null;
+    const rdate =
+      document.getElementById('rdate');
 
-    dailyRows=[];
+    if(rdate){
+      rdate.textContent =
+        x.date;
+    }
+
+
+    const pgen =
+      document.getElementById('pgen');
+
+    if(pgen){
+      pgen.textContent =
+        x.general;
+    }
+
+
+    const pneeds =
+      document.getElementById('pneeds');
+
+    if(pneeds){
+      pneeds.textContent =
+        x.needs;
+    }
+
+
+    editingDailyId = null;
+
+    dailyRows = [];
 
     renderDailyRows();
+
     renderSavedDaily();
 
     alert('تم تعديل التقرير بنجاح');
@@ -1785,18 +1842,38 @@ async function saveDaily(){
     return;
   }
 
-  const x={
 
-    id:id(),
+  /* =========================
+     إنشاء تقرير جديد
+  ========================= */
+
+  const reportId =
+    crypto.randomUUID();
+
+  const reportNumber =
+    db.daily.length + 1;
+
+  const x = {
+
+    id:
+      id(),
+
+    report_id:
+      reportId,
 
     number:
-      db.daily.length+1,
+      reportNumber,
+
+    report_number:
+      reportNumber,
 
     date:
-      document.getElementById('ddate').value||today(),
+      document.getElementById('ddate').value || today(),
 
     rows:
-      JSON.parse(JSON.stringify(dailyRows)),
+      JSON.parse(
+        JSON.stringify(dailyRows)
+      ),
 
     general:
       document.getElementById('dgen').value.trim(),
@@ -1806,37 +1883,78 @@ async function saveDaily(){
 
   };
 
+
   db.daily.push(x);
 
   save();
 
-  document.getElementById('rno').textContent=
-    x.number;
 
-  document.getElementById('rdate').textContent=
-    x.date;
+  const rno =
+    document.getElementById('rno');
 
-  document.getElementById('pgen').textContent=
-    x.general;
+  if(rno){
+    rno.textContent =
+      x.number;
+  }
 
-  document.getElementById('pneeds').textContent=
-    x.needs;
 
-  dailyRows=[];
+  const rdate =
+    document.getElementById('rdate');
+
+  if(rdate){
+    rdate.textContent =
+      x.date;
+  }
+
+
+  const pgen =
+    document.getElementById('pgen');
+
+  if(pgen){
+    pgen.textContent =
+      x.general;
+  }
+
+
+  const pneeds =
+    document.getElementById('pneeds');
+
+  if(pneeds){
+    pneeds.textContent =
+      x.needs;
+  }
+
+
+  dailyRows = [];
 
   renderDailyRows();
+
   renderSavedDaily();
 
   alert('تم حفظ التقرير');
+
 }
-  async function loadDailyFromSupabase(){
+
+
+/* =========================
+   جلب التقارير من Supabase
+========================= */
+
+async function loadDailyFromSupabase(){
 
   const { data, error } =
     await supabaseClient
       .from('daily_reports')
       .select('*')
-      .order('report_date', { ascending:false })
-      .order('report_time', { ascending:false });
+      .order(
+        'report_date',
+        { ascending:false }
+      )
+      .order(
+        'report_time',
+        { ascending:false }
+      );
+
 
   if(error){
 
@@ -1850,9 +1968,20 @@ async function saveDaily(){
     return;
   }
 
-  console.log('التقارير المحفوظة:', data);
+
+  console.log(
+    'التقارير المحفوظة:',
+    data
+  );
+
+  return data;
 }
-  
+
+
+/* =========================
+   عرض صفوف التقرير
+========================= */
+
 function renderDailyRows(){
 
   const body =
@@ -1860,154 +1989,368 @@ function renderDailyRows(){
 
   if(!body) return;
 
-  if(!dailyRows || dailyRows.length === 0){
+
+  if(
+    !dailyRows ||
+    dailyRows.length === 0
+  ){
 
     body.innerHTML =
-      '<tr><td colspan="9">لا توجد صفوف</td></tr>';
+      '<tr><td colspan="8">لا توجد صفوف</td></tr>';
 
     return;
   }
 
-  body.innerHTML = dailyRows.map((x,index)=>`
 
-    <tr>
-
-      <td>${esc(x.teacher || '')}</td>
-      <td>${esc(x.class_name || '')}</td>
-      <td>${esc(x.date || '')}</td>
-      <td>${esc(x.time || '')}</td>
-      <td>${esc(x.experiment || '')}</td>
-      <td>${esc(x.equipment || '')}</td>
-      <td>${esc(x.notes || '')}</td>
-      <td>${esc(x.status || '')}</td>
-
-      <td class="no-print">
-
-        <button
-          class="primary"
-          onclick="editDailyRow(${index})">
-          ✏️ تعديل
-        </button>
-
-      </td>
-
-    </tr>
-
-  `).join('');
-
-}
-function editDailyRow(index){
-
-  const x = dailyRows[index];
-
-  if(!x) return;
-
-  document.getElementById('dteach').value =
-    x.teacher || '';
-
-  document.getElementById('dclass').value =
-    x.class_name || '';
-
-  document.getElementById('dtime').value =
-    x.time || '';
-
-  document.getElementById('dexp').value =
-    x.experiment || '';
-
-  document.getElementById('dequip').value =
-    x.equipment || '';
-
-  document.getElementById('dnote').value =
-    x.notes || '';
-
-  dailyRows.splice(index,1);
-
-  renderDailyRows();
-
-}
-function renderSavedDaily(){
-
-  document.getElementById('savedDaily').innerHTML=
-    db.daily.map(x=>`
+  body.innerHTML =
+    dailyRows.map(
+      (x,index) => `
 
       <tr>
 
-        <td>${x.number}</td>
-
-        <td>${esc(x.date)}</td>
-
-        <td>${x.rows.length}</td>
+        <td>
+          ${esc(x.teacher || '')}
+        </td>
 
         <td>
+          ${esc(x.class_name || '')}
+        </td>
+
+        <td>
+          ${esc(x.experiment || '')}
+        </td>
+
+        <td>
+          ${esc(x.equipment || '')}
+        </td>
+
+        <td>
+          ${esc(x.report_date || '')}
+        </td>
+
+        <td>
+          ${esc(x.report_time || '')}
+        </td>
+
+        <td>
+          ${esc(x.note || '')}
+        </td>
+
+        <td class="no-print">
 
           <button
-            onclick="loadDaily('${x.id}')">
-            فتح
-          </button>
-
-          <button
-            onclick="editDaily('${x.id}')">
-            تعديل
+            class="primary"
+            onclick="editDailyRow(${index})">
+            ✏️ تعديل
           </button>
 
           <button
             class="danger"
-            onclick="delDaily('${x.id}')">
-            حذف
+            onclick="removeDailyRow(${index})">
+            🗑️ حذف
           </button>
 
         </td>
 
       </tr>
 
-    `).join('');
+    `
+    ).join('');
 
 }
+
+
+/* =========================
+   تعديل صف داخل التقرير
+========================= */
+
+function editDailyRow(index){
+
+  const x =
+    dailyRows[index];
+
+  if(!x) return;
+
+
+  document.getElementById('dteach').value =
+    x.teacher || '';
+
+
+  document.getElementById('dclass').value =
+    x.class_name || '';
+
+
+  document.getElementById('dtime').value =
+    x.report_time || '';
+
+
+  document.getElementById('dexp').value =
+    x.experiment || '';
+
+
+  document.getElementById('dequip').value =
+    x.equipment || '';
+
+
+  document.getElementById('dnote').value =
+    x.note || '';
+
+
+  /*
+    تاريخ التقرير موجود في ddate
+    ولا نغيره من هنا.
+  */
+
+  if(x.report_date){
+
+    const ddate =
+      document.getElementById('ddate');
+
+    if(ddate){
+      ddate.value =
+        x.report_date;
+    }
+  }
+
+
+  dailyRows.splice(index,1);
+
+  renderDailyRows();
+
+}
+
+
+/* =========================
+   حذف صف
+========================= */
+
+function removeDailyRow(index){
+
+  if(
+    index < 0 ||
+    index >= dailyRows.length
+  ){
+
+    return;
+  }
+
+
+  if(
+    !confirm(
+      'هل تريد حذف هذا الصف؟'
+    )
+  ){
+
+    return;
+  }
+
+
+  dailyRows.splice(index,1);
+
+  renderDailyRows();
+
+}
+
+
+/* =========================
+   الحفظ في Supabase
+========================= */
+
 async function saveDailyToSupabase(){
 
   if(!dailyRows.length){
-    alert('لا توجد صفوف لإرسالها');
+
+    alert(
+      'لا توجد صفوف لإرسالها'
+    );
+
     return false;
   }
 
-  // عند تعديل تقرير موجود لا ننشئ نسخة جديدة في Supabase الآن
-  if(editingDailyId){
-    return true;
-  }
 
   const reportDate =
-    document.getElementById('ddate').value || today();
+    document.getElementById('ddate').value ||
+    today();
 
-  const reportNumber =
-    db.daily.length + 1;
-
-  const reportId =
-    crypto.randomUUID();
 
   const general =
     document.getElementById('dgen').value.trim();
 
+
   const needs =
     document.getElementById('dneeds').value.trim();
 
-  const rows = dailyRows.map(x => ({
-    report_id: reportId,
-    report_number: reportNumber,
-    Teacher: x.teacher || '',
-    "Class-name": x.class_name || '',
-    experiment: x.experiment || '',
-    equipment: x.equipment || '',
-    report_date: reportDate,
-    report_time: x.time || '',
-    notes: x.notes || '',
-    general: general,
-    needs: needs
-  }));
+
+  let reportId = null;
+
+  let reportNumber = null;
+
+
+  /* =========================
+     حالة تعديل تقرير موجود
+  ========================= */
+
+  if(editingDailyId){
+
+    const oldReport =
+      db.daily.find(
+        y => y.id === editingDailyId
+      );
+
+
+    if(!oldReport){
+
+      alert(
+        '❌ لم يتم العثور على التقرير'
+      );
+
+      return false;
+    }
+
+
+    reportId =
+      oldReport.report_id ||
+      oldReport.reportId ||
+      null;
+
+
+    reportNumber =
+      oldReport.report_number ||
+      oldReport.number ||
+      null;
+
+
+    /*
+      إذا كان التقرير القديم لديه
+      report_id نحذف صفوفه القديمة
+      ثم نعيد إدخاله بالبيانات الجديدة.
+    */
+
+    if(reportId){
+
+      const { error: deleteError } =
+        await supabaseClient
+          .from('daily_reports')
+          .delete()
+          .eq(
+            'report_id',
+            reportId
+          );
+
+
+      if(deleteError){
+
+        console.error(deleteError);
+
+        alert(
+          '❌ تعذر تحديث التقرير في Supabase\n' +
+          deleteError.message
+        );
+
+        return false;
+      }
+
+    }else if(reportNumber){
+
+      /*
+        توافق مع التقارير القديمة
+        التي لم يكن لديها report_id.
+      */
+
+      const { error: deleteError } =
+        await supabaseClient
+          .from('daily_reports')
+          .delete()
+          .eq(
+            'report_number',
+            reportNumber
+          );
+
+
+      if(deleteError){
+
+        console.error(deleteError);
+
+        alert(
+          '❌ تعذر تحديث التقرير القديم في Supabase\n' +
+          deleteError.message
+        );
+
+        return false;
+      }
+
+
+      reportId =
+        crypto.randomUUID();
+    }
+
+  }else{
+
+    /* تقرير جديد */
+
+    reportId =
+      crypto.randomUUID();
+
+    reportNumber =
+      db.daily.length + 1;
+  }
+
+
+  /* =========================
+     تجهيز الصفوف
+  ========================= */
+
+  const rows =
+    dailyRows.map(
+      x => ({
+
+        teacher:
+          x.teacher || '',
+
+        class_name:
+          x.class_name || '',
+
+        experiment:
+          x.experiment || '',
+
+        equipment:
+          x.equipment || '',
+
+        report_date:
+          x.report_date ||
+          reportDate,
+
+        report_time:
+          x.report_time || '',
+
+        note:
+          x.note || '',
+
+        report_id:
+          reportId,
+
+        report_number:
+          reportNumber,
+
+        general:
+          general,
+
+        needs:
+          needs
+
+      })
+    );
+
+
+  /* =========================
+     إدخال البيانات
+  ========================= */
 
   const { error } =
     await supabaseClient
       .from('daily_reports')
       .insert(rows);
+
 
   if(error){
 
@@ -2021,78 +2364,103 @@ async function saveDailyToSupabase(){
     return false;
   }
 
+
+  /*
+    الاحتفاظ بالـ report_id
+    لاستخدامه عند التعديل القادم.
+  */
+
+  if(editingDailyId){
+
+    const oldReport =
+      db.daily.find(
+        y => y.id === editingDailyId
+      );
+
+    if(oldReport){
+
+      oldReport.report_id =
+        reportId;
+
+      oldReport.report_number =
+        reportNumber;
+    }
+  }
+
+
   return true;
 }
 
-function editDaily(id){
 
-  const x=db.daily.find(y=>y.id===id);
-
-  if(!x)return;
-
-  editingDailyId=id;
-
-  document.getElementById('ddate').value=
-    x.date||'';
-
-  document.getElementById('dgen').value=
-    x.general||'';
-
-  document.getElementById('dneeds').value=
-    x.needs||'';
-
-  dailyRows=
-    JSON.parse(JSON.stringify(x.rows||[]));
-
-  renderDailyRows();
-
-  show('daily');
-
-}
-function delDaily(id){
-
-  if(!confirm('حذف التقرير؟'))return;
-
-  db.daily=db.daily.filter(x=>x.id!==id);
-
-  save();
-}
-
+/* =========================
+   طباعة التقرير
+========================= */
 
 function printDaily(){
 
-  const s=document.getElementById('daily');
+  const s =
+    document.getElementById('daily');
 
-  document.querySelectorAll('.section')
-    .forEach(x=>x.classList.remove('printing'));
+  if(!s) return;
 
-  s.classList.add('printing');
+
+  document
+    .querySelectorAll('.section')
+    .forEach(
+      x =>
+        x.classList.remove(
+          'printing'
+        )
+    );
+
+
+  s.classList.add(
+    'printing'
+  );
+
 
   window.print();
 
-  setTimeout(()=>{
-    s.classList.remove('printing');
-  },500);
+
+  setTimeout(
+    () => {
+
+      s.classList.remove(
+        'printing'
+      );
+
+    },
+    500
+  );
+
 }
+
+
+/* =========================
+   إرسال التقرير بالبريد
+========================= */
 
 function mailDaily(){
 
-  const subject=
+  const subject =
     encodeURIComponent(
       'التقرير اليومي للمخبر'
     );
 
-  const body=
+
+  const body =
     encodeURIComponent(
       'تقرير يومي للمخبر - متوسطة قايد أحمد – غليزان'
     );
 
-  location.href=
-    'mailto:?subject='+subject+
-    '&body='+body;
+
+  location.href =
+    'mailto:?subject=' +
+    subject +
+    '&body=' +
+    body;
+
 }
-
-
 /* =========================
    التدرج السنوي
 ========================= */
