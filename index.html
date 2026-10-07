@@ -1829,84 +1829,10 @@ async function saveDaily(){
       return;
     }
 
-    /* =========================
-       إنشاء تقرير جديد
-    ========================= */
 
-    const reportNumber =
-      db.daily.length + 1;
-
-    const reportId =
-      crypto.randomUUID();
-
-    const x = {
-
-      id: id(),
-
-      report_id: reportId,
-
-      report_number: reportNumber,
-
-      number: reportNumber,
-
-      date: reportDate,
-
-      rows:
-        JSON.parse(JSON.stringify(dailyRows)),
-
-      general: general,
-
-      needs: needs
-
-    };
-
-    db.daily.push(x);
-
-    save();
-
-    const rno = document.getElementById('rno');
-    const rdate = document.getElementById('rdate');
-    const pgen = document.getElementById('pgen');
-    const pneeds = document.getElementById('pneeds');
-
-    if(rno) {
-      rno.textContent =
-        reportNumber;
-    }
-
-    if(rdate) {
-      rdate.textContent =
-        reportDate;
-    }
-
-    if(pgen) {
-      pgen.textContent =
-        general;
-    }
-
-    if(pneeds) {
-      pneeds.textContent =
-        needs;
-    }
-
-    dailyRows = [];
-
-    renderDailyRows();
-    renderSavedDaily();
-
-    alert('تم حفظ التقرير بنجاح');
-
-  } catch(error) {
-
-    console.error('saveDaily error:', error);
-
-    alert(
-      '❌ حدث خطأ أثناء حفظ التقرير:\n' +
-      (error.message || error)
-    );
 
   }
-}
+
 
 
 
