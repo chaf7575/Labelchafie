@@ -1,102 +1,112 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>طلب الوسائل المخبرية</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>صفحة الأستاذ - إرسال الطلب</title>
+
+<style>
+*{box-sizing:border-box}
+
 body{
   margin:0;
-  font-family:Arial,sans-serif;
+  font-family:Arial,Tahoma,sans-serif;
   background:#f4f7fb;
-  color:#1f2937;
+  color:#172033;
+}
+
+header{
+  background:#123b5d;
+  color:#fff;
+  padding:22px;
+  text-align:center;
 }
 
 .container{
-  max-width:600px;
-  margin:30px auto;
+  max-width:800px;
+  margin:auto;
   padding:20px;
 }
 
 .card{
-  background:white;
-  border-radius:18px;
-  padding:25px;
-  box-shadow:0 5px 20px rgba(0,0,0,.08);
+  background:#fff;
+  border-radius:15px;
+  padding:20px;
+  margin:15px 0;
+  box-shadow:0 4px 16px #0001;
 }
 
-h1{
-  text-align:center;
-  color:#14532d;
-  margin-bottom:25px;
+h1,h2{
+  margin-top:0;
 }
 
 label{
   display:block;
-  margin-top:15px;
   font-weight:bold;
+  margin-top:14px;
 }
 
-input, textarea{
+input,
+select,
+textarea{
   width:100%;
-  box-sizing:border-box;
-  margin-top:7px;
-  padding:13px;
-  border:1px solid #d1d5db;
-  border-radius:10px;
-  font-size:16px;
+  padding:11px;
+  margin-top:6px;
+  border:1px solid #ccd6e2;
+  border-radius:8px;
+  font:inherit;
 }
 
 textarea{
-  min-height:120px;
+  min-height:100px;
   resize:vertical;
 }
 
 button{
-  width:100%;
-  margin-top:22px;
-  padding:15px;
   border:0;
-  border-radius:12px;
-  background:#15803d;
-  color:white;
-  font-size:18px;
-  font-weight:bold;
+  border-radius:9px;
+  padding:12px 18px;
+  cursor:pointer;
+  font:inherit;
 }
 
-button:active{
-  transform:scale(.98);
+.primary{
+  background:#1769aa;
+  color:#fff;
 }
 
-#message{
-  text-align:center;
+.success{
+  background:#e8f7ee;
+  color:#17633b;
+  padding:13px;
+  border-radius:8px;
   margin-top:15px;
-  font-weight:bold;
 }
-</style></head><body><div class="container"><div class="card"><h1>🧪 طلب الوسائل المخبرية</h1><label>
-اسم الأستاذ
-<input id="teacher" type="text" placeholder="اكتب اسمك">
-</label><label>
-القسم
-<label>
-القسم
-<input id="className" type="text" placeholder="مثال: 1 متوسط">
-</label>
 
-<label>
-عنوان التجربة
-<input id="experimentTitle" type="text" placeholder="مثال: قانون أوم">
-</label>
+.error{
+  background:#fdecec;
+  color:#a11;
+  padding:13px;
+  border-radius:8px;
+  margin-top:15px;
+}
 
-<label>
-تاريخ الاحتياج
-<input id="needDate" type="date">
-</label><label>
-الوسائل المطلوبة
-<textarea id="requestText"
-placeholder="اكتب الوسائل التي تحتاجها..."></textarea>
-</label><button onclick="sendRequest()">
-📨 إرسال الطلب
-</button><div id="message"></div></div></div><script>
+.small{
+  color:#607086;
+  font-size:14px;
+}
 
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
 const SUPABASE_URL =
 "https://niedzlyvricaofqasohe.supabase.co";
 
@@ -108,74 +118,274 @@ window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY
 );
+</script>
 
-async function sendRequest(){
+</head>
 
-  const teacher =
-    document.getElementById("teacher").value.trim();
+<body>
+
+<header>
+  <h1>📨 إرسال طلب إلى المخبري</h1>
+  <div>متوسطة قايد أحمد – غليزان</div>
+</header>
+
+<div class="container">
+
+  <div class="card">
+
+    <h2>طلب الأستاذ</h2>
+
+    <p class="small">
+      يرجى ملء المعلومات التالية ثم الضغط على «إرسال الطلب».
+    </p>
+
+    <label>
+      اسم الأستاذ
+      <input
+        id="teacherName"
+        type="text"
+        placeholder="اكتب اسم الأستاذ"
+      >
+    </label>
+
+    <label>
+      القسم
+      <input
+        id="className"
+        type="text"
+        placeholder="مثال: 4 متوسط 1"
+      >
+    </label>
+
+    <label>
+      تاريخ الطلب
+      <input
+        id="requestDate"
+        type="date"
+      >
+    </label>
+
+    <label>
+      وقت الطلب
+      <input
+        id="requestTime"
+        type="time"
+      >
+    </label>
+
+    <label>
+      نص الطلب
+      <textarea
+        id="requestText"
+        placeholder="اكتب تفاصيل الطلب أو التجربة..."
+      ></textarea>
+    </label>
+
+    <label>
+      الأدوات والوسائل المطلوبة
+      <textarea
+        id="tools"
+        placeholder="اكتب الأدوات أو الوسائل المطلوبة..."
+      ></textarea>
+    </label>
+
+    <label>
+      ملاحظات
+      <textarea
+        id="notes"
+        placeholder="ملاحظات إضافية..."
+      ></textarea>
+    </label>
+
+    <div class="actions">
+
+      <button
+        class="primary"
+        onclick="sendTeacherRequest()"
+      >
+        📤 إرسال الطلب
+      </button>
+
+      <button
+        onclick="clearForm()"
+      >
+        مسح
+      </button>
+
+    </div>
+
+    <div id="message"></div>
+
+  </div>
+
+</div>
+
+<script>
+
+function setCurrentDateTime(){
+
+  const now = new Date();
+
+  const date =
+    now.toISOString().slice(0,10);
+
+  const time =
+    now.toTimeString().slice(0,5);
+
+  document.getElementById("requestDate").value =
+    date;
+
+  document.getElementById("requestTime").value =
+    time;
+}
+
+
+async function sendTeacherRequest(){
+
+  const teacherName =
+    document.getElementById("teacherName").value.trim();
 
   const className =
     document.getElementById("className").value.trim();
 
+  const requestDate =
+    document.getElementById("requestDate").value;
+
+  const requestTime =
+    document.getElementById("requestTime").value;
+
   const requestText =
     document.getElementById("requestText").value.trim();
-const experimentTitle =
-  document.getElementById("experimentTitle").value.trim();
 
-const needDate =
-  document.getElementById("needDate").value;
+  const tools =
+    document.getElementById("tools").value.trim();
+
+  const notes =
+    document.getElementById("notes").value.trim();
+
   const message =
     document.getElementById("message");
 
-  if(!teacher || !className || !experimentTitle || !needDate || !requestText){
 
-  message.textContent =
-    "⚠️ يرجى ملء جميع المعلومات";
+  if(!teacherName){
 
-  return;
-}
+    message.innerHTML =
+      '<div class="error">يرجى إدخال اسم الأستاذ.</div>';
 
-message.textContent =
-  "جارٍ إرسال الطلب...";
+    return;
+  }
 
-  const { error } =
+
+  if(!className){
+
+    message.innerHTML =
+      '<div class="error">يرجى إدخال القسم.</div>';
+
+    return;
+  }
+
+
+  if(!requestText){
+
+    message.innerHTML =
+      '<div class="error">يرجى كتابة نص الطلب.</div>';
+
+    return;
+  }
+
+
+  message.innerHTML =
+    '<div class="small">جاري إرسال الطلب...</div>';
+
+
+  const { data, error } =
     await supabaseClient
       .from("requests")
-      .insert({
+      .insert([{
 
-  teacher: teacher,
+        teacher_name: teacherName,
 
-  class_name: className,
+        class_name: className,
 
-  experiment_title: experimentTitle,
+        request_date:
+          requestDate ||
+          new Date().toISOString().slice(0,10),
 
-  need_date: needDate,
+        request_time:
+          requestTime ||
+          new Date().toTimeString().slice(0,5),
 
-  request_text: requestText,
+        request_text: requestText,
 
-  request_date:
-    new Date().toISOString().slice(0,10)
+        tools: tools,
 
-});
+        notes: notes,
+
+        status: "جديد",
+
+        is_read: false
+
+      }])
+      .select();
+
 
   if(error){
 
     console.error(error);
 
-    message.textContent =
-      "❌ حدث خطأ أثناء إرسال الطلب";
+    message.innerHTML =
+      '<div class="error">' +
+      'تعذر إرسال الطلب:<br>' +
+      error.message +
+      '</div>';
 
     return;
   }
 
-  message.textContent =
-    "✅ تم إرسال طلبك بنجاح";
 
-  document.getElementById("teacher").value = "";
-  document.getElementById("className").value = "";
+  message.innerHTML =
+    '<div class="success">' +
+    '✅ تم إرسال الطلب بنجاح إلى المخبري.' +
+    '</div>';
+
+
   document.getElementById("requestText").value = "";
+  document.getElementById("tools").value = "";
+  document.getElementById("notes").value = "";
+
+  setCurrentDateTime();
 
 }
 
-</script></body>
+
+function clearForm(){
+
+  document.getElementById("teacherName").value = "";
+
+  document.getElementById("className").value = "";
+
+  document.getElementById("requestText").value = "";
+
+  document.getElementById("tools").value = "";
+
+  document.getElementById("notes").value = "";
+
+  document.getElementById("message").innerHTML = "";
+
+  setCurrentDateTime();
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    setCurrentDateTime();
+
+  }
+);
+
+</script>
+
+</body>
 </html>
