@@ -303,8 +303,7 @@ async function sendTeacherRequest(){
       .from("requests")
       .insert([{
 
-        teacher_name: teacherName,
-
+        teacher: teacherName,
         class_name: className,
 
         request_date:
