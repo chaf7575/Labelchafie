@@ -264,14 +264,12 @@ const supabaseClient = window.supabase.createClient(
 <button onclick="show('home')">🏠 الرئيسية</button>
 <button onclick="show('inventory')">📦 الجرد</button>
 <button onclick="show('chemicals')">⚗️ المحاليل</button>
-<button onclick="show('movements')">🔄 الحركات</button>
 <button onclick="show('daily')">📝 التقارير</button>
 <button onclick="show('progress')">📅 التدرج</button>
 <button onclick="show('requests')">📨 الطلبات</button>
 <button onclick="show('safety')">🦺 السلامة</button>
 <button onclick="show('various')">🧪 منوعات</button>
 <button onclick="show('other')">🎧 الصوتيات والسمعيات</button>
-<button onclick="teacherMode()">👨‍🏫 الأستاذ</button>
 <button onclick="show('settings')">⚙️ الإعدادات</button>
 </nav>
 </header>
@@ -557,101 +555,6 @@ const supabaseClient = window.supabase.createClient(
 </section>
 
 
-<section id="movements" class="section">
-
-<div class="head">
-
-<h2>🔄 سجل الحركات</h2>
-
-<button onclick="printSec('movements')">
-🖨️ طباعة
-</button>
-
-</div>
-
-<div class="card">
-
-<div class="grid">
-
-<label>
-التجهيز
-<input id="mequip">
-</label>
-
-<label>
-الحركة
-<select id="mtype">
-<option>إخراج</option>
-<option>إرجاع</option>
-<option>إعارة</option>
-<option>استلام</option>
-</select>
-</label>
-
-<label>
-الأستاذ
-<input id="mteach">
-</label>
-
-<label>
-القسم
-<input id="mclass">
-</label>
-
-<label>
-التاريخ
-<input id="mdate" type="date">
-</label>
-
-<label>
-الوقت
-<input id="mtime" type="time">
-</label>
-
-<label>
-الكمية
-<input id="mqty" type="number" min="1" value="1">
-</label>
-
-<label>
-ملاحظات
-<textarea id="mnote"></textarea>
-</label>
-
-</div>
-
-<button class="primary" onclick="addMove()">
-💾 تسجيل
-</button>
-
-</div>
-
-<div class="tablewrap">
-
-<table>
-
-<thead>
-<tr>
-<th>التجهيز</th>
-<th>الحركة</th>
-<th>الأستاذ</th>
-<th>القسم</th>
-<th>التاريخ</th>
-<th>الوقت</th>
-<th>الكمية</th>
-<th>ملاحظات</th>
-</tr>
-</thead>
-
-<tbody id="moveBody"></tbody>
-
-</table>
-
-</div>
-
-</section>
-
-
 <section id="daily" class="section">
 
 <div class="head">
@@ -882,70 +785,15 @@ const supabaseClient = window.supabase.createClient(
 
   <div class="head">
 
-    <h2>📨 طلبات الأساتذة</h2>
+    <h2>📨 طلبات الأساتذة الواردة</h2>
+
+    <div class="notice">الأساتذة يرسلون طلباتهم من صفحة الأستاذ المستقلة. هنا تتم متابعة الطلبات وتنفيذها وحذفها.</div>
 
     <button onclick="printSec('requests')">
       🖨️ طباعة
     </button>
 
   </div>
-
-  <div id="teacherRequestForm"
-       style="background:#f8fafc;padding:15px;border-radius:12px;margin:15px 0">
-
-    <h3 id="requestFormTitle">
-      📝 إرسال طلب جديد
-    </h3>
-
-    <input id="reqId" type="hidden">
-
-    <div class="grid">
-
-      <label>
-        الأستاذ
-        <input id="reqTeacher" placeholder="اسم الأستاذ">
-      </label>
-
-      <label>
-        القسم
-        <input id="reqClass" placeholder="القسم">
-      </label>
-
-      <label>
-        التجربة أو النشاط
-        <input id="reqText" placeholder="التجربة أو النشاط المطلوب">
-      </label>
-
-      <label>
-        الوسائل والأدوات
-        <input id="reqTools" placeholder="الوسائل والأدوات المطلوبة">
-      </label>
-
-      <label>
-        ملاحظة
-        <textarea id="reqNote" placeholder="ملاحظة"></textarea>
-      </label>
-
-    </div>
-
-    <div class="actions">
-
-      <button class="primary" onclick="sendTeacherRequest()">
-        📨 إرسال الطلب
-      </button>
-
-      <button id="cancelReqEdit"
-              class="hidden"
-              onclick="cancelReqEdit()">
-        إلغاء التعديل
-      </button>
-
-    </div>
-
-    <div id="reqMessage"></div>
-
-  </div>
-
 
   <div class="card">
 
@@ -957,18 +805,17 @@ const supabaseClient = window.supabase.createClient(
 
         <thead>
 <tr>
-
   <th>الأستاذ</th>
   <th>القسم</th>
-  <th>التاريخ</th>
-  <th>التجربة</th>
+  <th>تاريخ الطلب</th>
+  <th>وقت الطلب</th>
+  <th>التجربة أو النشاط</th>
   <th>الوسائل المطلوبة</th>
   <th>ملاحظة</th>
+  <th>الحالة</th>
   <th>تاريخ التنفيذ</th>
-  <th>توقيت التنفيذ</th>
-  <th>حذف</th>
-
-
+  <th>وقت التنفيذ</th>
+  <th class="no-print">إجراء</th>
 </tr>
         </thead>
 
@@ -1240,75 +1087,6 @@ const supabaseClient = window.supabase.createClient(
 </section>
 
 
-<section id="teacher" class="section">
-
-<div class="head">
-
-<div>
-<h2>👨‍🏫 فضاء الأستاذ</h2>
-<p class="small">
-يمكن للأستاذ إرسال طلب تجهيز للمخبر.
-</p>
-</div>
-
-</div>
-
-<div class="notice">
-هذا القسم مخصص لإرسال طلبات الوسائل والتجارب.
-</div>
-
-<div class="card">
-
-<div class="grid">
-
-<label>
-اسم الأستاذ
-<input id="tname">
-</label>
-
-<label>
-القسم
-<input id="tclass">
-</label>
-
-<label>
-التاريخ
-<input id="tdate" type="date">
-</label>
-
-<label>
-الوقت
-<input id="ttime" type="time">
-</label>
-
-<label>
-التجربة أو النشاط
-<input id="texp">
-</label>
-
-<label>
-الوسائل المطلوبة
-<textarea id="ttools"></textarea>
-</label>
-
-<label>
-ملاحظات
-<textarea id="tnote"></textarea>
-</label>
-
-</div>
-
-<button class="primary" onclick="sendRequest()">
-📨 إرسال الطلب
-</button>
-
-<div id="tmsg"></div>
-
-</div>
-
-</section>
-
-
 <section id="settings" class="section">
 
 <div class="head">
@@ -1381,7 +1159,6 @@ const CATS=[
 const EMPTY={
   inventory:[],
   chemicals:[],
-  movements:[],
   daily:[],
   requests:[],
   projects:[],
@@ -1393,7 +1170,13 @@ let db=load();
 function load(){
   try{
     const x=JSON.parse(localStorage.getItem(KEY)||'null');
-    return x ? Object.assign({},EMPTY,x) : JSON.parse(JSON.stringify(EMPTY));
+    const data=x ? Object.assign({},EMPTY,x) : JSON.parse(JSON.stringify(EMPTY));
+    data.chemicals=(data.chemicals||[]).map(c=>({
+      ...c,
+      total:Number(c.total ?? c.qty ?? 0),
+      uses:Array.isArray(c.uses)?c.uses:[]
+    }));
+    return data;
   }catch(e){
     return JSON.parse(JSON.stringify(EMPTY));
   }
@@ -1443,10 +1226,6 @@ function show(id){
 function toggle(id){
   const e=document.getElementById(id);
   if(e)e.classList.toggle('hidden');
-}
-
-function teacherMode(){
-  show('teacher');
 }
 
 function printSec(id){
@@ -1711,7 +1490,9 @@ function renderChem(){
 
               <tr>
                 <th>التاريخ</th>
+                <th>الوقت</th>
                 <th>الأستاذ</th>
+                <th>التجربة</th>
                 <th>الكمية المستعملة</th>
                 <th>المتبقي</th>
               </tr>
@@ -1724,7 +1505,9 @@ function renderChem(){
 
                 <tr>
                   <td>${esc(u.date)}</td>
+                  <td>${esc(u.time || '')}</td>
                   <td>${esc(u.teacher)}</td>
+                  <td>${esc(u.experiment || '')}</td>
                   <td>${esc(u.qty)} ${esc(c.unit||'')}</td>
                   <td>${esc(u.remaining)} ${esc(c.unit||'')}</td>
                 </tr>
@@ -1855,24 +1638,22 @@ function useChem(cid){
     return;
   }
 
-  const teacher=prompt(
-    'اسم الأستاذ:'
-  )||'';
+  const teacher=prompt('اسم الأستاذ:')||'';
+  const experiment=prompt('اسم التجربة أو النشاط:')||'';
+  const time=prompt('وقت التجربة (مثال 10:30):', nowTime())||nowTime();
+  const date=prompt('تاريخ التجربة (YYYY-MM-DD):', today())||today();
 
   const r=remaining-q;
 
   c.uses=c.uses||[];
 
   c.uses.push({
-
-    date:today(),
-
+    date:date,
+    time:time,
     teacher:teacher,
-
+    experiment:experiment,
     qty:q,
-
     remaining:r
-
   });
 
   save();
@@ -1892,83 +1673,6 @@ function delChem(cid){
     db.chemicals.filter(x=>x.id!==cid);
 
   save();
-}
-
-
-/* =========================
-   الحركات
-========================= */
-
-function renderMoves(){
-
-  document.getElementById('moveBody').innerHTML=
-    db.movements.map(x=>`
-
-      <tr>
-
-        <td>${esc(x.equipment)}</td>
-        <td>${esc(x.type)}</td>
-        <td>${esc(x.teacher)}</td>
-        <td>${esc(x.class_name)}</td>
-        <td>${esc(x.date)}</td>
-        <td>${esc(x.time)}</td>
-        <td>${esc(x.quantity)}</td>
-        <td>${esc(x.notes)}</td>
-
-      </tr>
-
-    `).join('');
-
-}
-
-
-function addMove(){
-
-  const x={
-
-    id:id(),
-
-    equipment:
-      document.getElementById('mequip').value.trim(),
-
-    type:
-      document.getElementById('mtype').value,
-
-    teacher:
-      document.getElementById('mteach').value.trim(),
-
-    class_name:
-      document.getElementById('mclass').value.trim(),
-
-    date:
-      document.getElementById('mdate').value||today(),
-
-    time:
-      document.getElementById('mtime').value||nowTime(),
-
-    quantity:
-      Number(document.getElementById('mqty').value||1),
-
-    notes:
-      document.getElementById('mnote').value.trim()
-
-  };
-
-  if(!x.equipment){
-    alert('اكتب اسم التجهيز');
-    return;
-  }
-
-  db.movements.push(x);
-
-  save();
-
-  document.getElementById('mequip').value='';
-  document.getElementById('mteach').value='';
-  document.getElementById('mclass').value='';
-  document.getElementById('mnote').value='';
-
-  alert('تم تسجيل الحركة');
 }
 
 
@@ -2035,7 +1739,8 @@ async function saveDaily(){
 
     return;
   }
-  await saveDailyToSupabase();
+  const remoteSaved=await saveDailyToSupabase();
+  if(remoteSaved===false){ return; }
   if(editingDailyId){
 
     const x=db.daily.find(y=>y.id===editingDailyId);
@@ -2147,7 +1852,6 @@ async function saveDaily(){
 
   console.log('التقارير المحفوظة:', data);
 }
-  loadDailyFromSupabase();
   
 function renderDailyRows(){
 
@@ -2457,227 +2161,6 @@ function renderProgress(){
   `;
 
 }
-
-
-/* =========================
-   الطلبات
-========================= */
-async function sendTeacherRequest(){
-
-  const teacher =
-    document.getElementById('reqTeacher').value.trim();
-
-  const className =
-    document.getElementById('reqClass').value.trim();
-
-  const requestText =
-    document.getElementById('reqText').value.trim();
-
-  const tools =
-    document.getElementById('reqTools').value.trim();
-
-  const notes =
-    document.getElementById('reqNote').value.trim();
-
-  const message =
-    document.getElementById('reqMessage');
-
-  if(!teacher){
-
-    message.innerHTML =
-      '<div class="error">أدخل اسم الأستاذ</div>';
-
-    return;
-  }
-
-  if(!requestText){
-
-    message.innerHTML =
-      '<div class="error">أدخل التجربة أو النشاط المطلوب</div>';
-
-    return;
-  }
-
-  const { error } =
-    await supabaseClient
-      .from('requests')
-      .insert({
-
-        teacher: teacher,
-
-        class_name: className,
-
-        request_text: requestText,
-
-        tools: tools,
-
-        request_date:
-          new Date().toISOString().slice(0,10),
-
-        status: 'جديد',
-
-        is_read: false,
-
-        notes: notes
-
-      });
-
-  if(error){
-
-    console.error(error);
-
-    message.innerHTML =
-      '<div class="error">❌ حدث خطأ أثناء إرسال الطلب</div>';
-
-    return;
-  }
-
-  message.innerHTML =
-    '<div class="success">✅ تم إرسال الطلب بنجاح</div>';
-
-  document.getElementById('reqTeacher').value = '';
-  document.getElementById('reqClass').value = '';
-  document.getElementById('reqText').value = '';
-  document.getElementById('reqTools').value = '';
-  document.getElementById('reqNote').value = '';
-
-  if(typeof renderRequests === 'function'){
-
-    await renderRequests();
-
-  }
-
-}
-async function renderRequests(){
-
-  const body = document.getElementById("reqBody");
-
-  if(!body) return;
-
-  const { data, error } = await supabaseClient
-    .from("requests")
-    .select("*")
-    .order("request_date", { ascending: false });
-
-  if(error){
-
-    console.error(error);
-
-    body.innerHTML =
-      '<tr><td colspan="10">❌ تعذر تحميل الطلبات</td></tr>';
-
-    return;
-  }
-
-  if(!data || data.length === 0){
-
-    body.innerHTML =
-      '<tr><td colspan="10">لا توجد طلبات</td></tr>';
-
-    return;
-  }
-
-  body.innerHTML = data.map(x => `
-
-    <tr>
-
-      <td>
-        ${esc(x.teacher || "")}
-      </td>
-
-      <td>
-        ${esc(x.class_name || "")}
-      </td>
-
-      <td>
-        ${esc(x.request_date || "")}
-      </td>
-
-      <td>
-        ${esc(x.request_text || "")}
-      </td>
-
-      <td>
-        ${esc(x.tools || "")}
-      </td>
-
-      <td>
-        ${esc(x.notes || "")}
-      </td>
-
-      <td>
-        ${esc(x.status || "جديد")}
-      </td>
-
-      <td>
-        ${esc(x.execution_date || "—")}
-      </td>
-
-      <td>
-        ${esc(x.execution_time || "—")}
-      </td>
-
-      <td class="no-print">
-
-  ${
-    x.status === "تم التنفيذ"
-      ? "✅ تم التنفيذ"
-      : `
-        <button
-          class="primary"
-          onclick="executeRequest('${x.id}')">
-          ▶️ تنفيذ
-        </button>
-      `
-  }
-
-</td>
-    </tr>
-
-  `).join("");
-
-}
-
-async function executeRequest(id){
-
-  const now = new Date();
-
-  const executionDate =
-    now.toISOString().slice(0,10);
-
-  const executionTime =
-    now.toTimeString().slice(0,5);
-
-  const { error } =
-    await supabaseClient
-      .from("requests")
-      .update({
-        status: "تم التنفيذ",
-        execution_date: executionDate,
-        execution_time: executionTime
-      })
-      .eq("id", id);
-
-  if(error){
-
-    console.error(error);
-
-    alert("❌ تعذر تسجيل تنفيذ الطلب");
-
-    return;
-  }
-
-  await renderRequests();
-
-}
-
-
-
-
-
-
-
-
 
 
 /* =========================
@@ -3018,7 +2501,6 @@ function renderAll(){
   renderCats();
   renderInventory();
   renderChem();
-  renderMoves();
   renderSavedDaily();
   renderRequests();
   renderProjects();
@@ -3088,7 +2570,6 @@ document.addEventListener(
 const dates=[
       'idate',
       'cdate',
-      'mdate',
       'ddate',
       'tdate',
       'pdate',
@@ -3104,7 +2585,6 @@ const dates=[
     });
 
     const times=[
-      'mtime',
       'dtime',
       'ttime'
     ];
@@ -3118,6 +2598,8 @@ const dates=[
     });
 
     renderAll();
+    renderRequests();
+    updateRequestsNotification();
   }
 );
 </script> 
@@ -3180,71 +2662,10 @@ async function loginUser(){
   }
 
   document.getElementById("loginBox").style.display = "none";
-await applyTeacherAccess();
-message.textContent = "";
+  message.textContent = "";
 }
 </script> 
-  <script>
-async function loadUserRole(){
-
-  const { data, error } =
-    await supabaseClient.rpc("get_my_role");
-
-  if(error){
-    console.error(error);
-    return null;
-  }
-
-  return data;
-}
-    async function applyTeacherAccess(){
-
-  const role = await loadUserRole();
-
-  if(role !== "teacher") return;
-
-  const allowed = ["requests", "progress", "various"];
-
-  document.querySelectorAll(".section").forEach(function(sec){
-
-    if(!allowed.includes(sec.id)){
-      sec.classList.add("teacher-hidden");
-      sec.classList.remove("active");
-    }else{
-      sec.classList.remove("teacher-hidden");
-    }
-
-  });
-
-  const nav = document.getElementById("mainNav");
-
-  if(nav){
-
-    nav.querySelectorAll("button").forEach(function(btn){
-
-      const text = btn.textContent;
-
-      const allowedButton =
-        text.includes("الطلبات") ||
-        text.includes("التدرج") ||
-        text.includes("منوعات");
-
-      btn.style.display =
-        allowedButton ? "" : "none";
-
-    });
-
-  }
-
-  const title = document.querySelector("header h1");
-
-  if(title){
-    title.textContent = "👨‍🏫 فضاء الأستاذ";
-  }
-
-  show("requests");
-}
-</script>
+  
  <script>
 async function logoutUser(){
   await supabaseClient.auth.signOut();
@@ -3254,286 +2675,101 @@ async function logoutUser(){
 <script>
 
 </script>  
- <script>
- function sendTeacherRequest(){
+ 
+  
 
-  const idValue =
-    document.getElementById("reqId").value.trim();
+ 
 
-  const teacher =
-    document.getElementById("reqTeacher").value.trim();
+<script>
+/* =========================
+   الطلبات - النسخة الموحدة
+========================= */
 
-  const className =
-    document.getElementById("reqClass").value.trim();
+async function executeRequest(id){
 
-  const requestText =
-    document.getElementById("reqText").value.trim();
-
-  const tools =
-    document.getElementById("reqTools").value.trim();
-
-  const note =
-    document.getElementById("reqNote").value.trim();
-
-  const message =
-    document.getElementById("reqMessage");
-
-  if(!teacher || !className || !requestText){
-
-    message.textContent =
-      "⚠️ أكمل اسم الأستاذ والقسم والتجربة";
-
-    return;
-  }
-
-  message.textContent =
-    idValue
-      ? "جارٍ حفظ التعديل..."
-      : "جارٍ إرسال الطلب...";
-
-  const notes =
-    tools + (note ? " | " + note : "");
-
-  if(idValue){
-
-    const { error } =
-      await supabaseClient
-        .from("requests")
-        .update({
-          teacher: teacher,
-          class_name: className,
-          request_text: requestText,
-          notes: notes
-        })
-        .eq("id", idValue);
-
-    if(error){
-
-      console.error(error);
-
-      message.textContent =
-        "❌ حدث خطأ أثناء تعديل الطلب";
-
-      return;
-    }
-
-    message.innerHTML =
-      '<div class="success">✅ تم تعديل الطلب بنجاح</div>';
-
-  }else{
-
-    const { error } =
-      await supabaseClient
-        .from("requests")
-        .insert({
-  teacher: teacher,
-  class_name: className,
-  request_text: requestText,
-  request_date:
-    new Date().toISOString().slice(0,10),
-  status: "جديد",
-  is_read: false,
-  notes: notes
-});
-    if(error){
-
-      console.error(error);
-
-      message.textContent =
-        "❌ حدث خطأ أثناء إرسال الطلب";
-
-      return;
-    }
-
-    message.innerHTML =
-      '<div class="success">✅ تم إرسال الطلب بنجاح</div>';
-  }
-
-  cancelReqEdit();
-
-  if(typeof renderRequests === "function"){
-    await renderRequests();
-  }
-}
-</script>
-  <script>
-
-async function editReq(id){
-
-  const { data, error } =
-    await supabaseClient
-      .from("requests")
-      .select("*")
-      .eq("id", id)
-      .single();
+  const now=new Date();
+  const {error}=await supabaseClient.from("requests").update({
+    status:"تم التنفيذ",
+    execution_date:now.toISOString().slice(0,10),
+    execution_time:now.toTimeString().slice(0,5),
+    is_read:true
+  }).eq("id",id);
 
   if(error){
     console.error(error);
-    alert("❌ تعذر فتح الطلب للتعديل");
+    alert("❌ تعذر تسجيل تنفيذ الطلب\n\n"+error.message);
     return;
   }
 
-  document.getElementById("reqId").value = data.id || "";
-  document.getElementById("reqTeacher").value = data.teacher || "";
-  document.getElementById("reqClass").value = data.class_name || "";
-  document.getElementById("reqText").value = data.request_text || "";
-
-  const parts = String(data.notes || "").split(" | ");
-
-  document.getElementById("reqTools").value = parts[0] || "";
-  document.getElementById("reqNote").value =
-    parts.slice(1).join(" | ");
-
-  document.getElementById("requestFormTitle").textContent =
-    "✏️ تعديل الطلب";
-
-  document.getElementById("cancelReqEdit")
-    .classList.remove("hidden");
-
-  document.getElementById("teacherRequestForm")
-    .scrollIntoView({
-      behavior:"smooth",
-      block:"start"
-    });
+  await renderRequests();
+  await updateRequestsNotification();
 }
-
-
-function cancelReqEdit(){
-
-  document.getElementById("reqId").value = "";
-  document.getElementById("reqTeacher").value = "";
-  document.getElementById("reqClass").value = "";
-  document.getElementById("reqText").value = "";
-  document.getElementById("reqTools").value = "";
-  document.getElementById("reqNote").value = "";
-
-  document.getElementById("requestFormTitle").textContent =
-    "📝 إرسال طلب جديد";
-
-  document.getElementById("cancelReqEdit")
-    .classList.add("hidden");
-
-  document.getElementById("reqMessage").innerHTML = "";
-}
-
 
 async function deleteReq(id){
 
-  if(!confirm("هل تريد حذف هذا الطلب نهائيًا؟")){
-    return;
-  }
+  if(!confirm("هل تريد حذف هذا الطلب نهائيًا؟")) return;
 
-  const { error } =
-    await supabaseClient
-      .from("requests")
-      .delete()
-      .eq("id", id);
+  const {error}=await supabaseClient.from("requests").delete().eq("id",id);
 
   if(error){
-
     console.error(error);
-
-    alert(
-      "❌ لم يتم حذف الطلب\n\n" +
-      error.message
-    );
-
+    alert("❌ لم يتم حذف الطلب\n\n"+error.message);
     return;
   }
 
-  alert("✅ تم حذف الطلب بنجاح");
-
   await renderRequests();
+  await updateRequestsNotification();
+  alert("✅ تم حذف الطلب بنجاح");
 }
 
-</script>
-
-<script>
 async function renderRequests(){
 
-  const body = document.getElementById("reqBody");
+  const body=document.getElementById("reqBody");
+  if(!body)return;
 
-  if(!body) return;
-
-  const { data, error } = await supabaseClient
+  const {data,error}=await supabaseClient
     .from("requests")
     .select("*")
-    .order("request_date", { ascending: false });
+    .order("request_date",{ascending:false})
+    .order("request_time",{ascending:false});
 
   if(error){
-
     console.error(error);
-
-    body.innerHTML =
-      '<tr><td colspan="9">❌ تعذر تحميل الطلبات</td></tr>';
-
+    body.innerHTML='<tr><td colspan="11">❌ تعذر تحميل الطلبات: '+esc(error.message)+'</td></tr>';
     return;
   }
 
-  if(!data || data.length === 0){
-
-    body.innerHTML =
-      '<tr><td colspan="9">لا توجد طلبات</td></tr>';
-
+  if(!data || !data.length){
+    body.innerHTML='<tr><td colspan="11">لا توجد طلبات</td></tr>';
     return;
   }
 
-  body.innerHTML = data.map(x => `
-
+  body.innerHTML=data.map(x=>`
     <tr>
-
-      <td>${esc(x.teacher || "")}</td>
-
-      <td>${esc(x.class_name || "")}</td>
-
-      <td>${esc(x.request_date || "")}</td>
-
-      <td>${esc(x.request_text || "")}</td>
-
-      <td>${esc(x.tools || "")}</td>
-
-      <td>${esc(x.notes || "")}</td>
-
-      <td>${esc(x.execution_date || "—")}</td>
-
-      <td>${esc(x.execution_time || "—")}</td>
-
+      <td>${esc(x.teacher||"")}</td>
+      <td>${esc(x.class_name||"")}</td>
+      <td>${esc(x.request_date||"")}</td>
+      <td>${esc(x.request_time||"")}</td>
+      <td>${esc(x.request_text||"")}</td>
+      <td>${esc(x.tools||"")}</td>
+      <td>${esc(x.notes||"")}</td>
+      <td>${esc(x.status||"جديد")}</td>
+      <td>${esc(x.execution_date||"—")}</td>
+      <td>${esc(x.execution_time||"—")}</td>
       <td class="no-print">
-
-        <button
-          type="button"
-          onclick="deleteRequest('${x.id}')">
-          🗑️ حذف
-        </button>
-
+        <div class="actions" style="margin-top:0">
+          ${
+            x.status==="تم التنفيذ"
+            ? '<button type="button" disabled>✅ تم التنفيذ</button>'
+            : `<button type="button" onclick="executeRequest('${x.id}')">▶️ تنفيذ</button>`
+          }
+          <button class="danger" type="button" onclick="deleteReq('${x.id}')">🗑️ حذف</button>
+        </div>
       </td>
-
     </tr>
-
   `).join("");
-
 }
-}
-async function deleteRequest(id){
+</script>
 
-  const { error } =
-    await supabaseClient
-      .from("requests")
-      .delete()
-      .eq("id", id);
-
-  if(error){
-
-    console.error(error);
-
-    alert("❌ تعذر حذف الطلب");
-
-    return;
-  }
-
-  await renderRequests();
-
-}
-</script> 
 </body>
-</html> 
+</html>
