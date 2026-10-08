@@ -225,6 +225,9 @@ const supabaseClient = window.supabase.createClient(
 </script>
 </head>
 <body>
+ <audio id="requestSound" preload="auto">
+  <source src="https://actions.google.com/sounds/v1/alarms/medium_bell_ringing_near.ogg" type="audio/ogg">
+</audio> 
 <script>
 
 </script>
@@ -2558,7 +2561,10 @@ async function updateRequestsNotification(){
   const box = document.getElementById("requestsNotificationText");
 
   if(!box) return;
+const sound = document.getElementById("requestSound");
 
+const oldCount =
+  Number(localStorage.getItem("OLD_REQUEST_COUNT") || 0);
   const { count, error } = await supabaseClient
     .from("requests")
     .select("*", { count: "exact", head: true })
@@ -2569,7 +2575,19 @@ async function updateRequestsNotification(){
     console.error("Requests notification error:", error);
 
     box.textContent = "تعذر التحقق من الطلبات";
+if(count > oldCount && sound){
 
+  sound.currentTime = 0;
+
+  sound.play().catch(()=>{
+    console.log("الصوت يحتاج تفاعلًا من المستخدم");
+  });
+}
+
+localStorage.setItem(
+  "OLD_REQUEST_COUNT",
+  String(count || 0)
+);
     return;
   }
 
