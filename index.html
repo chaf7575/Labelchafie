@@ -2050,6 +2050,7 @@ function renderDailyRows(){
     ).join('');
 
 }
+  
 function renderSavedDaily(){
 
   const body = document.getElementById('savedDaily');
@@ -2059,19 +2060,24 @@ function renderSavedDaily(){
   body.innerHTML = '';
 
   if(!db.daily || !db.daily.length){
+
     body.innerHTML = `
       <tr>
-        <td colspan="5" style="text-align:center">
+        <td colspan="6" style="text-align:center">
           لا توجد تقارير محفوظة
         </td>
       </tr>
     `;
+
     return;
   }
 
   [...db.daily]
     .sort((a,b) => {
-      return String(b.date || '').localeCompare(String(a.date || ''));
+
+      return String(b.date || '')
+        .localeCompare(String(a.date || ''));
+
     })
     .forEach((report, index) => {
 
@@ -2083,9 +2089,14 @@ function renderSavedDaily(){
           : 0;
 
       tr.innerHTML = `
-        <td>${report.number || (index + 1)}</td>
 
-        <td>${report.date || ''}</td>
+        <td>
+          ${report.number || report.report_number || (index + 1)}
+        </td>
+
+        <td>
+          ${report.date || ''}
+        </td>
 
         <td>
           ${report.general || ''}
@@ -2099,21 +2110,256 @@ function renderSavedDaily(){
 
           <button
             class="primary"
+            onclick="openDailyReport('${report.id}')">
+            👁️ فتح
+          </button>
+
+          <button
+            class="primary"
+            onclick="printSavedDaily('${report.id}')">
+            🖨️ طباعة
+          </button>
+
+          <button
+            class="primary"
+            onclick="mailSavedDaily('${report.id}')">
+            📧 إرسال
+          </button>
+
+          <button
+            class="primary"
             onclick="editDaily('${report.id}')">
-            تعديل
+            ✏️ تعديل
           </button>
 
           <button
             class="danger"
             onclick="deleteDaily('${report.id}')">
-            حذف
+            🗑️ حذف
           </button>
 
         </td>
+
       `;
 
       body.appendChild(tr);
+
     });
+
+}
+function openDailyReport(id){
+
+  const report =
+    db.daily.find(
+      x => x.id === id
+    );
+
+  if(!report){
+
+    alert('❌ لم يتم العثور على التقرير');
+
+    return;
+  }
+
+  /* تحميل بيانات التقرير */
+
+  dailyRows =
+    JSON.parse(
+      JSON.stringify(
+        report.rows || []
+      )
+    );
+
+  const ddate =
+    document.getElementById('ddate');
+
+  if(ddate){
+
+    ddate.value =
+      report.date || today();
+
+  }
+
+  const dgen =
+    document.getElementById('dgen');
+
+  if(dgen){
+
+    dgen.value =
+      report.general || '';
+
+  }
+
+  const dneeds =
+    document.getElementById('dneeds');
+
+  if(dneeds){
+
+    dneeds.value =
+      report.needs || '';
+
+  }
+
+  /* عرض رقم التقرير */
+
+  const rno =
+    document.getElementById('rno');
+
+  if(rno){
+
+    rno.textContent =
+      report.number ||
+      report.report_number ||
+      '';
+
+  }
+
+  /* عرض التاريخ */
+
+  const rdate =
+    document.getElementById('rdate');
+
+  if(rdate){
+
+    rdate.textContent =
+      report.date || '';
+
+  }
+
+  /* عرض العام */
+
+  const pgen =
+    document.getElementById('pgen');
+
+  if(pgen){
+
+    pgen.textContent =
+      report.general || '';
+
+  }
+
+  /* عرض الاحتياجات */
+
+  const pneeds =
+    document.getElementById('pneeds');
+
+  if(pneeds){
+
+    pneeds.textContent =
+      report.needs || '';
+
+  }
+
+  renderDailyRows();
+
+  alert(
+    '✅ تم فتح التقرير رقم ' +
+    (report.number || report.report_number || '')
+  );
+
+} 
+ function printSavedDaily(id){
+
+  openDailyReport(id);
+
+  setTimeout(() => {
+
+    printDaily();
+
+  }, 300);
+
+}
+function mailSavedDaily(id){
+
+  const report =
+    db.daily.find(
+      x => x.id === id
+    );
+
+  if(!report){
+
+    alert('❌ لم يتم العثور على التقرير');
+
+    return;
+  }
+
+  const number =
+    report.number ||
+    report.report_number ||
+    '';
+
+  const date =
+    report.date ||
+    '';
+
+  const general =
+    report.general ||
+    '';
+
+  const needs =
+    report.needs ||
+    '';
+
+  let rowsText = '';
+
+  if(Array.isArray(report.rows)){
+
+    rowsText =
+      report.rows.map((x, i) => {
+
+        return (
+          (i + 1) +
+          '. الأستاذ: ' +
+          (x.teacher || '') +
+          ' | القسم: ' +
+          (x.class_name || '') +
+          ' | التجربة: ' +
+          (x.experiment || '') +
+          ' | الأدوات: ' +
+          (x.equipment || '') +
+          ' | التاريخ: ' +
+          (x.report_date || '') +
+          ' | الوقت: ' +
+          (x.report_time || '') +
+          ' | ملاحظة: ' +
+          (x.note || '')
+        );
+
+      }).join('\n');
+
+  }
+
+  const subject =
+    encodeURIComponent(
+      'التقرير اليومي رقم ' + number
+    );
+
+  const body =
+    encodeURIComponent(
+      'التقرير اليومي للمخبر\n\n' +
+
+      'رقم التقرير: ' +
+      number + '\n' +
+
+      'التاريخ: ' +
+      date + '\n\n' +
+
+      'الصفوف:\n' +
+      rowsText + '\n\n' +
+
+      'ملاحظات عامة:\n' +
+      general + '\n\n' +
+
+      'الاحتياجات:\n' +
+      needs
+    );
+
+  location.href =
+    'mailto:?subject=' +
+    subject +
+    '&body=' +
+    body;
+
 }
 function editDaily(id){
 
