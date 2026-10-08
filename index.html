@@ -2115,7 +2115,148 @@ function renderSavedDaily(){
       body.appendChild(tr);
     });
 }
+function editDaily(id){
 
+  const report =
+    db.daily.find(
+      x => x.id === id
+    );
+
+  if(!report){
+    alert('❌ لم يتم العثور على التقرير');
+    return;
+  }
+
+  editingDailyId = id;
+
+  dailyRows =
+    JSON.parse(
+      JSON.stringify(
+        report.rows || []
+      )
+    );
+
+  const ddate =
+    document.getElementById('ddate');
+
+  if(ddate){
+    ddate.value =
+      report.date || today();
+  }
+
+  const dgen =
+    document.getElementById('dgen');
+
+  if(dgen){
+    dgen.value =
+      report.general || '';
+  }
+
+  const dneeds =
+    document.getElementById('dneeds');
+
+  if(dneeds){
+    dneeds.value =
+      report.needs || '';
+  }
+
+  renderDailyRows();
+
+  alert('تم تحميل التقرير للتعديل');
+
+}
+ async function deleteDaily(id){
+
+  const report =
+    db.daily.find(
+      x => x.id === id
+    );
+
+  if(!report){
+    alert('❌ لم يتم العثور على التقرير');
+    return;
+  }
+
+  const confirmed =
+    confirm(
+      'هل أنت متأكد من حذف هذا التقرير؟'
+    );
+
+  if(!confirmed){
+    return;
+  }
+
+  /* =========================
+     حذف التقرير من Supabase
+  ========================= */
+
+  let query =
+    supabaseClient
+      .from('daily_reports')
+      .delete();
+
+  if(report.report_id){
+
+    query =
+      query.eq(
+        'report_id',
+        report.report_id
+      );
+
+  }else if(report.report_number){
+
+    query =
+      query.eq(
+        'report_number',
+        report.report_number
+      );
+
+  }else if(report.number){
+
+    query =
+      query.eq(
+        'report_number',
+        report.number
+      );
+  }
+
+  const { error } =
+    await query;
+
+  if(error){
+
+    console.error(error);
+
+    alert(
+      '❌ تعذر حذف التقرير من Supabase\n' +
+      error.message
+    );
+
+    return;
+  }
+
+  /* =========================
+     حذف التقرير محليًا
+  ========================= */
+
+  db.daily =
+    db.daily.filter(
+      x => x.id !== id
+    );
+
+  save();
+
+  if(editingDailyId === id){
+    editingDailyId = null;
+    dailyRows = [];
+    renderDailyRows();
+  }
+
+  renderSavedDaily();
+
+  alert('✅ تم حذف التقرير بنجاح');
+
+} 
 /* =========================
    تعديل صف داخل التقرير
 ========================= */
