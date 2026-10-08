@@ -231,7 +231,7 @@ const supabaseClient = window.supabase.createClient(
 <script>
 
 </script>
-<div id="activationBox"style="position:fixed;inset:0;background:#f4f7fb;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px">
+<div id="activationBox" style="position:fixed;inset:0;background:#f4f7fb;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px">
   <div style="background:white;padding:25px;border-radius:15px;max-width:420px;width:100%;text-align:center;box-shadow:0 4px 20px #0002">
     <h2>🔐 تفعيل منصة المخبري</h2>
     <p>أدخل كود التفعيل الخاص بك للمتابعة</p>
@@ -584,6 +584,11 @@ const supabaseClient = window.supabase.createClient(
 <div class="grid">
 
 <label>
+رقم التقرير
+<input id="dnumber" type="number" min="1" placeholder="رقم التقرير">
+</label>
+
+<label>
 التاريخ
 <input id="ddate" type="date">
 </label>
@@ -671,11 +676,12 @@ const supabaseClient = window.supabase.createClient(
 
 <th>الأستاذ</th>
 <th>القسم</th>
-<th>التجربة</th>
-<th>الأدوات</th>
 <th>التاريخ</th>
 <th>الوقت</th>
+<th>التجربة</th>
+<th>الأدوات</th>
 <th>ملاحظة</th>
+<th>الحالة</th>
 <th class="no-print">إجراء</th>
 
 </tr>
@@ -1219,7 +1225,7 @@ function show(id){
   }
 
   window.scrollTo(0,0);
-  updateRequestsNotification();
+  renderAll();
 }
 
 function toggle(id){
@@ -1676,1234 +1682,459 @@ function delChem(cid){
 
 
 /* =========================
- /* =========================
-   التقارير اليومية
+   التقارير اليومية - النسخة الموحدة
 ========================= */
 
 let dailyRows = [];
 let editingDailyId = null;
 
+function getDailyNumberValue(){
+  const el=document.getElementById('dnumber');
+  const n=el ? parseInt(el.value,10) : NaN;
+  return Number.isInteger(n) && n>0 ? n : null;
+}
 
-/* =========================
-   إضافة صف للتقرير
-========================= */
+function getNextDailyNumber(){
+  const nums=(db.daily||[]).map(x=>parseInt(x.report_number ?? x.number,10)).filter(Number.isFinite);
+  return nums.length ? Math.max(...nums)+1 : 1;
+}
+
+function dailyNumberExists(number, exceptId=null){
+  return (db.daily||[]).some(x=>{
+    const n=parseInt(x.report_number ?? x.number,10);
+    return n===number && x.id!==exceptId;
+  });
+}
+
+function normalizeDailyRow(x){
+  return {
+    teacher:x.teacher ?? x.Teacher ?? '',
+    class_name:x.class_name ?? x['Class-name'] ?? '',
+    experiment:x.experiment ?? x.request_text ?? '',
+    equipment:x.equipment ?? x.tools ?? '',
+    report_date:x.report_date ?? x.date ?? today(),
+    report_time:x.report_time ?? x.time ?? '',
+    note:x.note ?? x.notes ?? '',
+    status:x.status ?? 'مكتمل'
+  };
+}
 
 function addDailyRow(){
-
-  const reportDate =
-    document.getElementById('ddate').value || today();
-
-  const x = {
-
-    teacher:
-      document.getElementById('dteach').value.trim(),
-
-    class_name:
-      document.getElementById('dclass').value.trim(),
-
-    experiment:
-      document.getElementById('dexp').value.trim(),
-
-    equipment:
-      document.getElementById('dequip').value.trim(),
-
-    report_date:
-      reportDate,
-
-    report_time:
-      document.getElementById('dtime').value || nowTime(),
-
-    note:
-      document.getElementById('dnote').value.trim()
-
+  const reportDate=document.getElementById('ddate').value || today();
+  const x={
+    teacher:document.getElementById('dteach').value.trim(),
+    class_name:document.getElementById('dclass').value.trim(),
+    experiment:document.getElementById('dexp').value.trim(),
+    equipment:document.getElementById('dequip').value.trim(),
+    report_date:reportDate,
+    report_time:document.getElementById('dtime').value || nowTime(),
+    note:document.getElementById('dnote').value.trim(),
+    status:'مكتمل'
   };
 
   if(!x.teacher && !x.experiment){
-
     alert('أدخل اسم الأستاذ أو التجربة');
-
     return;
   }
 
   dailyRows.push(x);
-
   renderDailyRows();
 
-  document.getElementById('dteach').value = '';
-  document.getElementById('dclass').value = '';
-  document.getElementById('dtime').value = '';
-  document.getElementById('dexp').value = '';
-  document.getElementById('dequip').value = '';
-  document.getElementById('dnote').value = '';
-
+  ['dteach','dclass','dtime','dexp','dequip','dnote'].forEach(id=>{
+    const e=document.getElementById(id);
+    if(e)e.value='';
+  });
 }
-
-
-/* =========================
-   حفظ التقرير
-========================= */
-async function saveDaily(){
-alert('دخل إلى saveDaily');
-    if(!dailyRows || !dailyRows.length){
-      alert('أضف صفًا واحدًا على الأقل');
-      return;
-    }
-
-    const remoteSaved = await saveDailyToSupabase();
-
-    if(remoteSaved === false){
-      return;
-    }
-
-    const dateEl = document.getElementById('ddate');
-    const generalEl = document.getElementById('dgen');
-    const needsEl = document.getElementById('dneeds');
-
-    const reportDate =
-      dateEl ? (dateEl.value || today()) : today();
-
-    const general =
-      generalEl ? generalEl.value.trim() : '';
-
-    const needs =
-      needsEl ? needsEl.value.trim() : '';
-
-    /* =========================
-       تعديل تقرير موجود
-    ========================= */
-
-    if(editingDailyId){
-
-      const x = db.daily.find(y => y.id === editingDailyId);
-
-      if(!x){
-        alert('تعذر العثور على التقرير المراد تعديله');
-        return;
-      }
-
-      x.date = reportDate;
-
-      x.rows =
-        JSON.parse(JSON.stringify(dailyRows));
-
-      x.general = general;
-      x.needs = needs;
-
-      save();
-
-      const rno = document.getElementById('rno');
-      const rdate = document.getElementById('rdate');
-      const pgen = document.getElementById('pgen');
-      const pneeds = document.getElementById('pneeds');
-
-      if(rno) {
-        rno.textContent =
-          x.number || x.report_number || '';
-      }
-
-      if(rdate) {
-        rdate.textContent =
-          x.date || '';
-      }
-
-      if(pgen) {
-        pgen.textContent =
-          x.general || '';
-      }
-
-      if(pneeds) {
-        pneeds.textContent =
-          x.needs || '';
-      }
-
-      editingDailyId = null;
-
-      dailyRows = [];
-
-      renderDailyRows();
-      renderSavedDaily();
-
-      alert('تم تعديل التقرير بنجاح');
-
-      return;
-    }
-
-
-
-  
-
-
-
-
-  /* =========================
-     إنشاء تقرير جديد
-  ========================= */
-
-  const reportId =
-    crypto.randomUUID();
-
-  const reportNumber =
-    db.daily.length + 1;
-
-  const x = {
-
-    id:
-      id(),
-
-    report_id:
-      reportId,
-
-    number:
-      reportNumber,
-
-    report_number:
-      reportNumber,
-
-    date:
-      document.getElementById('ddate').value || today(),
-
-    rows:
-      JSON.parse(
-        JSON.stringify(dailyRows)
-      ),
-
-    general:
-      document.getElementById('dgen').value.trim(),
-
-    needs:
-      document.getElementById('dneeds').value.trim()
-
-  };
-
-
-  db.daily.push(x);
-
-  save();
-
-
-  const rno =
-    document.getElementById('rno');
-
-  if(rno){
-    rno.textContent =
-      x.number;
-  }
-
-
-  const rdate =
-    document.getElementById('rdate');
-
-  if(rdate){
-    rdate.textContent =
-      x.date;
-  }
-
-
-  const pgen =
-    document.getElementById('pgen');
-
-  if(pgen){
-    pgen.textContent =
-      x.general;
-  }
-
-
-  const pneeds =
-    document.getElementById('pneeds');
-
-  if(pneeds){
-    pneeds.textContent =
-      x.needs;
-  }
-
-
-  dailyRows = [];
-
-  renderDailyRows();
-
-  renderSavedDaily();
-
-  alert('تم حفظ التقرير');
-
-}
-
-
-/* =========================
-   جلب التقارير من Supabase
-========================= */
-
-async function loadDailyFromSupabase(){
-
-  const { data, error } =
-    await supabaseClient
-      .from('daily_reports')
-      .select('*')
-      .order(
-        'report_date',
-        { ascending:false }
-      )
-      .order(
-        'report_time',
-        { ascending:false }
-      );
-
-
-  if(error){
-
-    console.error(error);
-
-    alert(
-      '❌ تعذر جلب التقارير من Supabase\n' +
-      error.message
-    );
-
-    return;
-  }
-
-
-  console.log(
-    'التقارير المحفوظة:',
-    data
-  );
-
-  return data;
-}
-
-
-/* =========================
-   عرض صفوف التقرير
-========================= */
 
 function renderDailyRows(){
-
-  const body =
-    document.getElementById('dailyBody');
-
-  if(!body) return;
-
-
-  if(
-    !dailyRows ||
-    dailyRows.length === 0
-  ){
-
-    body.innerHTML =
-      '<tr><td colspan="8">لا توجد صفوف</td></tr>';
-
-    return;
-  }
-
-
-  body.innerHTML =
-    dailyRows.map(
-      (x,index) => `
-
-      <tr>
-
-        <td>
-          ${esc(x.teacher || '')}
-        </td>
-
-        <td>
-          ${esc(x.class_name || '')}
-        </td>
-
-        <td>
-          ${esc(x.experiment || '')}
-        </td>
-
-        <td>
-          ${esc(x.equipment || '')}
-        </td>
-
-        <td>
-          ${esc(x.report_date || '')}
-        </td>
-
-        <td>
-          ${esc(x.report_time || '')}
-        </td>
-
-        <td>
-          ${esc(x.note || '')}
-        </td>
-
-        <td class="no-print">
-
-          <button
-            class="primary"
-            onclick="editDailyRow(${index})">
-            ✏️ تعديل
-          </button>
-
-          <button
-            class="danger"
-            onclick="removeDailyRow(${index})">
-            🗑️ حذف
-          </button>
-
-        </td>
-
-      </tr>
-
-    `
-    ).join('');
-
-}
-  
-function renderSavedDaily(){
-
-  const body = document.getElementById('savedDaily');
-
-  if(!body) return;
-
-  body.innerHTML = '';
-
-  if(!db.daily || !db.daily.length){
-
-    body.innerHTML = `
-      <tr>
-        <td colspan="6" style="text-align:center">
-          لا توجد تقارير محفوظة
-        </td>
-      </tr>
-    `;
-
-    return;
-  }
-
-  [...db.daily]
-    .sort((a,b) => {
-
-      return String(b.date || '')
-        .localeCompare(String(a.date || ''));
-
-    })
-    .forEach((report, index) => {
-
-      const tr = document.createElement('tr');
-
-      const rowsCount =
-        Array.isArray(report.rows)
-          ? report.rows.length
-          : 0;
-
-      tr.innerHTML = `
-
-        <td>
-          ${report.number || report.report_number || (index + 1)}
-        </td>
-
-        <td>
-          ${report.date || ''}
-        </td>
-
-        <td>
-          ${report.general || ''}
-        </td>
-
-        <td>
-          ${rowsCount}
-        </td>
-
-        <td class="no-print">
-
-          <button
-            class="primary"
-            onclick="openDailyReport('${report.id}')">
-            👁️ فتح
-          </button>
-
-          <button
-            class="primary"
-            onclick="printSavedDaily('${report.id}')">
-            🖨️ طباعة
-          </button>
-
-          <button
-            class="primary"
-            onclick="mailSavedDaily('${report.id}')">
-            📧 إرسال
-          </button>
-
-          <button
-            class="primary"
-            onclick="editDaily('${report.id}')">
-            ✏️ تعديل
-          </button>
-
-          <button
-            class="danger"
-            onclick="deleteDaily('${report.id}')">
-            🗑️ حذف
-          </button>
-
-        </td>
-
-      `;
-
-      body.appendChild(tr);
-
-    });
-
-}
-function openDailyReport(id){
-
-  const report =
-    db.daily.find(
-      x => x.id === id
-    );
-
-  if(!report){
-
-    alert('❌ لم يتم العثور على التقرير');
-
-    return;
-  }
-
-  /* تحميل بيانات التقرير */
-
-  dailyRows =
-    JSON.parse(
-      JSON.stringify(
-        report.rows || []
-      )
-    );
-
-  const ddate =
-    document.getElementById('ddate');
-
-  if(ddate){
-
-    ddate.value =
-      report.date || today();
-
-  }
-
-  const dgen =
-    document.getElementById('dgen');
-
-  if(dgen){
-
-    dgen.value =
-      report.general || '';
-
-  }
-
-  const dneeds =
-    document.getElementById('dneeds');
-
-  if(dneeds){
-
-    dneeds.value =
-      report.needs || '';
-
-  }
-
-  /* عرض رقم التقرير */
-
-  const rno =
-    document.getElementById('rno');
-
-  if(rno){
-
-    rno.textContent =
-      report.number ||
-      report.report_number ||
-      '';
-
-  }
-
-  /* عرض التاريخ */
-
-  const rdate =
-    document.getElementById('rdate');
-
-  if(rdate){
-
-    rdate.textContent =
-      report.date || '';
-
-  }
-
-  /* عرض العام */
-
-  const pgen =
-    document.getElementById('pgen');
-
-  if(pgen){
-
-    pgen.textContent =
-      report.general || '';
-
-  }
-
-  /* عرض الاحتياجات */
-
-  const pneeds =
-    document.getElementById('pneeds');
-
-  if(pneeds){
-
-    pneeds.textContent =
-      report.needs || '';
-
-  }
-
-  renderDailyRows();
-
-  alert(
-    '✅ تم فتح التقرير رقم ' +
-    (report.number || report.report_number || '')
-  );
-
-} 
- function printSavedDaily(id){
-
-  openDailyReport(id);
-
-  setTimeout(() => {
-
-    printDaily();
-
-  }, 300);
-
-}
-function mailSavedDaily(id){
-
-  const report =
-    db.daily.find(
-      x => x.id === id
-    );
-
-  if(!report){
-
-    alert('❌ لم يتم العثور على التقرير');
-
-    return;
-  }
-
-  const number =
-    report.number ||
-    report.report_number ||
-    '';
-
-  const date =
-    report.date ||
-    '';
-
-  const general =
-    report.general ||
-    '';
-
-  const needs =
-    report.needs ||
-    '';
-
-  let rowsText = '';
-
-  if(Array.isArray(report.rows)){
-
-    rowsText =
-      report.rows.map((x, i) => {
-
-        return (
-          (i + 1) +
-          '. الأستاذ: ' +
-          (x.teacher || '') +
-          ' | القسم: ' +
-          (x.class_name || '') +
-          ' | التجربة: ' +
-          (x.experiment || '') +
-          ' | الأدوات: ' +
-          (x.equipment || '') +
-          ' | التاريخ: ' +
-          (x.report_date || '') +
-          ' | الوقت: ' +
-          (x.report_time || '') +
-          ' | ملاحظة: ' +
-          (x.note || '')
-        );
-
-      }).join('\n');
-
-  }
-
-  const subject =
-    encodeURIComponent(
-      'التقرير اليومي رقم ' + number
-    );
-
-  const body =
-    encodeURIComponent(
-      'التقرير اليومي للمخبر\n\n' +
-
-      'رقم التقرير: ' +
-      number + '\n' +
-
-      'التاريخ: ' +
-      date + '\n\n' +
-
-      'الصفوف:\n' +
-      rowsText + '\n\n' +
-
-      'ملاحظات عامة:\n' +
-      general + '\n\n' +
-
-      'الاحتياجات:\n' +
-      needs
-    );
-
-  location.href =
-    'mailto:?subject=' +
-    subject +
-    '&body=' +
-    body;
-
-}
-function editDaily(id){
-
-  const report =
-    db.daily.find(
-      x => x.id === id
-    );
-
-  if(!report){
-    alert('❌ لم يتم العثور على التقرير');
-    return;
-  }
-
-  editingDailyId = id;
-
-  dailyRows =
-    JSON.parse(
-      JSON.stringify(
-        report.rows || []
-      )
-    );
-
-  const ddate =
-    document.getElementById('ddate');
-
-  if(ddate){
-    ddate.value =
-      report.date || today();
-  }
-
-  const dgen =
-    document.getElementById('dgen');
-
-  if(dgen){
-    dgen.value =
-      report.general || '';
-  }
-
-  const dneeds =
-    document.getElementById('dneeds');
-
-  if(dneeds){
-    dneeds.value =
-      report.needs || '';
-  }
-
-  renderDailyRows();
-
-  alert('تم تحميل التقرير للتعديل');
-
-}
- async function deleteDaily(id){
-
-  const report =
-    db.daily.find(
-      x => x.id === id
-    );
-
-  if(!report){
-    alert('❌ لم يتم العثور على التقرير');
-    return;
-  }
-
-  const confirmed =
-    confirm(
-      'هل أنت متأكد من حذف هذا التقرير؟'
-    );
-
-  if(!confirmed){
-    return;
-  }
-
-  /* =========================
-     حذف التقرير من Supabase
-  ========================= */
-
-  let query =
-    supabaseClient
-      .from('daily_reports')
-      .delete();
-
-  if(report.report_id){
-
-    query =
-      query.eq(
-        'report_id',
-        report.report_id
-      );
-
-  }else if(report.report_number){
-
-    query =
-      query.eq(
-        'report_number',
-        report.report_number
-      );
-
-  }else if(report.number){
-
-    query =
-      query.eq(
-        'report_number',
-        report.number
-      );
-  }
-
-  const { error } =
-    await query;
-
-  if(error){
-
-    console.error(error);
-
-    alert(
-      '❌ تعذر حذف التقرير من Supabase\n' +
-      error.message
-    );
-
-    return;
-  }
-
-  /* =========================
-     حذف التقرير محليًا
-  ========================= */
-
-  db.daily =
-    db.daily.filter(
-      x => x.id !== id
-    );
-
-  save();
-
-  if(editingDailyId === id){
-    editingDailyId = null;
-    dailyRows = [];
-    renderDailyRows();
-  }
-
-  renderSavedDaily();
-
-  alert('✅ تم حذف التقرير بنجاح');
-
-} 
-/* =========================
-   تعديل صف داخل التقرير
-========================= */
-
-function editDailyRow(index){
-
-  const x =
-    dailyRows[index];
-
-  if(!x) return;
-
-
-  document.getElementById('dteach').value =
-    x.teacher || '';
-
-
-  document.getElementById('dclass').value =
-    x.class_name || '';
-
-
-  document.getElementById('dtime').value =
-    x.report_time || '';
-
-
-  document.getElementById('dexp').value =
-    x.experiment || '';
-
-
-  document.getElementById('dequip').value =
-    x.equipment || '';
-
-
-  document.getElementById('dnote').value =
-    x.note || '';
-
-
-  /*
-    تاريخ التقرير موجود في ddate
-    ولا نغيره من هنا.
-  */
-
-  if(x.report_date){
-
-    const ddate =
-      document.getElementById('ddate');
-
-    if(ddate){
-      ddate.value =
-        x.report_date;
-    }
-  }
-
-
-  dailyRows.splice(index,1);
-
-  renderDailyRows();
-
-}
-
-
-/* =========================
-   حذف صف
-========================= */
-
-function removeDailyRow(index){
-
-  if(
-    index < 0 ||
-    index >= dailyRows.length
-  ){
-
-    return;
-  }
-
-
-  if(
-    !confirm(
-      'هل تريد حذف هذا الصف؟'
-    )
-  ){
-
-    return;
-  }
-
-
-  dailyRows.splice(index,1);
-
-  renderDailyRows();
-
-}
-
-
-/* =========================
-   الحفظ في Supabase
-========================= */
-
-async function saveDailyToSupabase(){
+  const body=document.getElementById('dailyBody');
+  if(!body)return;
 
   if(!dailyRows.length){
+    body.innerHTML='<tr><td colspan="9" style="text-align:center">لا توجد صفوف</td></tr>';
+    return;
+  }
 
-    alert(
-      'لا توجد صفوف لإرسالها'
-    );
+  body.innerHTML=dailyRows.map((x,index)=>`
+    <tr>
+      <td>${esc(x.teacher||'')}</td>
+      <td>${esc(x.class_name||'')}</td>
+      <td>${esc(x.report_date||'')}</td>
+      <td>${esc(x.report_time||'')}</td>
+      <td>${esc(x.experiment||'')}</td>
+      <td>${esc(x.equipment||'')}</td>
+      <td>${esc(x.note||'')}</td>
+      <td>${esc(x.status||'مكتمل')}</td>
+      <td class="no-print">
+        <button class="primary" type="button" onclick="editDailyRow(${index})">✏️ تعديل</button>
+        <button class="danger" type="button" onclick="removeDailyRow(${index})">🗑️ حذف</button>
+      </td>
+    </tr>
+  `).join('');
+}
 
+function editDailyRow(index){
+  const x=dailyRows[index];
+  if(!x)return;
+
+  document.getElementById('dteach').value=x.teacher||'';
+  document.getElementById('dclass').value=x.class_name||'';
+  document.getElementById('ddate').value=x.report_date||today();
+  document.getElementById('dtime').value=x.report_time||'';
+  document.getElementById('dexp').value=x.experiment||'';
+  document.getElementById('dequip').value=x.equipment||'';
+  document.getElementById('dnote').value=x.note||'';
+
+  dailyRows.splice(index,1);
+  renderDailyRows();
+}
+
+function removeDailyRow(index){
+  if(index<0 || index>=dailyRows.length)return;
+  if(!confirm('هل تريد حذف هذا الصف؟'))return;
+  dailyRows.splice(index,1);
+  renderDailyRows();
+}
+
+async function saveDaily(){
+  if(!dailyRows.length){
+    alert('أضف صفًا واحدًا على الأقل');
+    return;
+  }
+
+  const reportDate=document.getElementById('ddate').value || today();
+  const general=(document.getElementById('dgen')?.value || '').trim();
+  const needs=(document.getElementById('dneeds')?.value || '').trim();
+  const currentId=editingDailyId;
+  const reportNumber=getDailyNumberValue() || (currentId ? parseInt((db.daily.find(x=>x.id===currentId)||{}).number,10) : getNextDailyNumber());
+
+  if(!Number.isInteger(reportNumber) || reportNumber<1){
+    alert('رقم التقرير يجب أن يكون رقمًا صحيحًا أكبر من صفر');
+    return;
+  }
+
+  if(dailyNumberExists(reportNumber,currentId)){
+    alert('❌ رقم التقرير '+reportNumber+' مستخدم بالفعل. اختر رقمًا آخر.');
+    return;
+  }
+
+  const reportId=currentId
+    ? ((db.daily.find(x=>x.id===currentId)||{}).report_id || crypto.randomUUID())
+    : crypto.randomUUID();
+
+  const ok=await saveDailyToSupabase({
+    reportId,
+    oldReportId:currentId ? ((db.daily.find(x=>x.id===currentId)||{}).report_id || null) : null,
+    oldReportNumber:currentId ? ((db.daily.find(x=>x.id===currentId)||{}).report_number ?? (db.daily.find(x=>x.id===currentId)||{}).number) : null,
+    reportNumber,
+    reportDate,
+    general,
+    needs
+  });
+
+  if(!ok)return;
+
+  const localRows=JSON.parse(JSON.stringify(dailyRows));
+
+  if(currentId){
+    const x=db.daily.find(y=>y.id===currentId);
+    if(!x)return;
+    x.report_id=reportId;
+    x.report_number=reportNumber;
+    x.number=reportNumber;
+    x.date=reportDate;
+    x.rows=localRows;
+    x.general=general;
+    x.needs=needs;
+  }else{
+    db.daily.push({
+      id:id(),
+      report_id:reportId,
+      report_number:reportNumber,
+      number:reportNumber,
+      date:reportDate,
+      rows:localRows,
+      general,
+      needs
+    });
+  }
+
+  save();
+  editingDailyId=null;
+  dailyRows=[];
+  renderDailyRows();
+  renderSavedDaily();
+  updateDailyOfficial();
+  alert(currentId ? '✅ تم تعديل التقرير بنجاح' : '✅ تم حفظ التقرير بنجاح');
+}
+
+async function saveDailyToSupabase(opts={}){
+  if(!dailyRows.length){
+    alert('لا توجد صفوف لإرسالها');
     return false;
   }
 
+  const {
+    reportId,
+    oldReportId,
+    oldReportNumber,
+    reportNumber,
+    reportDate,
+    general,
+    needs
+  }=opts;
 
-  const reportDate =
-    document.getElementById('ddate').value ||
-    today();
+  if(!reportId || !reportNumber){
+    alert('❌ بيانات التقرير غير مكتملة');
+    return false;
+  }
 
-
-  const general =
-    document.getElementById('dgen').value.trim();
-
-
-  const needs =
-    document.getElementById('dneeds').value.trim();
-
-
-  let reportId = null;
-
-  let reportNumber = null;
-
-
-  /* =========================
-     حالة تعديل تقرير موجود
-  ========================= */
-
-  if(editingDailyId){
-
-    const oldReport =
-      db.daily.find(
-        y => y.id === editingDailyId
-      );
-
-
-    if(!oldReport){
-
-      alert(
-        '❌ لم يتم العثور على التقرير'
-      );
-
+  // عند التعديل نحذف النسخة القديمة أولًا، سواء كانت تستخدم report_id أو report_number.
+  if(oldReportId){
+    const {error}=await supabaseClient.from('daily_reports').delete().eq('report_id',oldReportId);
+    if(error){
+      console.error(error);
+      alert('❌ تعذر تحديث التقرير في Supabase\n'+error.message);
       return false;
     }
-
-
-    reportId =
-      oldReport.report_id ||
-      oldReport.reportId ||
-      null;
-
-
-    reportNumber =
-      oldReport.report_number ||
-      oldReport.number ||
-      null;
-
-
-    /*
-      إذا كان التقرير القديم لديه
-      report_id نحذف صفوفه القديمة
-      ثم نعيد إدخاله بالبيانات الجديدة.
-    */
-
-    if(reportId){
-
-      const { error: deleteError } =
-        await supabaseClient
-          .from('daily_reports')
-          .delete()
-          .eq(
-            'report_id',
-            reportId
-          );
-
-
-      if(deleteError){
-
-        console.error(deleteError);
-
-        alert(
-          '❌ تعذر تحديث التقرير في Supabase\n' +
-          deleteError.message
-        );
-
-        return false;
-      }
-
-    }else if(reportNumber){
-
-      /*
-        توافق مع التقارير القديمة
-        التي لم يكن لديها report_id.
-      */
-
-      const { error: deleteError } =
-        await supabaseClient
-          .from('daily_reports')
-          .delete()
-          .eq(
-            'report_number',
-            reportNumber
-          );
-
-
-      if(deleteError){
-
-        console.error(deleteError);
-
-        alert(
-          '❌ تعذر تحديث التقرير القديم في Supabase\n' +
-          deleteError.message
-        );
-
-        return false;
-      }
-
-
-      reportId =
-        crypto.randomUUID();
+  }else if(oldReportNumber){
+    const {error}=await supabaseClient.from('daily_reports').delete().eq('report_number',oldReportNumber);
+    if(error){
+      console.error(error);
+      alert('❌ تعذر تحديث التقرير القديم في Supabase\n'+error.message);
+      return false;
     }
-
-  }else{
-
-    /* تقرير جديد */
-
-    reportId =
-      crypto.randomUUID();
-
-    reportNumber =
-      db.daily.length + 1;
   }
 
+  const rows=dailyRows.map(x=>({
+    teacher:x.teacher||'',
+    class_name:x.class_name||'',
+    experiment:x.experiment||'',
+    equipment:x.equipment||'',
+    report_date:x.report_date||reportDate,
+    report_time:x.report_time||'',
+    note:x.note||'',
+    report_id:reportId,
+    report_number:reportNumber,
+    general:general||'',
+    needs:needs||''
+  }));
 
-  /* =========================
-     تجهيز الصفوف
-  ========================= */
-
-  const rows =
-    dailyRows.map(
-      x => ({
-
-        teacher:
-          x.teacher || '',
-
-        class_name:
-          x.class_name || '',
-
-        experiment:
-          x.experiment || '',
-
-        equipment:
-          x.equipment || '',
-
-        report_date:
-          x.report_date ||
-          reportDate,
-
-        report_time:
-          x.report_time || '',
-
-        note:
-          x.note || '',
-
-        report_id:
-          reportId,
-
-        report_number:
-          reportNumber,
-
-        general:
-          general,
-
-        needs:
-          needs
-
-      })
-    );
-
-
-  /* =========================
-     إدخال البيانات
-  ========================= */
-
-  const { error } =
-    await supabaseClient
-      .from('daily_reports')
-      .insert(rows);
-
-
+  const {error}=await supabaseClient.from('daily_reports').insert(rows);
   if(error){
-
     console.error(error);
-
-    alert(
-      '❌ لم يتم حفظ التقرير في Supabase\n' +
-      error.message
-    );
-
+    alert('❌ لم يتم حفظ التقرير في Supabase\n'+error.message);
     return false;
   }
-
-
-  /*
-    الاحتفاظ بالـ report_id
-    لاستخدامه عند التعديل القادم.
-  */
-
-  if(editingDailyId){
-
-    const oldReport =
-      db.daily.find(
-        y => y.id === editingDailyId
-      );
-
-    if(oldReport){
-
-      oldReport.report_id =
-        reportId;
-
-      oldReport.report_number =
-        reportNumber;
-    }
-  }
-
 
   return true;
 }
 
+async function loadDailyFromSupabase(){
+  const {data,error}=await supabaseClient
+    .from('daily_reports')
+    .select('*')
+    .order('report_date',{ascending:false})
+    .order('report_time',{ascending:false});
 
-/* =========================
-   طباعة التقرير
-========================= */
+  if(error){
+    console.error(error);
+    alert('❌ تعذر جلب التقارير من Supabase\n'+error.message);
+    return false;
+  }
+
+  if(!Array.isArray(data))return false;
+
+  const groups=new Map();
+
+  data.forEach(row=>{
+    const number=row.report_number ?? row.number ?? '';
+    const key=row.report_id || ('legacy_'+String(number));
+
+    if(!groups.has(key)){
+      groups.set(key,{
+        id:id(),
+        report_id:row.report_id || null,
+        report_number:parseInt(number,10) || 0,
+        number:parseInt(number,10) || 0,
+        date:row.report_date || today(),
+        rows:[],
+        general:row.general || '',
+        needs:row.needs || ''
+      });
+    }
+
+    const report=groups.get(key);
+    report.rows.push(normalizeDailyRow(row));
+    if(!report.general && row.general)report.general=row.general;
+    if(!report.needs && row.needs)report.needs=row.needs;
+    if(!report.date && row.report_date)report.date=row.report_date;
+  });
+
+  const remoteReports=[...groups.values()];
+
+  // Supabase هو المصدر الرئيسي. إذا كان فارغًا نحتفظ بالنسخة المحلية بدل محوها.
+  if(remoteReports.length || !db.daily.length){
+    db.daily=remoteReports;
+    save();
+  }
+
+  renderSavedDaily();
+  renderStats();
+  return true;
+}
+
+function renderSavedDaily(){
+  const body=document.getElementById('savedDaily');
+  if(!body)return;
+
+  if(!db.daily || !db.daily.length){
+    body.innerHTML='<tr><td colspan="4" style="text-align:center">لا توجد تقارير محفوظة</td></tr>';
+    return;
+  }
+
+  const arr=[...db.daily].sort((a,b)=>{
+    const na=parseInt(a.report_number ?? a.number,10) || 0;
+    const nb=parseInt(b.report_number ?? b.number,10) || 0;
+    return nb-na;
+  });
+
+  body.innerHTML=arr.map(report=>{
+    const number=report.report_number ?? report.number ?? '';
+    const rowsCount=Array.isArray(report.rows)?report.rows.length:0;
+    return `
+      <tr>
+        <td>${esc(number)}</td>
+        <td>${esc(report.date||'')}</td>
+        <td>${rowsCount}</td>
+        <td class="no-print">
+          <button type="button" onclick="openDailyReport('${report.id}')">👁️ فتح</button>
+          <button type="button" class="primary" onclick="editDaily('${report.id}')">✏️ تعديل</button>
+          <button type="button" onclick="printSavedDaily('${report.id}')">🖨️ طباعة</button>
+          <button type="button" class="danger" onclick="deleteDaily('${report.id}')">🗑️ حذف</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateDailyOfficial(){
+  const report=editingDailyId ? db.daily.find(x=>x.id===editingDailyId) : null;
+  const number=getDailyNumberValue();
+  const date=document.getElementById('ddate')?.value || '';
+  const general=document.getElementById('dgen')?.value || '';
+  const needs=document.getElementById('dneeds')?.value || '';
+
+  const rno=document.getElementById('rno');
+  const rdate=document.getElementById('rdate');
+  const pgen=document.getElementById('pgen');
+  const pneeds=document.getElementById('pneeds');
+
+  if(rno)rno.textContent=number || (report ? (report.report_number||report.number||'') : 'غير محفوظ');
+  if(rdate)rdate.textContent=date || (report?.date||'');
+  if(pgen)pgen.textContent=general || (report?.general||'');
+  if(pneeds)pneeds.textContent=needs || (report?.needs||'');
+}
+
+function fillDailyForm(report){
+  const dnumber=document.getElementById('dnumber');
+  const ddate=document.getElementById('ddate');
+  const dgen=document.getElementById('dgen');
+  const dneeds=document.getElementById('dneeds');
+
+  if(dnumber)dnumber.value=report.report_number ?? report.number ?? '';
+  if(ddate)ddate.value=report.date || today();
+  if(dgen)dgen.value=report.general || '';
+  if(dneeds)dneeds.value=report.needs || '';
+}
+
+function openDailyReport(id){
+  const report=db.daily.find(x=>x.id===id);
+  if(!report){alert('❌ لم يتم العثور على التقرير');return;}
+
+  editingDailyId=null;
+  dailyRows=JSON.parse(JSON.stringify(report.rows||[]));
+  fillDailyForm(report);
+  renderDailyRows();
+  updateDailyOfficial();
+  show('daily');
+}
+
+function editDaily(id){
+  const report=db.daily.find(x=>x.id===id);
+  if(!report){alert('❌ لم يتم العثور على التقرير');return;}
+
+  editingDailyId=id;
+  dailyRows=JSON.parse(JSON.stringify(report.rows||[]));
+  fillDailyForm(report);
+  renderDailyRows();
+  updateDailyOfficial();
+  show('daily');
+  alert('✏️ تم تحميل التقرير للتعديل. يمكنك تغيير رقم التقرير ثم الضغط على حفظ.');
+}
+
+async function deleteDaily(id){
+  const report=db.daily.find(x=>x.id===id);
+  if(!report){alert('❌ لم يتم العثور على التقرير');return;}
+  if(!confirm('هل أنت متأكد من حذف التقرير رقم '+(report.report_number||report.number||'')+'؟'))return;
+
+  let query=supabaseClient.from('daily_reports').delete();
+  if(report.report_id){
+    query=query.eq('report_id',report.report_id);
+  }else if(report.report_number || report.number){
+    query=query.eq('report_number',report.report_number || report.number);
+  }else{
+    alert('❌ لا يوجد معرف للتقرير في Supabase');
+    return;
+  }
+
+  const {error}=await query;
+  if(error){
+    console.error(error);
+    alert('❌ تعذر حذف التقرير من Supabase\n'+error.message);
+    return;
+  }
+
+  db.daily=db.daily.filter(x=>x.id!==id);
+  if(editingDailyId===id){
+    editingDailyId=null;
+    dailyRows=[];
+    renderDailyRows();
+  }
+  save();
+  renderSavedDaily();
+  alert('✅ تم حذف التقرير بنجاح');
+}
+
+function printSavedDaily(id){
+  openDailyReport(id);
+  setTimeout(()=>printDaily(),250);
+}
 
 function printDaily(){
+  const s=document.getElementById('daily');
+  if(!s)return;
 
-  const s =
-    document.getElementById('daily');
-
-  if(!s) return;
-
-
-  document
-    .querySelectorAll('.section')
-    .forEach(
-      x =>
-        x.classList.remove(
-          'printing'
-        )
-    );
-
-
-  s.classList.add(
-    'printing'
-  );
-
-
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('printing'));
+  s.classList.add('printing');
   window.print();
-
-
-  setTimeout(
-    () => {
-
-      s.classList.remove(
-        'printing'
-      );
-
-    },
-    500
-  );
-
+  setTimeout(()=>s.classList.remove('printing'),500);
 }
-
-
-/* =========================
-   إرسال التقرير بالبريد
-========================= */
 
 function mailDaily(){
-
-  const subject =
-    encodeURIComponent(
-      'التقرير اليومي للمخبر'
-    );
-
-
-  const body =
-    encodeURIComponent(
-      'تقرير يومي للمخبر - متوسطة قايد أحمد – غليزان'
-    );
-
-
-  location.href =
-    'mailto:?subject=' +
-    subject +
-    '&body=' +
-    body;
-
+  const number=document.getElementById('rno')?.textContent || '';
+  const date=document.getElementById('rdate')?.textContent || '';
+  const subject=encodeURIComponent('التقرير اليومي للمخبر رقم '+number);
+  const body=encodeURIComponent(
+    'تقرير يومي للمخبر - متوسطة قايد أحمد – غليزان\n'+
+    'رقم التقرير: '+number+'\n'+
+    'التاريخ: '+date+'\n\n'+
+    'يمكن إرفاق النسخة المطبوعة أو PDF من جهازك.'
+  );
+  location.href='mailto:?subject='+subject+'&body='+body;
 }
+
+
 /* =========================
    التدرج السنوي
 ========================= */
@@ -3312,7 +2543,8 @@ function renderAll(){
   renderCats();
   renderInventory();
   renderChem();
-  
+  renderDailyRows();
+  renderSavedDaily();
   renderRequests();
   renderProjects();
   renderAV();
@@ -3363,6 +2595,7 @@ const activated =
   localStorage.getItem("LAB_ACTIVATED") === "true";
 
 if(activated){
+
   document.getElementById("activationBox").style.display = "none";
 
   document.getElementById("loginBox").style.display = "flex";
@@ -3374,7 +2607,7 @@ if(activated){
 
 document.addEventListener(
   'DOMContentLoaded',
-  ()=>{
+  async ()=>{
         
 
 const dates=[
@@ -3410,6 +2643,9 @@ const dates=[
     renderAll();
     renderRequests();
     updateRequestsNotification();
+    await loadDailyFromSupabase();
+    renderSavedDaily();
+    renderStats();
   }
 );
 </script> 
@@ -3582,4 +2818,4 @@ async function renderRequests(){
 </script>
 
 </body>
-</html>
+</html> 
