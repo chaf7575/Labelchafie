@@ -567,10 +567,9 @@ const supabaseClient = window.supabase.createClient(
 💾 حفظ
 </button>
 
-<button onclick="printDaily()">
+<button class="primary" onclick="printDailyReport()">
 🖨️ طباعة
 </button>
-
 <button onclick="mailDaily()">
 📧 بريد
 </button>
@@ -2815,6 +2814,66 @@ async function renderRequests(){
     </tr>
   `).join("");
 }
+ function printDailyReport(){
+
+  const report = document.querySelector('#daily .report-print');
+
+  if(!report){
+    alert('❌ لم يتم العثور على التقرير');
+    return;
+  }
+
+  const printWindow = window.open('', '_blank');
+
+  if(!printWindow){
+    alert('❌ المتصفح منع نافذة الطباعة');
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>📝 التقرير اليومي</title>
+
+      <style>
+        body{
+          font-family:Arial,sans-serif;
+          direction:rtl;
+          padding:20px;
+        }
+
+        table{
+          width:100%;
+          border-collapse:collapse;
+        }
+
+        th,td{
+          border:1px solid #000;
+          padding:8px;
+          text-align:center;
+        }
+
+        h2,h3{
+          text-align:center;
+        }
+      </style>
+    </head>
+
+    <body>
+      ${report.innerHTML}
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.focus();
+
+  setTimeout(()=>{
+    printWindow.print();
+  },500);
+} 
 </script>
 
 </body>
