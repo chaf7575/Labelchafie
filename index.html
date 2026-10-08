@@ -1681,6 +1681,7 @@ function delChem(cid){
 ========================= */
 
 let dailyRows = [];
+let editingDailyId = null;
 
 
 /* =========================
@@ -2049,7 +2050,71 @@ function renderDailyRows(){
     ).join('');
 
 }
+function renderSavedDaily(){
 
+  const body = document.getElementById('savedDaily');
+
+  if(!body) return;
+
+  body.innerHTML = '';
+
+  if(!db.daily || !db.daily.length){
+    body.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center">
+          لا توجد تقارير محفوظة
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  [...db.daily]
+    .sort((a,b) => {
+      return String(b.date || '').localeCompare(String(a.date || ''));
+    })
+    .forEach((report, index) => {
+
+      const tr = document.createElement('tr');
+
+      const rowsCount =
+        Array.isArray(report.rows)
+          ? report.rows.length
+          : 0;
+
+      tr.innerHTML = `
+        <td>${report.number || (index + 1)}</td>
+
+        <td>${report.date || ''}</td>
+
+        <td>
+          ${report.general || ''}
+        </td>
+
+        <td>
+          ${rowsCount}
+        </td>
+
+        <td class="no-print">
+
+          <button
+            class="primary"
+            onclick="editDaily('${report.id}')">
+            تعديل
+          </button>
+
+          <button
+            class="danger"
+            onclick="deleteDaily('${report.id}')">
+            حذف
+          </button>
+
+        </td>
+      `;
+
+      body.appendChild(tr);
+    });
+}
 
 /* =========================
    تعديل صف داخل التقرير
