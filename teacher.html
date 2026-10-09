@@ -419,58 +419,206 @@ document.addEventListener(
 
 </script>
 
-<section id="simulations" style="background:#fff;padding:20px;margin:20px 0;border-radius:15px;box-shadow:0 4px 16px #0001">
 
-  <h2 style="color:#123b5d">🧪 التجارب بالمحاكاة</h2>
+<style>
+#simulations {
+  background: #fff;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 15px;
+  box-shadow: 0 4px 16px #0001;
+  color: #172033;
+}
+#simulations h2 { color: #123b5d; }
+#simulations .sim-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 15px 0;
+}
+#simulations input,
+#simulations select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccd6e2;
+  border-radius: 8px;
+  font: inherit;
+  background: white;
+}
+#simulations .sim-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 12px;
+}
+#simulations .sim-card {
+  border: 1px solid #dce5ef;
+  background: #f7f9fc;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+#simulations .sim-card h3 { margin: 0; font-size: 18px; }
+#simulations .sim-card p { margin: 0; line-height: 1.7; }
+#simulations .sim-tag {
+  color: #1769aa;
+  font-size: 13px;
+  font-weight: bold;
+}
+#simulations .sim-link {
+  display: inline-block;
+  background: #1769aa;
+  color: white;
+  text-decoration: none;
+  padding: 11px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: auto;
+}
+#simulations .sim-empty {
+  padding: 15px;
+  color: #607086;
+}
+@media(max-width:500px) {
+  #simulations .sim-controls { grid-template-columns: 1fr; }
+}
+</style>
 
-  <p>اختر التجربة التي تريد استعمالها في القسم:</p>
+<section id="simulations">
+  <h2>🧪 التجارب بالمحاكاة</h2>
+  <p>اختر تجربة تفاعلية لاستعمالها في القسم.</p>
 
-  <div style="background:#f4f7fb;padding:15px;border-radius:12px;margin:12px 0">
-    <h3>⚡ تركيب الدارات الكهربائية</h3>
-    <p>ركّب البطاريات والمصابيح والأسلاك واختبر الدارة.</p>
-    <a href="https://phet.colorado.edu/sims/html/circuit-construction-kit-dc-virtual-lab/latest/circuit-construction-kit-dc-virtual-lab_ar_MA.html"
-       target="_blank" rel="noopener noreferrer"
-       style="display:inline-block;background:#1769aa;color:white;padding:12px;border-radius:8px;text-decoration:none">
-      ▶️ افتح المحاكاة
-    </a>
+  <div class="sim-controls">
+    <input
+      id="simSearch"
+      type="search"
+      placeholder="🔎 ابحث عن تجربة..."
+      oninput="filterSimulations()"
+    >
+
+    <select id="simCategory" onchange="filterSimulations()">
+      <option value="all">جميع المجالات</option>
+      <option value="electricity">الكهرباء</option>
+      <option value="magnetism">المغناطيسية</option>
+      <option value="light">الضوء والبصريات</option>
+      <option value="sound">الصوت والموجات</option>
+      <option value="motion">القوى والحركة</option>
+      <option value="matter">المادة والكتلة الحجمية</option>
+    </select>
   </div>
 
-  <div style="background:#f4f7fb;padding:15px;border-radius:12px;margin:12px 0">
-    <h3>🧲 المغناطيس والبوصلة</h3>
-    <p>استكشف المجال المغناطيسي واتجاه البوصلة.</p>
-    <a href="https://phet.colorado.edu/ar_SA/simulations/magnet-and-compass"
-       target="_blank" rel="noopener noreferrer"
-       style="display:inline-block;background:#1769aa;color:white;padding:12px;border-radius:8px;text-decoration:none">
-      ▶️ افتح المحاكاة
-    </a>
+  <div class="sim-grid" id="simGrid">
+
+    <article class="sim-card" data-category="electricity">
+      <h3>⚡ تركيب الدارات الكهربائية</h3>
+      <span class="sim-tag">الكهرباء</span>
+      <p>ركّب البطاريات والمصابيح والأسلاك والقواطع في دارة افتراضية.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/sims/html/circuit-construction-kit-dc-virtual-lab/latest/circuit-construction-kit-dc-virtual-lab_ar_MA.html"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="electricity">
+      <h3>🔌 المقاومة في سلك</h3>
+      <span class="sim-tag">الكهرباء</span>
+      <p>استكشف تأثير خصائص السلك على مقاومته الكهربائية.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/en/simulations/resistance-in-a-wire"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="magnetism">
+      <h3>🧲 المغناطيس والبوصلة</h3>
+      <span class="sim-tag">المغناطيسية</span>
+      <p>لاحظ اتجاه البوصلة والمجال حول المغناطيس.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/ar_SA/simulations/magnet-and-compass"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="electricity">
+      <h3>🎈 الكهرباء الساكنة</h3>
+      <span class="sim-tag">الكهرباء</span>
+      <p>استكشف الشحنات الكهربائية والتجاذب والتنافر.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/en/simulations/balloons-and-static-electricity"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="light">
+      <h3>🌈 انكسار الضوء</h3>
+      <span class="sim-tag">الضوء والبصريات</span>
+      <p>راقب مسار الضوء عند انتقاله بين أوساط مختلفة.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/en/simulations/bending-light"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="sound">
+      <h3>🔊 الصوت والموجات</h3>
+      <span class="sim-tag">الصوت والموجات</span>
+      <p>استكشف الموجات الصوتية وتغير خصائصها.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/ar_SA/simulations/sound"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="motion">
+      <h3>🏃 القوى والحركة</h3>
+      <span class="sim-tag">القوى والحركة</span>
+      <p>استكشف تأثير القوى والاحتكاك على حركة الأجسام.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/en/simulations/forces-and-motion-basics"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="matter">
+      <h3>🧊 الكتلة الحجمية</h3>
+      <span class="sim-tag">المادة والكتلة الحجمية</span>
+      <p>قارن الكتلة والحجم والكثافة وراقب الطفو.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/en/simulations/density"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
   </div>
 
-  <div style="background:#f4f7fb;padding:15px;border-radius:12px;margin:12px 0">
-    <h3>🎈 الكهرباء الساكنة</h3>
-    <p>اكتشف الشحنات الكهربائية والتجاذب والتنافر.</p>
-    <a href="https://phet.colorado.edu/en/simulations/balloons-and-static-electricity"
-       target="_blank" rel="noopener noreferrer"
-       style="display:inline-block;background:#1769aa;color:white;padding:12px;border-radius:8px;text-decoration:none">
-      ▶️ افتح المحاكاة
-    </a>
-  </div>
+  <p id="simCount" class="sim-empty" aria-live="polite"></p>
 
-  <div style="background:#f4f7fb;padding:15px;border-radius:12px;margin:12px 0">
-    <h3>🔊 الصوت والموجات</h3>
-    <p>استكشف خصائص الصوت والموجات.</p>
-    <a href="https://phet.colorado.edu/ar_SA/simulations/sound"
-       target="_blank" rel="noopener noreferrer"
-       style="display:inline-block;background:#1769aa;color:white;padding:12px;border-radius:8px;text-decoration:none">
-      ▶️ افتح المحاكاة
-    </a>
-  </div>
-
-  <p style="font-size:13px;color:#607086">
-    المحاكيات من منصة PhET التعليمية:
-    <a href="https://phet.colorado.edu/ar_SA/" target="_blank" rel="noopener noreferrer">الموقع الرسمي</a>.
+  <p style="font-size:13px;color:#607086;line-height:1.7">
+    المحاكيات مرتبطة بموقع PhET الرسمي. لم تُصنّف بعد حسب فصول
+    المنهاج الجزائري؛ يجب مطابقة كل تجربة مع التدرج الرسمي قبل اعتمادها.
   </p>
-
 </section>
+
+<script>
+function filterSimulations() {
+  const search = document.getElementById("simSearch")
+    .value.trim().toLocaleLowerCase();
+
+  const category = document.getElementById("simCategory").value;
+  const cards = document.querySelectorAll("#simGrid .sim-card");
+  let visible = 0;
+
+  cards.forEach(function(card) {
+    const text = card.innerText.toLocaleLowerCase();
+    const categoryMatch =
+      category === "all" || card.dataset.category === category;
+    const searchMatch = text.includes(search);
+    const show = categoryMatch && searchMatch;
+
+    card.style.display = show ? "flex" : "none";
+    if (show) visible++;
+  });
+
+  document.getElementById("simCount").textContent =
+    "عدد التجارب المعروضة: " + visible;
+}
+
+filterSimulations();
+</script>
+
 
 </body>
 </html>
