@@ -2748,25 +2748,112 @@ async function logoutUser(){
    الطلبات - النسخة الموحدة
 ========================= */
 
+
 async function executeRequest(id){
 
-  const now=new Date();
-  const {error}=await supabaseClient.from("requests").update({
-    status:"تم التنفيذ",
-    execution_date:now.toISOString().slice(0,10),
-    execution_time:now.toTimeString().slice(0,5),
-    is_read:true
-  }).eq("id",id);
+  const { data: request, error: fetchError } =
+    await supabaseClient
+      .from("requests")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-  if(error){
-    console.error(error);
-    alert("❌ تعذر تسجيل تنفيذ الطلب\n\n"+error.message);
+  if(fetchError || !request){
+    alert(
+      "❌ تعذر العثور على الطلب\n" +
+      (fetchError ? fetchError.message : "")
+    );
+    return;
+  }
+
+  if(request.status === "تم التنفيذ"){
+    alert("هذا الطلب مسجل على أنه نُفذ بالفعل.");
+    return;
+  }
+
+  const now = new Date();
+
+  const executionDate =
+    now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+    String(now.getDate()).padStart(2, "0");
+
+  const executionTime =
+    String(now.getHours()).padStart(2, "0") + ":" +
+    String(now.getMinutes()).padStart(2, "0");
+
+  const { error: updateError } =
+    await supabaseClient
+      .from("requests")
+      .update({
+        status: "تم التنفيذ",
+        execution_date: executionDate,
+        execution_time: executionTime,
+        is_read: true
+      })
+      .eq("id", id);
+
+  if(updateError){
+    alert(
+      "❌ تعذر تسجيل تنفيذ الطلب\n" +
+      updateError.message
+    );
     return;
   }
 
   await renderRequests();
-  await updateRequestsNotification();
+
+  if(typeof updateRequestsNotification === "function"){
+    await updateRequestsNotification();
+  }
+
+  // تجهيز بيانات التقرير اليومي تلقائيًا
+  const teacher = document.getElementById("dteach");
+  const className = document.getElementById("dclass");
+  const date = document.getElementById("ddate");
+  const time = document.getElementById("dtime");
+  const experiment = document.getElementById("dexp");
+  const equipment = document.getElementById("dequip");
+  const note = document.getElementById("dnote");
+
+  if(!Array.isArray(dailyRows)){
+    alert("✅ تم التنفيذ، لكن تعذر تجهيز التقرير تلقائيًا.");
+    return;
+  }
+
+  const reportRow = {
+    teacher: request.teacher || "",
+    class_name: request.class_name || "",
+    experiment: request.request_text || "",
+    equipment: request.tools || "",
+    report_date: executionDate,
+    report_time: executionTime,
+    note: request.notes || "",
+    request_id: request.id
+  };
+
+  dailyRows.push(reportRow);
+
+  if(teacher) teacher.value = reportRow.teacher;
+  if(className) className.value = reportRow.class_name;
+  if(date) date.value = executionDate;
+  if(time) time.value = executionTime;
+  if(experiment) experiment.value = reportRow.experiment;
+  if(equipment) equipment.value = reportRow.equipment;
+  if(note) note.value = reportRow.note;
+
+  if(typeof renderDailyRows === "function"){
+    renderDailyRows();
+  }
+
+  alert(
+    "✅ تم تنفيذ الطلب.\n" +
+    "تم نقل بياناته إلى مسودة التقرير اليومي.\n" +
+    "اضغط حفظ التقرير لحفظه."
+  );
 }
+
+
 
 async function deleteReq(id){
 
