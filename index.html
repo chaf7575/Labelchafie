@@ -2834,7 +2834,11 @@ async function executeRequest(id){
 
   dailyRows.push(reportRow);
 
-  if(teacher) teacher.value = reportRow.teacher;
+console.log("صفوف التقرير بعد تنفيذ الطلب:", dailyRows);
+console.log("عدد الصفوف:", dailyRows.length);
+console.log("جدول التقرير موجود:", !!document.getElementById("dailyBody"));
+
+value = reportRow.teacher;
   if(className) className.value = reportRow.class_name;
   if(date) date.value = executionDate;
   if(time) time.value = executionTime;
