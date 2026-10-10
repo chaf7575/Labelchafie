@@ -6,6 +6,7 @@
 <title>منصة المخبري</title>
 
 <style>
+  
 *{box-sizing:border-box}
 body{
   margin:0;
@@ -213,6 +214,93 @@ footer{
   }
 
 }
+  
+/* ===== واجهة المخبري المستقبلية ===== */
+#home {
+  animation: labHomeEnter .8s ease-out both;
+}
+
+#home .head {
+  position: relative;
+  overflow: hidden;
+  padding: 22px;
+  border-radius: 18px;
+  color: #f0f9ff;
+  background:
+    radial-gradient(circle at 85% 15%,
+      rgba(0, 210, 255, .25), transparent 35%),
+    linear-gradient(135deg, #07152e, #103d70);
+  border: 1px solid rgba(56, 189, 248, .4);
+  box-shadow: 0 8px 28px rgba(2, 20, 50, .18);
+}
+
+#home .head h2 {
+  color: #ffffff;
+  text-shadow: 0 0 14px rgba(56, 189, 248, .4);
+}
+
+#home .head .small {
+  color: #d4eaff;
+}
+
+#home .stats .statbox {
+  border: 1px solid #d7eaff;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffffff, #eef7ff);
+  box-shadow: 0 5px 18px rgba(15, 65, 120, .09);
+  transition: transform .25s ease, box-shadow .25s ease;
+  animation: labStatEnter .65s ease-out both;
+}
+
+#home .stats .statbox:nth-child(1) { animation-delay: .08s; }
+#home .stats .statbox:nth-child(2) { animation-delay: .16s; }
+#home .stats .statbox:nth-child(3) { animation-delay: .24s; }
+#home .stats .statbox:nth-child(4) { animation-delay: .32s; }
+#home .stats .statbox:nth-child(5) { animation-delay: .40s; }
+
+#home .stats .statbox b {
+  color: #0879c9;
+  text-shadow: 0 0 12px rgba(14, 165, 233, .16);
+}
+
+#home #requestsNotification {
+  border-radius: 16px !important;
+  border-color: #8bdcff !important;
+  box-shadow: 0 6px 22px rgba(14, 116, 180, .10) !important;
+  animation: labStatEnter .7s ease-out both;
+}
+
+#home #requestsNotification button {
+  color: #ffffff;
+  background: linear-gradient(135deg, #0879c9, #0755a5);
+  box-shadow: 0 4px 12px rgba(7, 85, 165, .22);
+  transition: transform .2s ease, filter .2s ease;
+}
+
+#home #requestsNotification button:hover {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+}
+
+@keyframes labHomeEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes labStatEnter {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #home,
+  #home .stats .statbox,
+  #home #requestsNotification {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
