@@ -2924,9 +2924,12 @@ async function renderRequests(){
   `).join("");
 }
 
- async function updateRequestsCount(){
+ 
+async function updateRequestsCount(){
   const counter = document.getElementById("sReq");
   if(!counter) return;
+
+  counter.textContent = "...";
 
   const { count, error } = await supabaseClient
     .from("requests")
@@ -2934,11 +2937,13 @@ async function renderRequests(){
 
   if(error){
     console.error("Requests count error:", error);
+    counter.textContent = "خطأ";
     return;
   }
 
   counter.textContent = count ?? 0;
 }
+
  function printDailyReport(){
 
   const report = document.querySelector('#daily .report-print');
