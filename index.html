@@ -6,7 +6,6 @@
 <title>منصة المخبري</title>
 
 <style>
-  
 *{box-sizing:border-box}
 body{
   margin:0;
@@ -214,93 +213,6 @@ footer{
   }
 
 }
-  
-/* ===== واجهة المخبري المستقبلية ===== */
-#home {
-  animation: labHomeEnter .8s ease-out both;
-}
-
-#home .head {
-  position: relative;
-  overflow: hidden;
-  padding: 22px;
-  border-radius: 18px;
-  color: #f0f9ff;
-  background:
-    radial-gradient(circle at 85% 15%,
-      rgba(0, 210, 255, .25), transparent 35%),
-    linear-gradient(135deg, #07152e, #103d70);
-  border: 1px solid rgba(56, 189, 248, .4);
-  box-shadow: 0 8px 28px rgba(2, 20, 50, .18);
-}
-
-#home .head h2 {
-  color: #ffffff;
-  text-shadow: 0 0 14px rgba(56, 189, 248, .4);
-}
-
-#home .head .small {
-  color: #d4eaff;
-}
-
-#home .stats .statbox {
-  border: 1px solid #d7eaff;
-  border-radius: 16px;
-  background: linear-gradient(145deg, #ffffff, #eef7ff);
-  box-shadow: 0 5px 18px rgba(15, 65, 120, .09);
-  transition: transform .25s ease, box-shadow .25s ease;
-  animation: labStatEnter .65s ease-out both;
-}
-
-#home .stats .statbox:nth-child(1) { animation-delay: .08s; }
-#home .stats .statbox:nth-child(2) { animation-delay: .16s; }
-#home .stats .statbox:nth-child(3) { animation-delay: .24s; }
-#home .stats .statbox:nth-child(4) { animation-delay: .32s; }
-#home .stats .statbox:nth-child(5) { animation-delay: .40s; }
-
-#home .stats .statbox b {
-  color: #0879c9;
-  text-shadow: 0 0 12px rgba(14, 165, 233, .16);
-}
-
-#home #requestsNotification {
-  border-radius: 16px !important;
-  border-color: #8bdcff !important;
-  box-shadow: 0 6px 22px rgba(14, 116, 180, .10) !important;
-  animation: labStatEnter .7s ease-out both;
-}
-
-#home #requestsNotification button {
-  color: #ffffff;
-  background: linear-gradient(135deg, #0879c9, #0755a5);
-  box-shadow: 0 4px 12px rgba(7, 85, 165, .22);
-  transition: transform .2s ease, filter .2s ease;
-}
-
-#home #requestsNotification button:hover {
-  filter: brightness(1.12);
-  transform: translateY(-2px);
-}
-
-@keyframes labHomeEnter {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes labStatEnter {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #home,
-  #home .stats .statbox,
-  #home #requestsNotification {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
@@ -313,9 +225,6 @@ const supabaseClient = window.supabase.createClient(
 </script>
 </head>
 <body>
- <audio id="requestSound" preload="auto">
-  <source src="https://actions.google.com/sounds/v1/alarms/medium_bell_ringing_near.ogg" type="audio/ogg">
-</audio> 
 <script>
 
 </script>
@@ -658,9 +567,10 @@ const supabaseClient = window.supabase.createClient(
 💾 حفظ
 </button>
 
-<button class="primary" onclick="printDailyReport()">
+<button onclick="printDaily()">
 🖨️ طباعة
 </button>
+
 <button onclick="mailDaily()">
 📧 بريد
 </button>
@@ -789,30 +699,24 @@ const supabaseClient = window.supabase.createClient(
 <h4>احتياجات المخبر</h4>
 <div id="pneeds"></div>
 
-<div style="display:flex !important;flex-direction:row !important;justify-content:space-around !important;align-items:flex-start !important;text-align:center;width:100% !important;margin-top:35px;gap:10px;">
-
-<div>
-المدير
-<br>________
-</div>
-
-<div>
-مسؤول المخبر
-<br>________
-</div>
-
-<div>
-المستشار
-<br>________
-</div>
-
+<div class="signatures" style="display:flex;flex-direction:row;direction:rtl;justify-content:space-between;align-items:flex-start;text-align:center;width:100%;margin-top:35px;gap:10px;">
+  <div style="flex:1;text-align:center;">مسؤول المخبر<br><br>________________</div>
+  <div style="flex:1;text-align:center;">المستشار<br><br>________________</div>
+  <div style="flex:1;text-align:center;">المدير<br><br>________________</div>
 </div>
 
 </div>
 
 <div class="card no-print">
 
-<h3>التقارير المحفوظة</h3>
+<div class="head">
+  <h3>التقارير المحفوظة</h3>
+  <div class="actions">
+    <button type="button" onclick="loadDailyFromSupabase()">🔄 تحديث التقارير</button>
+  </div>
+</div>
+
+<div id="dailyLoadMessage" class="notice" style="display:none"></div>
 
 <div class="tablewrap">
 
@@ -893,6 +797,8 @@ const supabaseClient = window.supabase.createClient(
   <div class="card">
 
     <h3>📋 سجل الطلبات</h3>
+
+    <div class="notice">زر «➕ إلى التقرير» ينقل بيانات طلب الأستاذ إلى التقرير اليومي. بعد حفظ التقرير يصبح الطلب مرتبطًا به ويظهر رقم التقرير في سجل الطلبات.</div>
 
     <div class="tablewrap">
 
@@ -1809,31 +1715,91 @@ function normalizeDailyRow(x){
   };
 }
 
-function addDailyRow(){
-  const reportDate=document.getElementById('ddate').value || today();
-  const x={
+function getRequestTag(requestId){
+  return requestId ? `[[REQUEST_ID:${requestId}]]` : '';
+}
+
+function extractRequestId(note){
+  const m=String(note||'').match(/\[\[REQUEST_ID:([^\]]+)\]\]/);
+  return m ? m[1] : null;
+}
+
+function visibleDailyNote(note){
+  return String(note||'')
+    .replace(/\[\[REQUEST_ID:[^\]]+\]\]\s*/g,'')
+    .trim();
+}
+
+function dailyRowNote(note, requestId){
+  const clean=visibleDailyNote(note);
+  const tag=getRequestTag(requestId);
+  return tag ? (tag + (clean ? ' ' + clean : '')) : clean;
+}
+
+function normalizeDailyRow(row){
+  const rawNote=row.note ?? row.notes ?? '';
+  return {
+    teacher:row.teacher ?? row.Teacher ?? '',
+    class_name:row.class_name ?? row['Class-name'] ?? '',
+    experiment:row.experiment ?? '',
+    equipment:row.equipment ?? '',
+    report_date:row.report_date ?? row.date ?? '',
+    report_time:row.report_time ?? row.time ?? '',
+    note:visibleDailyNote(rawNote),
+    status:row.status ?? (extractRequestId(rawNote) ? 'طلب من الأستاذ' : 'مكتمل'),
+    request_id:row.request_id ?? extractRequestId(rawNote) ?? null
+  };
+}
+
+function getDailyNumberValue(){
+  const e=document.getElementById('dnumber');
+  const n=e ? parseInt(e.value,10) : NaN;
+  return Number.isInteger(n) && n>0 ? n : null;
+}
+
+function getNextDailyNumber(){
+  const nums=(db.daily||[])
+    .map(x=>parseInt(x.report_number ?? x.number,10))
+    .filter(Number.isFinite);
+  return nums.length ? Math.max(...nums)+1 : 1;
+}
+
+function dailyNumberExists(number,currentId=null){
+  return (db.daily||[]).some(x=>
+    x.id!==currentId &&
+    parseInt(x.report_number ?? x.number,10)===number
+  );
+}
+
+function addDailyRow(rowFromRequest=null){
+  const row=rowFromRequest || {
     teacher:document.getElementById('dteach').value.trim(),
     class_name:document.getElementById('dclass').value.trim(),
+    report_date:document.getElementById('ddate').value || today(),
+    report_time:document.getElementById('dtime').value || nowTime(),
     experiment:document.getElementById('dexp').value.trim(),
     equipment:document.getElementById('dequip').value.trim(),
-    report_date:reportDate,
-    report_time:document.getElementById('dtime').value || nowTime(),
     note:document.getElementById('dnote').value.trim(),
-    status:'مكتمل'
+    status:'مكتمل',
+    request_id:null
   };
 
-  if(!x.teacher && !x.experiment){
+  if(!row.teacher && !row.experiment){
     alert('أدخل اسم الأستاذ أو التجربة');
-    return;
+    return false;
   }
 
-  dailyRows.push(x);
+  dailyRows.push(row);
   renderDailyRows();
 
-  ['dteach','dclass','dtime','dexp','dequip','dnote'].forEach(id=>{
-    const e=document.getElementById(id);
-    if(e)e.value='';
-  });
+  if(!rowFromRequest){
+    ['dteach','dclass','dtime','dexp','dequip','dnote'].forEach(id=>{
+      const e=document.getElementById(id);
+      if(e)e.value='';
+    });
+  }
+
+  return true;
 }
 
 function renderDailyRows(){
@@ -1845,22 +1811,26 @@ function renderDailyRows(){
     return;
   }
 
-  body.innerHTML=dailyRows.map((x,index)=>`
-    <tr>
-      <td>${esc(x.teacher||'')}</td>
-      <td>${esc(x.class_name||'')}</td>
-      <td>${esc(x.report_date||'')}</td>
-      <td>${esc(x.report_time||'')}</td>
-      <td>${esc(x.experiment||'')}</td>
-      <td>${esc(x.equipment||'')}</td>
-      <td>${esc(x.note||'')}</td>
-      <td>${esc(x.status||'مكتمل')}</td>
-      <td class="no-print">
-        <button class="primary" type="button" onclick="editDailyRow(${index})">✏️ تعديل</button>
-        <button class="danger" type="button" onclick="removeDailyRow(${index})">🗑️ حذف</button>
-      </td>
-    </tr>
-  `).join('');
+  body.innerHTML=dailyRows.map((x,index)=>{
+    const linked=x.request_id ? '<span class="badge">📨 مرتبط بطلب</span>' : '';
+    const status=x.request_id ? 'طلب من الأستاذ' : (x.status||'مكتمل');
+    return `
+      <tr>
+        <td>${esc(x.teacher||'')}</td>
+        <td>${esc(x.class_name||'')}</td>
+        <td>${esc(x.report_date||'')}</td>
+        <td>${esc(x.report_time||'')}</td>
+        <td>${esc(x.experiment||'')}</td>
+        <td>${esc(x.equipment||'')}</td>
+        <td>${esc(x.note||'')}</td>
+        <td>${linked || esc(status)}</td>
+        <td class="no-print">
+          <button class="primary" type="button" onclick="editDailyRow(${index})">✏️ تعديل</button>
+          <button class="danger" type="button" onclick="removeDailyRow(${index})">🗑️ حذف</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function editDailyRow(index){
@@ -1886,6 +1856,45 @@ function removeDailyRow(index){
   renderDailyRows();
 }
 
+async function markRequestsExecuted(requestIds,reportNumber){
+  const ids=[...new Set((requestIds||[]).filter(Boolean))];
+  if(!ids.length)return;
+
+  const now=new Date();
+  const executionDate=now.toISOString().slice(0,10);
+  const executionTime=now.toTimeString().slice(0,5);
+
+  for(const requestId of ids){
+    const {data:current,error:readError}=await supabaseClient
+      .from('requests')
+      .select('notes')
+      .eq('id',requestId)
+      .maybeSingle();
+
+    if(readError){
+      console.error('قراءة الطلب المرتبط:',readError);
+      continue;
+    }
+
+    let notes=current?.notes || '';
+    notes=notes.replace(/\n?\[التقرير\s*#?\d+\]\s*$/,'').trim();
+    notes=(notes ? notes+'\n' : '')+'[التقرير #'+reportNumber+']';
+
+    const {error}=await supabaseClient
+      .from('requests')
+      .update({
+        status:'تم التنفيذ',
+        execution_date:executionDate,
+        execution_time:executionTime,
+        is_read:true,
+        notes:notes
+      })
+      .eq('id',requestId);
+
+    if(error)console.error('تحديث الطلب المرتبط:',error);
+  }
+}
+
 async function saveDaily(){
   if(!dailyRows.length){
     alert('أضف صفًا واحدًا على الأقل');
@@ -1896,7 +1905,8 @@ async function saveDaily(){
   const general=(document.getElementById('dgen')?.value || '').trim();
   const needs=(document.getElementById('dneeds')?.value || '').trim();
   const currentId=editingDailyId;
-  const reportNumber=getDailyNumberValue() || (currentId ? parseInt((db.daily.find(x=>x.id===currentId)||{}).number,10) : getNextDailyNumber());
+  const oldReport=currentId ? db.daily.find(x=>x.id===currentId) : null;
+  const reportNumber=getDailyNumberValue() || (oldReport ? parseInt(oldReport.report_number ?? oldReport.number,10) : getNextDailyNumber());
 
   if(!Number.isInteger(reportNumber) || reportNumber<1){
     alert('رقم التقرير يجب أن يكون رقمًا صحيحًا أكبر من صفر');
@@ -1909,13 +1919,15 @@ async function saveDaily(){
   }
 
   const reportId=currentId
-    ? ((db.daily.find(x=>x.id===currentId)||{}).report_id || crypto.randomUUID())
+    ? (oldReport?.report_id || crypto.randomUUID())
     : crypto.randomUUID();
+
+  const requestIds=dailyRows.map(x=>x.request_id).filter(Boolean);
 
   const ok=await saveDailyToSupabase({
     reportId,
-    oldReportId:currentId ? ((db.daily.find(x=>x.id===currentId)||{}).report_id || null) : null,
-    oldReportNumber:currentId ? ((db.daily.find(x=>x.id===currentId)||{}).report_number ?? (db.daily.find(x=>x.id===currentId)||{}).number) : null,
+    oldReportId:oldReport?.report_id || null,
+    oldReportNumber:oldReport ? (oldReport.report_number ?? oldReport.number) : null,
     reportNumber,
     reportDate,
     general,
@@ -1949,13 +1961,39 @@ async function saveDaily(){
     });
   }
 
+  await markRequestsExecuted(requestIds,reportNumber);
+
   save();
   editingDailyId=null;
   dailyRows=[];
+  clearDailyForm();
   renderDailyRows();
   renderSavedDaily();
   updateDailyOfficial();
+  await renderRequests();
+  await updateRequestsNotification();
+
   alert(currentId ? '✅ تم تعديل التقرير بنجاح' : '✅ تم حفظ التقرير بنجاح');
+}
+
+function clearDailyForm(){
+  const ids=['dnumber','dteach','dclass','dtime','dexp','dequip','dnote','dgen','dneeds'];
+  ids.forEach(id=>{
+    const e=document.getElementById(id);
+    if(e)e.value='';
+  });
+  const ddate=document.getElementById('ddate');
+  if(ddate)ddate.value=today();
+  const dtime=document.getElementById('dtime');
+  if(dtime)dtime.value=nowTime();
+  const rno=document.getElementById('rno');
+  const rdate=document.getElementById('rdate');
+  const pgen=document.getElementById('pgen');
+  const pneeds=document.getElementById('pneeds');
+  if(rno)rno.textContent='غير محفوظ';
+  if(rdate)rdate.textContent='';
+  if(pgen)pgen.textContent='';
+  if(pneeds)pneeds.textContent='';
 }
 
 async function saveDailyToSupabase(opts={}){
@@ -1964,22 +2002,12 @@ async function saveDailyToSupabase(opts={}){
     return false;
   }
 
-  const {
-    reportId,
-    oldReportId,
-    oldReportNumber,
-    reportNumber,
-    reportDate,
-    general,
-    needs
-  }=opts;
-
+  const {reportId,oldReportId,oldReportNumber,reportNumber,reportDate,general,needs}=opts;
   if(!reportId || !reportNumber){
     alert('❌ بيانات التقرير غير مكتملة');
     return false;
   }
 
-  // عند التعديل نحذف النسخة القديمة أولًا، سواء كانت تستخدم report_id أو report_number.
   if(oldReportId){
     const {error}=await supabaseClient.from('daily_reports').delete().eq('report_id',oldReportId);
     if(error){
@@ -2003,7 +2031,7 @@ async function saveDailyToSupabase(opts={}){
     equipment:x.equipment||'',
     report_date:x.report_date||reportDate,
     report_time:x.report_time||'',
-    note:x.note||'',
+    note:dailyRowNote(x.note||'',x.request_id||null),
     report_id:reportId,
     report_number:reportNumber,
     general:general||'',
@@ -2021,6 +2049,12 @@ async function saveDailyToSupabase(opts={}){
 }
 
 async function loadDailyFromSupabase(){
+  const msg=document.getElementById('dailyLoadMessage');
+  if(msg){
+    msg.style.display='block';
+    msg.textContent='⏳ جارٍ تحميل التقارير المحفوظة من قاعدة البيانات...';
+  }
+
   const {data,error}=await supabaseClient
     .from('daily_reports')
     .select('*')
@@ -2028,26 +2062,32 @@ async function loadDailyFromSupabase(){
     .order('report_time',{ascending:false});
 
   if(error){
-    console.error(error);
-    alert('❌ تعذر جلب التقارير من Supabase\n'+error.message);
+    console.error('loadDailyFromSupabase:',error);
+    if(msg)msg.textContent='❌ تعذر تحميل التقارير: '+error.message;
     return false;
   }
 
-  if(!Array.isArray(data))return false;
+  if(!Array.isArray(data)){
+    if(msg)msg.textContent='❌ لم تُرجع قاعدة البيانات بيانات صالحة للتقارير.';
+    return false;
+  }
 
   const groups=new Map();
-
   data.forEach(row=>{
     const number=row.report_number ?? row.number ?? '';
-    const key=row.report_id || ('legacy_'+String(number));
+    const date=row.report_date ?? row.date ?? '';
+    const key=row.report_id
+      ? 'id_'+String(row.report_id)
+      : 'legacy_'+String(number)+'_'+String(date);
 
     if(!groups.has(key)){
+      const parsedNumber=parseInt(number,10);
       groups.set(key,{
         id:id(),
         report_id:row.report_id || null,
-        report_number:parseInt(number,10) || 0,
-        number:parseInt(number,10) || 0,
-        date:row.report_date || today(),
+        report_number:Number.isFinite(parsedNumber)?parsedNumber:0,
+        number:Number.isFinite(parsedNumber)?parsedNumber:0,
+        date:date || today(),
         rows:[],
         general:row.general || '',
         needs:row.needs || ''
@@ -2058,19 +2098,31 @@ async function loadDailyFromSupabase(){
     report.rows.push(normalizeDailyRow(row));
     if(!report.general && row.general)report.general=row.general;
     if(!report.needs && row.needs)report.needs=row.needs;
-    if(!report.date && row.report_date)report.date=row.report_date;
+    if(!report.date && date)report.date=date;
   });
 
   const remoteReports=[...groups.values()];
-
-  // Supabase هو المصدر الرئيسي. إذا كان فارغًا نحتفظ بالنسخة المحلية بدل محوها.
-  if(remoteReports.length || !db.daily.length){
+  if(remoteReports.length){
     db.daily=remoteReports;
-    save();
+    localStorage.setItem(KEY,JSON.stringify(db));
   }
 
   renderSavedDaily();
   renderStats();
+  await renderRequests();
+
+  const shownCount=db.daily?.length || 0;
+  if(msg){
+    msg.style.display='block';
+    if(remoteReports.length){
+      msg.textContent='✅ تم تحميل '+remoteReports.length+' تقريرًا محفوظًا من قاعدة البيانات.';
+    }else if(shownCount){
+      msg.textContent='⚠️ لم تُرجع قاعدة البيانات تقارير، لذلك تم عرض '+shownCount+' تقريرًا محفوظًا محليًا.';
+    }else{
+      msg.textContent='ℹ️ لا توجد تقارير محفوظة حاليًا.';
+    }
+  }
+
   return true;
 }
 
@@ -2084,8 +2136,8 @@ function renderSavedDaily(){
   }
 
   const arr=[...db.daily].sort((a,b)=>{
-    const na=parseInt(a.report_number ?? a.number,10) || 0;
-    const nb=parseInt(b.report_number ?? b.number,10) || 0;
+    const na=parseInt(a.report_number ?? a.number,10)||0;
+    const nb=parseInt(b.report_number ?? b.number,10)||0;
     return nb-na;
   });
 
@@ -2189,26 +2241,69 @@ async function deleteDaily(id){
   if(editingDailyId===id){
     editingDailyId=null;
     dailyRows=[];
+    clearDailyForm();
     renderDailyRows();
   }
   save();
   renderSavedDaily();
+  await renderRequests();
+  await updateRequestsNotification();
   alert('✅ تم حذف التقرير بنجاح');
 }
 
 function printSavedDaily(id){
   openDailyReport(id);
-  setTimeout(()=>printDaily(),250);
+  printDaily();
 }
 
 function printDaily(){
-  const s=document.getElementById('daily');
-  if(!s)return;
+  const official=document.querySelector('#daily .official');
+  if(!official){
+    alert('❌ تعذر العثور على نموذج التقرير للطباعة');
+    return;
+  }
 
-  document.querySelectorAll('.section').forEach(x=>x.classList.remove('printing'));
-  s.classList.add('printing');
-  window.print();
-  setTimeout(()=>s.classList.remove('printing'),500);
+  // طباعة نسخة مستقلة من التقرير مع فرض حدود سوداء واضحة على كل خلايا الجدول
+  const report=official.cloneNode(true);
+  report.querySelectorAll('.no-print,button').forEach(el=>el.remove());
+
+  const printWindow=window.open('', '_blank', 'width=1100,height=800');
+  if(!printWindow){
+    alert('❌ منع المتصفح نافذة الطباعة. اسمح بالنوافذ المنبثقة لهذا الموقع ثم أعد المحاولة.');
+    return;
+  }
+
+  printWindow.document.open();
+  printWindow.document.write(`<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تقرير يومي للمخبر</title>
+<style>
+@page{size:A4 landscape;margin:10mm}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff;color:#000;font-family:Arial,Tahoma,sans-serif;direction:rtl}
+.report{width:100%;background:#fff;color:#000}
+h2,h3,h4,p{text-align:inherit}
+table{display:table!important;width:100%!important;min-width:0!important;border-collapse:collapse!important;border-spacing:0!important;table-layout:fixed!important;background:#fff!important;color:#000!important}
+thead{display:table-header-group!important}
+tbody{display:table-row-group!important}
+tr{display:table-row!important;break-inside:avoid;page-break-inside:avoid}
+th,td{display:table-cell!important;border:1.5px solid #000!important;padding:6px 5px!important;color:#000!important;background:#fff!important;text-align:right;vertical-align:middle;overflow-wrap:anywhere;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+th{font-weight:bold!important}
+.tablewrap{width:100%!important;overflow:visible!important}
+.signatures{display:flex!important;flex-direction:row!important;direction:rtl!important;justify-content:space-between!important;align-items:flex-start!important;text-align:center!important;width:100%!important;margin-top:35px!important;gap:10px!important;break-inside:avoid!important}
+.signatures>div{flex:1 1 0!important;text-align:center!important;direction:rtl!important}
+@media screen{body{padding:18px}.report{max-width:1200px;margin:auto}}
+</style>
+</head>
+<body><main class="report">${report.innerHTML}</main>
+<script>
+window.addEventListener('load',function(){setTimeout(function(){window.focus();window.print();},300)});
+<\/script>
+</body></html>`);
+  printWindow.document.close();
 }
 
 function mailDaily(){
@@ -2649,10 +2744,7 @@ async function updateRequestsNotification(){
   const box = document.getElementById("requestsNotificationText");
 
   if(!box) return;
-const sound = document.getElementById("requestSound");
 
-const oldCount =
-  Number(localStorage.getItem("OLD_REQUEST_COUNT") || 0);
   const { count, error } = await supabaseClient
     .from("requests")
     .select("*", { count: "exact", head: true })
@@ -2663,19 +2755,7 @@ const oldCount =
     console.error("Requests notification error:", error);
 
     box.textContent = "تعذر التحقق من الطلبات";
-if(count > oldCount && sound){
 
-  sound.currentTime = 0;
-
-  sound.play().catch(()=>{
-    console.log("الصوت يحتاج تفاعلًا من المستخدم");
-  });
-}
-
-localStorage.setItem(
-  "OLD_REQUEST_COUNT",
-  String(count || 0)
-);
     return;
   }
 
@@ -2746,9 +2826,6 @@ const dates=[
     });
 
     renderAll();
-    renderRequests();
-    updateRequestsNotification();
-    await loadDailyFromSupabase();
     renderSavedDaily();
     renderStats();
   }
@@ -2783,6 +2860,7 @@ async function activatePlatform(){
     document.getElementById("activationBox").style.display = "none";
     document.getElementById("loginBox").style.display = "flex";
     message.textContent = "";
+    document.getElementById("loginEmail")?.focus();
   }else{
     message.textContent = "❌ كود التفعيل غير صحيح أو غير نشط";
   }
@@ -2791,30 +2869,38 @@ async function activatePlatform(){
  <script>
 async function loginUser(){
 
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value;
-  const message = document.getElementById("loginMessage");
+  const email=document.getElementById("loginEmail").value.trim();
+  const password=document.getElementById("loginPassword").value;
+  const message=document.getElementById("loginMessage");
 
   if(!email || !password){
-    message.textContent = "أدخل البريد الإلكتروني وكلمة المرور";
+    message.textContent="أدخل البريد الإلكتروني وكلمة المرور";
     return;
   }
 
-  message.textContent = "جارٍ تسجيل الدخول...";
+  message.textContent="جارٍ تسجيل الدخول...";
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: email,
-    password: password
+  const {data,error}=await supabaseClient.auth.signInWithPassword({
+    email:email,
+    password:password
   });
 
   if(error){
-    message.textContent = "❌ البريد الإلكتروني أو كلمة المرور غير صحيحة";
+    console.error(error);
+    message.textContent="❌ البريد الإلكتروني أو كلمة المرور غير صحيحة";
     return;
   }
 
-  document.getElementById("loginBox").style.display = "none";
-  message.textContent = "";
+  document.getElementById("loginBox").style.display="none";
+  message.textContent="";
+
+  // مهم جدًا: لا نحمل التقارير قبل المصادقة.
+  await loadDailyFromSupabase();
+  await renderRequests();
+  await updateRequestsNotification();
+  renderAll();
 }
+
 </script> 
   
  <script>
@@ -2836,144 +2922,150 @@ async function logoutUser(){
    الطلبات - النسخة الموحدة
 ========================= */
 
+async function getLinkedRequestsMap(){
+  const map=new Map();
 
-async function executeRequest(id){
+  const {data,error}=await supabaseClient
+    .from('daily_reports')
+    .select('report_id,report_number,note');
 
-  const { data: request, error: fetchError } =
-    await supabaseClient
-      .from("requests")
-      .select("*")
-      .eq("id", id)
-      .single();
-
-  if(fetchError || !request){
-    alert(
-      "❌ تعذر العثور على الطلب\n" +
-      (fetchError ? fetchError.message : "")
-    );
-    return;
+  if(error){
+    console.error('Linked requests lookup:',error);
+    return map;
   }
 
-  if(request.status === "تم التنفيذ"){
-    alert("هذا الطلب مسجل على أنه نُفذ بالفعل.");
-    return;
-  }
+  (data||[]).forEach(row=>{
+    const requestId=extractRequestId(row.note||'');
+    if(!requestId)return;
+    if(!map.has(requestId)){
+      map.set(requestId,{
+        report_id:row.report_id || null,
+        report_number:row.report_number ?? ''
+      });
+    }
+  });
 
-  const now = new Date();
-
-  const executionDate =
-    now.getFullYear() + "-" +
-    String(now.getMonth() + 1).padStart(2, "0") + "-" +
-    String(now.getDate()).padStart(2, "0");
-
-  const executionTime =
-    String(now.getHours()).padStart(2, "0") + ":" +
-    String(now.getMinutes()).padStart(2, "0");
-
-  const { error: updateError } =
-    await supabaseClient
-      .from("requests")
-      .update({
-        status: "تم التنفيذ",
-        execution_date: executionDate,
-        execution_time: executionTime,
-        is_read: true
-      })
-      .eq("id", id);
-
-  if(updateError){
-    alert(
-      "❌ تعذر تسجيل تنفيذ الطلب\n" +
-      updateError.message
-    );
-    return;
-  }
-
-  await renderRequests();
-
-  if(typeof updateRequestsNotification === "function"){
-    await updateRequestsNotification();
-  }
-
-  // تجهيز بيانات التقرير اليومي تلقائيًا
-  const teacher = document.getElementById("dteach");
-  const className = document.getElementById("dclass");
-  const date = document.getElementById("ddate");
-  const time = document.getElementById("dtime");
-  const experiment = document.getElementById("dexp");
-  const equipment = document.getElementById("dequip");
-  const note = document.getElementById("dnote");
-
-  if(!Array.isArray(dailyRows)){
-    alert("✅ تم التنفيذ، لكن تعذر تجهيز التقرير تلقائيًا.");
-    return;
-  }
-
-  const reportRow = {
-    teacher: request.teacher || "",
-    class_name: request.class_name || "",
-    experiment: request.request_text || "",
-    equipment: request.tools || "",
-    report_date: executionDate,
-    report_time: executionTime,
-    note: request.notes || "",
-    request_id: request.id
-  };
-
-  dailyRows.push(reportRow);
-
-console.log("صفوف التقرير بعد تنفيذ الطلب:", dailyRows);
-console.log("عدد الصفوف:", dailyRows.length);
-console.log("جدول التقرير موجود:", !!document.getElementById("dailyBody"));
-
-value = reportRow.teacher;
-  if(className) className.value = reportRow.class_name;
-  if(date) date.value = executionDate;
-  if(time) time.value = executionTime;
-  if(experiment) experiment.value = reportRow.experiment;
-  if(equipment) equipment.value = reportRow.equipment;
-  if(note) note.value = reportRow.note;
-
-  if(typeof renderDailyRows === "function"){
-    renderDailyRows();
-  }
-
-  alert(
-    "✅ تم تنفيذ الطلب.\n" +
-    "تم نقل بياناته إلى مسودة التقرير اليومي.\n" +
-    "اضغط حفظ التقرير لحفظه."
-  );
+  return map;
 }
 
+async function addRequestToDaily(requestId){
+  if(!requestId)return;
 
+  const linked=await getLinkedRequestsMap();
+  if(linked.has(String(requestId))){
+    const info=linked.get(String(requestId));
+    alert('✅ هذا الطلب مرتبط بالفعل بالتقرير رقم '+(info.report_number||'—')+'.');
+    const localReport=db.daily.find(x=>String(x.report_id||'')===String(info.report_id||''));
+    if(localReport)openDailyReport(localReport.id);
+    return;
+  }
 
-async function deleteReq(id){
-
-  if(!confirm("هل تريد حذف هذا الطلب نهائيًا؟")) return;
-
-  const {error}=await supabaseClient.from("requests").delete().eq("id",id);
+  const {data:req,error}=await supabaseClient
+    .from('requests')
+    .select('*')
+    .eq('id',requestId)
+    .maybeSingle();
 
   if(error){
     console.error(error);
-    alert("❌ لم يتم حذف الطلب\n\n"+error.message);
+    alert('❌ تعذر قراءة الطلب\n'+error.message);
+    return;
+  }
+
+  if(!req){
+    alert('❌ لم يتم العثور على الطلب');
+    return;
+  }
+
+  // لا نسمح بإضاعة صفوف غير محفوظة بدون تنبيه.
+  if(dailyRows.length && !confirm('لديك صفوف غير محفوظة حاليًا في التقرير. هل تريد إضافة الطلب إليها؟')){
+    return;
+  }
+
+  editingDailyId=null;
+  dailyRows.push({
+    teacher:req.teacher || '',
+    class_name:req.class_name || '',
+    report_date:req.request_date || today(),
+    report_time:req.request_time || nowTime(),
+    experiment:req.request_text || '',
+    equipment:req.tools || '',
+    note:visibleDailyNote(req.notes || ''),
+    status:'طلب من الأستاذ',
+    request_id:String(req.id)
+  });
+
+  const ddate=document.getElementById('ddate');
+  if(ddate)ddate.value=req.request_date || today();
+
+  const dnumber=document.getElementById('dnumber');
+  if(dnumber)dnumber.value=getDailyNumberValue() || getNextDailyNumber();
+
+  renderDailyRows();
+  updateDailyOfficial();
+  show('daily');
+
+  alert('✅ تمت إضافة طلب الأستاذ إلى التقرير اليومي. اضغط «حفظ» لإتمام الربط وتسجيل التنفيذ.');
+}
+
+function linkedReportButton(requestId,linkedMap){
+  const info=linkedMap.get(String(requestId));
+  if(!info){
+    return `<button type="button" class="primary" onclick="addRequestToDaily('${requestId}')">➕ إلى التقرير</button>`;
+  }
+
+  const localReport=db.daily.find(x=>String(x.report_id||'')===String(info.report_id||''));
+  if(localReport){
+    return `<button type="button" onclick="openDailyReport('${localReport.id}')">✅ التقرير #${esc(info.report_number||'')}</button>`;
+  }
+
+  return `<button type="button" disabled>✅ مرتبط بالتقرير #${esc(info.report_number||'')}</button>`;
+}
+
+async function executeRequest(id){
+  const now=new Date();
+  const {error}=await supabaseClient.from('requests').update({
+    status:'تم التنفيذ',
+    execution_date:now.toISOString().slice(0,10),
+    execution_time:now.toTimeString().slice(0,5),
+    is_read:true
+  }).eq('id',id);
+
+  if(error){
+    console.error(error);
+    alert('❌ تعذر تسجيل تنفيذ الطلب\n\n'+error.message);
     return;
   }
 
   await renderRequests();
   await updateRequestsNotification();
-  alert("✅ تم حذف الطلب بنجاح");
+}
+
+async function deleteReq(id){
+  if(!confirm('هل تريد حذف هذا الطلب نهائيًا؟'))return;
+
+  const {error}=await supabaseClient.from('requests').delete().eq('id',id);
+
+  if(error){
+    console.error(error);
+    alert('❌ لم يتم حذف الطلب\n\n'+error.message);
+    return;
+  }
+
+  await renderRequests();
+  await updateRequestsNotification();
+  alert('✅ تم حذف الطلب بنجاح');
 }
 
 async function renderRequests(){
-
-  const body=document.getElementById("reqBody");
+  const body=document.getElementById('reqBody');
   if(!body)return;
 
   const {data,error}=await supabaseClient
-    .from("requests")
-    .select("*")
-    .order("request_date",{ascending:false})
-    .order("request_time",{ascending:false});
+    .from('requests')
+    .select('*')
+    .order('request_date',{ascending:false})
+    .order('request_time',{ascending:false});
 
   if(error){
     console.error(error);
@@ -2986,22 +3078,25 @@ async function renderRequests(){
     return;
   }
 
+  const linkedMap=await getLinkedRequestsMap();
+
   body.innerHTML=data.map(x=>`
     <tr>
-      <td>${esc(x.teacher||"")}</td>
-      <td>${esc(x.class_name||"")}</td>
-      <td>${esc(x.request_date||"")}</td>
-      <td>${esc(x.request_time||"")}</td>
-      <td>${esc(x.request_text||"")}</td>
-      <td>${esc(x.tools||"")}</td>
-      <td>${esc(x.notes||"")}</td>
-      <td>${esc(x.status||"جديد")}</td>
-      <td>${esc(x.execution_date||"—")}</td>
-      <td>${esc(x.execution_time||"—")}</td>
+      <td>${esc(x.teacher||'')}</td>
+      <td>${esc(x.class_name||'')}</td>
+      <td>${esc(x.request_date||'')}</td>
+      <td>${esc(x.request_time||'')}</td>
+      <td>${esc(x.request_text||'')}</td>
+      <td>${esc(x.tools||'')}</td>
+      <td>${esc(visibleDailyNote(x.notes||''))}</td>
+      <td>${esc(x.status||'جديد')}</td>
+      <td>${esc(x.execution_date||'—')}</td>
+      <td>${esc(x.execution_time||'—')}</td>
       <td class="no-print">
         <div class="actions" style="margin-top:0">
+          ${linkedReportButton(x.id,linkedMap)}
           ${
-            x.status==="تم التنفيذ"
+            x.status==='تم التنفيذ'
             ? '<button type="button" disabled>✅ تم التنفيذ</button>'
             : `<button type="button" onclick="executeRequest('${x.id}')">▶️ تنفيذ</button>`
           }
@@ -3009,90 +3104,8 @@ async function renderRequests(){
         </div>
       </td>
     </tr>
-  `).join("");
+  `).join('');
 }
-
- 
-async function updateRequestsCount(){
-  const counter = document.getElementById("sReq");
-  if(!counter) return;
-
-  counter.textContent = "...";
-
-  const { count, error } = await supabaseClient
-    .from("requests")
-    .select("*", { count: "exact", head: true });
-
-  if(error){
-    console.error("Requests count error:", error);
-    counter.textContent = "خطأ";
-    return;
-  }
-
-  counter.textContent = count ?? 0;
-}
-
- function printDailyReport(){
-
-  const report = document.querySelector('#daily .report-print');
-
-  if(!report){
-    alert('❌ لم يتم العثور على التقرير');
-    return;
-  }
-
-  const printWindow = window.open('', '_blank');
-
-  if(!printWindow){
-    alert('❌ المتصفح منع نافذة الطباعة');
-    return;
-  }
-
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html dir="rtl">
-    <head>
-      <meta charset="UTF-8">
-      <title>📝 التقرير اليومي</title>
-
-      <style>
-        body{
-          font-family:Arial,sans-serif;
-          direction:rtl;
-          padding:20px;
-        }
-
-        table{
-          width:100%;
-          border-collapse:collapse;
-        }
-
-        th,td{
-          border:1px solid #000;
-          padding:8px;
-          text-align:center;
-        }
-
-        h2,h3{
-          text-align:center;
-        }
-      </style>
-    </head>
-
-    <body>
-      ${report.innerHTML}
-    </body>
-    </html>
-  `);
-
-  printWindow.document.close();
-  printWindow.focus();
-
-  setTimeout(()=>{
-    printWindow.print();
-  },500);
-} 
-  updateRequestsCount();
 </script>
 
 </body>
