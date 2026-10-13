@@ -197,22 +197,36 @@ footer{
 @media print{
 
   header,nav,.no-print,footer{
-    display:none!important
+    display:none!important;
   }
 
   .section{
-    display:none!important
+    display:none!important;
   }
 
   .section.printing{
-    display:block!important
+    display:block!important;
   }
 
   .card{
-    box-shadow:none
+    box-shadow:none!important;
+  }
+
+  /* تقليل ارتفاع صفوف المعلومات القصيرة */
+  .section.printing tr:has(td:nth-child(1)),
+  .section.printing tr:has(th){
+    height:auto;
+  }
+
+  .section.printing table td,
+  .section.printing table th{
+    padding-top:2px!important;
+    padding-bottom:2px!important;
+    line-height:1.2!important;
   }
 
 }
+
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
