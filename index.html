@@ -1202,6 +1202,73 @@ function save(){
   renderAll();
 }
 
+
+async function loadInventoryFromSupabase(){
+
+  const { data, error } = await supabaseClient
+    .from("inventory")
+    .select("*");
+
+  if(error){
+    console.error("خطأ تحميل الجرد:", error);
+    alert("تعذر تحميل الجرد من قاعدة البيانات: " + error.message);
+    return;
+  }
+
+  if(!Array.isArray(data)){
+    alert("لم نستطع التأكد من بيانات الجرد؛ لم نغيّر القائمة المحلية.");
+    return;
+  }
+
+  db.inventory = data.map(item => ({
+    id: item.id,
+    item_number: item.item_number || "",
+    name: item.name || "",
+    category: item.category || "",
+    quantity: Number(item.quantity || 0),
+    condition: item.condition || "",
+    location: item.location || "",
+    item_date: item.item_date || "",
+    notes: item.notes || ""
+  }));
+
+  localStorage.setItem(KEY, JSON.stringify(db));
+  renderAll();
+}
+
+async function loadChemicalsFromSupabase(){
+  const { data, error } = await supabaseClient
+    .from("chemicals")
+    .select("*");
+
+  if(error){
+    console.error("خطأ تحميل المحاليل:", error);
+    alert("تعذر تحميل المحاليل من قاعدة البيانات: " + error.message);
+    return;
+  }
+
+ 
+  if((data || []).length === 0 && db.chemicals.length > 0){
+    console.warn("جدول المحاليل فارغ؛ تم الحفاظ على البيانات المحلية.");
+    return;
+  }
+
+  db.chemicals = (data || []).map(item => ({
+    id: item.id,
+    name: item.name || "",
+    total: Number(item.total_quantity || 0),
+    unit: item.unit || "",
+    date: item.chemical_date || "",
+    state: item.remaining_quantity > 0 ? "متوفرة" : "منتهية",
+    notes: item.notes || "",
+    uses: Array.isArray(item.uses) ? item.uses : []
+  }));
+
+  localStorage.setItem(KEY, JSON.stringify(db));
+  renderAll();
+}
+
+
 function id(){
   return Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 }
@@ -1355,18 +1422,18 @@ function renderInventory(){
 }
 
 
+
 async function addInv(){
 
-  const item={
-    id:id(),
-    item_number:document.getElementById('ino').value.trim(),
-    name:document.getElementById('iname').value.trim(),
-    category:document.getElementById('icat').value,
-    quantity:Number(document.getElementById('iqty').value||0),
-    condition:document.getElementById('icond').value,
-    location:document.getElementById('iloc').value.trim(),
-    item_date:document.getElementById('idate').value||today(),
-    notes:document.getElementById('inote').value.trim()
+  const item = {
+    item_number: document.getElementById('ino').value.trim(),
+    name: document.getElementById('iname').value.trim(),
+    category: document.getElementById('icat').value,
+    quantity: Number(document.getElementById('iqty').value || 0),
+    condition: document.getElementById('icond').value,
+    location: document.getElementById('iloc').value.trim(),
+    item_date: document.getElementById('idate').value || today(),
+    notes: document.getElementById('inote').value.trim()
   };
 
   if(!item.name){
@@ -1374,45 +1441,68 @@ async function addInv(){
     return;
   }
 
-  const { error } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from("inventory")
-    .insert({
-      item_number: item.item_number,
-      name: item.name,
-      category: item.category,
-      quantity: item.quantity,
-      condition: item.condition,
-      location: item.location,
-      item_date: item.item_date,
-      notes: item.notes
-    });
+    .insert(item)
+    .select()
+    .single();
 
   if(error){
-    alert(error.message);
+    alert("فشل حفظ التجهيز: " + error.message);
     console.error(error);
     return;
   }
 
-  db.inventory.push(item);
-  save();
-
-  document.getElementById('ino').value='';
-  document.getElementById('iname').value='';
-  document.getElementById('iqty').value=1;
-  document.getElementById('iloc').value='';
-  document.getElementById('inote').value='';
-
-  alert('تم حفظ التجهيز بنجاح');
-}
-
-function delInv(id){
-
-  if(!confirm('هل تريد حذف هذا التجهيز؟'))return;
-
-  db.inventory=db.inventory.filter(x=>x.id!==id);
+  db.inventory.push({
+    id: data.id,
+    item_number: data.item_number || "",
+    name: data.name || "",
+    category: data.category || "",
+    quantity: Number(data.quantity || 0),
+    condition: data.condition || "",
+    location: data.location || "",
+    item_date: data.item_date || "",
+    notes: data.notes || ""
+  });
 
   save();
+
+  document.getElementById('ino').value = '';
+  document.getElementById('iname').value = '';
+  document.getElementById('iqty').value = 1;
+  document.getElementById('iloc').value = '';
+  document.getElementById('inote').value = '';
+
+  alert('تم حفظ التجهيز في قاعدة البيانات بنجاح');
 }
+
+async function delInv(id){
+
+  if(!confirm('هل تريد حذف هذا التجهيز؟')) return;
+
+  const item = db.inventory.find(x => String(x.id) === String(id));
+  if(!item) return;
+
+  const { error } = await supabaseClient
+    .from("inventory")
+    .delete()
+    .eq("id", id);
+
+  if(error){
+    alert("فشل حذف التجهيز من قاعدة البيانات: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  db.inventory = db.inventory.filter(
+    x => String(x.id) !== String(id)
+  );
+
+  save();
+
+  alert('تم حذف التجهيز بنجاح');
+}
+
 
 
 /* =========================
@@ -1544,150 +1634,293 @@ function renderChem(){
 }
 
 
-function addChem(){
 
-  const name=document.getElementById('cname').value.trim();
-  const qty=Number(document.getElementById('cqty').value||0);
+async function addChem(){
+
+  const name = document.getElementById('cname').value.trim();
+  const qty = Number(document.getElementById('cqty').value || 0);
+  const unit = document.getElementById('cunit').value.trim();
+  const date = document.getElementById('cdate').value || today();
+  const state = document.getElementById('cstate').value;
+  const notes = document.getElementById('cnote').value.trim();
 
   if(!name){
     alert('اكتب اسم المادة');
     return;
   }
 
-  if(qty<=0){
+  if(qty <= 0){
     alert('أدخل كمية صحيحة');
     return;
   }
 
-  let existing=db.chemicals.find(
-    x=>x.name.trim().toLowerCase()===name.toLowerCase()
+  const local = db.chemicals.find(
+    x => x.name.trim().toLowerCase() === name.toLowerCase()
   );
 
-  if(existing){
+  const { data: rows, error: findError } = await supabaseClient
+    .from("chemicals")
+    .select("*")
+    .ilike("name", name);
 
-    existing.total=
-      Number(existing.total||0)+qty;
-
-    existing.unit=
-      document.getElementById('cunit').value||existing.unit;
-
-  }else{
-
-    db.chemicals.push({
-
-      id:id(),
-
-      name:name,
-
-      total:qty,
-
-      unit:document.getElementById('cunit').value.trim(),
-
-      date:document.getElementById('cdate').value||today(),
-
-      state:document.getElementById('cstate').value,
-
-      notes:document.getElementById('cnote').value.trim(),
-
-      uses:[]
-
-    });
-
-  }
-
-  save();
-
-  document.getElementById('cname').value='';
-  document.getElementById('cqty').value='';
-  document.getElementById('cunit').value='';
-  document.getElementById('cnote').value='';
-
-  alert('تمت إضافة الكمية');
-}
-
-
-function addChemStock(cid){
-
-  const c=db.chemicals.find(x=>x.id===cid);
-
-  if(!c)return;
-
-  const q=Number(prompt(
-    'أدخل الكمية الجديدة:'
-  ));
-
-  if(!q || q<=0)return;
-
-  c.total=Number(c.total||0)+q;
-
-  save();
-
-  alert('تمت إضافة الكمية');
-}
-
-
-function useChem(cid){
-
-  const c=db.chemicals.find(x=>x.id===cid);
-
-  if(!c)return;
-
-  const q=Number(prompt(
-    'كمية المادة المستعملة:'
-  ));
-
-  if(!q || q<=0)return;
-
-  const used=(c.uses||[])
-    .reduce((a,b)=>a+Number(b.qty||0),0);
-
-  const remaining=Number(c.total||0)-used;
-
-  if(q>remaining){
-
-    alert(
-      'الكمية غير كافية. المتبقي فقط '+
-      remaining+' '+(c.unit||'')
-    );
-
+  if(findError){
+    alert("تعذر التحقق من المادة: " + findError.message);
+    console.error(findError);
     return;
   }
 
-  const teacher=prompt('اسم الأستاذ:')||'';
-  const experiment=prompt('اسم التجربة أو النشاط:')||'';
-  const time=prompt('وقت التجربة (مثال 10:30):', nowTime())||nowTime();
-  const date=prompt('تاريخ التجربة (YYYY-MM-DD):', today())||today();
+  const remote = (rows || []).find(
+    x => x.name.trim().toLowerCase() === name.toLowerCase()
+  );
 
-  const r=remaining-q;
+  const previousTotal = Number(
+    remote?.total_quantity ?? local?.total ?? 0
+  );
 
-  c.uses=c.uses||[];
+  const uses = Array.isArray(remote?.uses)
+    ? remote.uses
+    : (local?.uses || []);
 
-  c.uses.push({
-    date:date,
-    time:time,
-    teacher:teacher,
-    experiment:experiment,
-    qty:q,
-    remaining:r
-  });
+  const used = uses.reduce(
+    (sum, item) => sum + Number(item.qty || 0), 0
+  );
+
+  const newTotal = previousTotal + qty;
+
+  const record = {
+    name: name,
+    total_quantity: newTotal,
+    used_quantity: used,
+    remaining_quantity: Math.max(0, newTotal - used),
+    unit: unit || remote?.unit || local?.unit || "",
+    used_by: remote?.used_by || "",
+    chemical_date: date,
+    notes: notes || remote?.notes || local?.notes || "",
+    uses: uses
+  };
+
+  let result;
+
+  if(remote){
+    result = await supabaseClient
+      .from("chemicals")
+      .update(record)
+      .eq("id", remote.id)
+      .select()
+      .single();
+  }else{
+    result = await supabaseClient
+      .from("chemicals")
+      .insert(record)
+      .select()
+      .single();
+  }
+
+  if(result.error){
+    alert("فشل حفظ المحلول: " + result.error.message);
+    console.error(result.error);
+    return;
+  }
+
+  const saved = result.data;
+
+  const chemical = {
+    id: saved.id,
+    name: saved.name,
+    total: Number(saved.total_quantity || 0),
+    unit: saved.unit || "",
+    date: saved.chemical_date || "",
+    state: saved.remaining_quantity > 0 ? "متوفرة" : "منتهية",
+    notes: saved.notes || "",
+    uses: Array.isArray(saved.uses) ? saved.uses : []
+  };
+
+  const index = db.chemicals.findIndex(
+    x => x.name.trim().toLowerCase() === name.toLowerCase()
+  );
+
+  if(index >= 0){
+    db.chemicals[index] = chemical;
+  }else{
+    db.chemicals.push(chemical);
+  }
 
   save();
 
-  alert(
-    'تم التسجيل. المتبقي: '+
-    r+' '+(c.unit||'')
-  );
+  document.getElementById('cname').value = '';
+  document.getElementById('cqty').value = '';
+  document.getElementById('cunit').value = '';
+  document.getElementById('cnote').value = '';
+
+  alert('تم حفظ المحلول في قاعدة البيانات بنجاح');
 }
 
 
-function delChem(cid){
 
-  if(!confirm('هل تريد حذف هذه المادة؟'))return;
+async function addChemStock(cid){
 
-  db.chemicals=
-    db.chemicals.filter(x=>x.id!==cid);
+  const c = db.chemicals.find(x => String(x.id) === String(cid));
+  if(!c) return;
+
+  const q = Number(prompt('أدخل الكمية الجديدة:'));
+  if(!q || q <= 0) return;
+
+  const { data: remote, error: loadError } = await supabaseClient
+    .from("chemicals")
+    .select("*")
+    .eq("id", cid)
+    .maybeSingle();
+
+  if(loadError){
+    alert("تعذر تحميل بيانات المادة: " + loadError.message);
+    console.error(loadError);
+    return;
+  }
+
+  if(!remote){
+    alert("لم يُعثر على المادة في قاعدة البيانات.");
+    return;
+  }
+
+  const total = Number(remote.total_quantity || 0) + q;
+  const used = Number(remote.used_quantity || 0);
+  const remaining = total - used;
+
+  const { data: saved, error } = await supabaseClient
+    .from("chemicals")
+    .update({
+      total_quantity: total,
+      remaining_quantity: remaining
+    })
+    .eq("id", cid)
+    .select()
+    .single();
+
+  if(error){
+    alert("فشل حفظ الكمية الجديدة: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  c.total = Number(saved.total_quantity || 0);
+  c.unit = saved.unit || c.unit;
+  c.date = saved.chemical_date || c.date;
+  c.notes = saved.notes || c.notes;
+  c.uses = Array.isArray(saved.uses) ? saved.uses : (c.uses || []);
+  c.state = Number(saved.remaining_quantity || 0) > 0 ? "متوفرة" : "منتهية";
 
   save();
+
+  alert('تم حفظ الكمية الجديدة بنجاح');
+}
+
+async function useChem(cid){
+
+  const c = db.chemicals.find(x => String(x.id) === String(cid));
+  if(!c) return;
+
+  const q = Number(prompt('كمية المادة المستعملة:'));
+  if(!q || q <= 0) return;
+
+  const { data: remote, error: loadError } = await supabaseClient
+    .from("chemicals")
+    .select("*")
+    .eq("id", cid)
+    .maybeSingle();
+
+  if(loadError){
+    alert("تعذر تحميل بيانات المحلول: " + loadError.message);
+    console.error(loadError);
+    return;
+  }
+
+  if(!remote){
+    alert("لم يُعثر على المحلول في قاعدة البيانات. لم يتم تسجيل الاستعمال.");
+    return;
+  }
+
+  const uses = Array.isArray(remote.uses) ? remote.uses : [];
+  const total = Number(remote.total_quantity || 0);
+  const used = uses.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+  const remaining = Math.max(0, total - used);
+
+  if(q > remaining){
+    alert('الكمية غير كافية. المتبقي فقط ' + remaining + ' ' + (c.unit || ''));
+    return;
+  }
+
+  const teacher = prompt('اسم الأستاذ:') || '';
+  const experiment = prompt('اسم التجربة أو النشاط:') || '';
+  const time = prompt('وقت التجربة (مثال 10:30):', nowTime()) || nowTime();
+  const date = prompt('تاريخ التجربة (YYYY-MM-DD):', today()) || today();
+
+  uses.push({
+    date: date,
+    time: time,
+    teacher: teacher,
+    experiment: experiment,
+    qty: q,
+    remaining: remaining - q
+  });
+
+  const { data: saved, error } = await supabaseClient
+    .from("chemicals")
+    .update({
+      used_quantity: used + q,
+      remaining_quantity: total - used - q,
+      used_by: teacher,
+      uses: uses
+    })
+    .eq("id", cid)
+    .select()
+    .single();
+
+  if(error){
+    alert("فشل حفظ الاستعمال: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  c.total = Number(saved.total_quantity || 0);
+  c.unit = saved.unit || c.unit;
+  c.date = saved.chemical_date || c.date;
+  c.notes = saved.notes || c.notes;
+  c.uses = Array.isArray(saved.uses) ? saved.uses : uses;
+  c.state = Number(saved.remaining_quantity || 0) > 0 ? "متوفرة" : "منتهية";
+
+  save();
+
+  alert('تم تسجيل الاستعمال في قاعدة البيانات. المتبقي: ' +
+    Number(saved.remaining_quantity || 0) + ' ' + (c.unit || ''));
+}
+
+
+async function delChem(cid){
+
+  if(!confirm('هل تريد حذف هذه المادة؟')) return;
+
+  const c = db.chemicals.find(x => String(x.id) === String(cid));
+
+  if(!c) return;
+
+  const { error } = await supabaseClient
+    .from("chemicals")
+    .delete()
+    .eq("id", cid);
+
+  if(error){
+    alert("فشل حذف المادة من قاعدة البيانات: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  db.chemicals = db.chemicals.filter(
+    x => String(x.id) !== String(cid)
+  );
+
+  save();
+
+  alert('تم حذف المادة من قاعدة البيانات');
 }
 
 
@@ -2900,6 +3133,8 @@ async function loginUser(){
 
   // مهم جدًا: لا نحمل التقارير قبل المصادقة.
   await loadDailyFromSupabase();
+  await loadInventoryFromSupabase();
+await loadChemicalsFromSupabase();
   await renderRequests();
   await updateRequestsNotification();
   renderAll();
