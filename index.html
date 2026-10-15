@@ -1236,6 +1236,7 @@ async function loadInventoryFromSupabase(){
   renderAll();
 }
 
+
 async function loadChemicalsFromSupabase(){
   const { data, error } = await supabaseClient
     .from("chemicals")
@@ -1243,23 +1244,81 @@ async function loadChemicalsFromSupabase(){
 
   if(error){
     console.error("خطأ تحميل المحاليل:", error);
-    alert("تعذر تحميل المحاليل من قاعدة البيانات: " + error.message);
+    alert("تعذر تحميل المحاليل: " + error.message);
     return;
   }
 
- 
+  // إذا كانت قاعدة البيانات فارغة والهاتف يحتوي على محاليل،
+  // ننقل المحاليل المحلية إلى قاعدة البيانات.
   if((data || []).length === 0 && db.chemicals.length > 0){
-    console.warn("جدول المحاليل فارغ؛ تم الحفاظ على البيانات المحلية.");
+
+    const rows = db.chemicals.map(c => {
+      const uses = Array.isArray(c.uses) ? c.uses : [];
+      const total = Number(c.total || 0);
+      const used = uses.reduce(
+        (sum, u) => sum + Number(u.qty || 0), 0
+      );
+
+      return {
+        name: c.name || "",
+        total_quantity: total,
+        used_quantity: used,
+        remaining_quantity: Math.max(0, total - used),
+        unit: c.unit || "",
+        used_by: uses.length
+          ? (uses[uses.length - 1].teacher || "")
+          : "",
+        chemical_date: c.date || today(),
+        notes: c.notes || "",
+        uses: uses
+      };
+    });
+
+    const { data: saved, error: saveError } =
+      await supabaseClient
+        .from("chemicals")
+        .insert(rows)
+        .select("*");
+
+    if(saveError){
+      console.error("فشل نقل المحاليل:", saveError);
+      alert("لم يتم نقل المحاليل: " + saveError.message);
+      return;
+    }
+
+    db.chemicals = (saved || []).map(item => ({
+      id: item.id,
+      name: item.name || "",
+      total: Number(item.total_quantity || 0),
+      unit: item.unit || "",
+      date: item.chemical_date || "",
+      state: Number(item.remaining_quantity || 0) > 0
+        ? "متوفرة" : "منتهية",
+      notes: item.notes || "",
+      uses: Array.isArray(item.uses) ? item.uses : []
+    }));
+
+    localStorage.setItem(KEY, JSON.stringify(db));
+    renderAll();
+
+    alert("تم نقل المحاليل وسجلات استعمالها بنجاح.");
     return;
   }
 
-  db.chemicals = (data || []).map(item => ({
+  // لا نستبدل بيانات الهاتف إذا كان الجدول فارغًا.
+  if((data || []).length === 0){
+    console.warn("جدول المحاليل فارغ، ولا توجد بيانات محلية لنقلها.");
+    return;
+  }
+
+  db.chemicals = data.map(item => ({
     id: item.id,
     name: item.name || "",
     total: Number(item.total_quantity || 0),
     unit: item.unit || "",
     date: item.chemical_date || "",
-    state: item.remaining_quantity > 0 ? "متوفرة" : "منتهية",
+    state: Number(item.remaining_quantity || 0) > 0
+      ? "متوفرة" : "منتهية",
     notes: item.notes || "",
     uses: Array.isArray(item.uses) ? item.uses : []
   }));
@@ -1267,7 +1326,6 @@ async function loadChemicalsFromSupabase(){
   localStorage.setItem(KEY, JSON.stringify(db));
   renderAll();
 }
-
 
 function id(){
   return Date.now().toString(36)+Math.random().toString(36).slice(2,7);
