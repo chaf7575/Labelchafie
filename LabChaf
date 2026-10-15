@@ -1,1 +1,3409 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>منصة المخبري</title>
 
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Tahoma,sans-serif;
+  background:#f4f7fb;
+  color:#172033
+}
+header{
+  background:#123b5d; 
+  color:#fff;
+  padding:18px;
+  position:sticky;
+  top:0;
+  z-index:10
+}
+h1,h2,h3{margin-top:0}
+
+nav{
+  display:flex;
+  gap:7px;
+  overflow:auto;
+  margin-top:12px
+}
+
+button{
+  border:0;
+  border-radius:9px;
+  padding:10px 13px;
+  cursor:pointer
+}
+
+nav button{
+  white-space:nowrap;
+  background:#fff;
+  color:#123b5d
+}
+
+.primary{
+  background:#1769aa;
+  color:#fff
+}
+
+.danger{  background:#b42318;
+  color:#fff
+}
+
+.container{
+  max-width:1250px;
+  margin:auto;
+  padding:18px
+}
+
+.section{display:none}
+.section.active{display:block}
+
+.section.teacher-hidden{
+  display:none !important;
+}
+
+.head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:12px
+}
+
+.card,.statbox,.cat{
+  background:#fff;
+  border-radius:15px;
+  padding:16px;
+  margin:12px 0;
+  box-shadow:0 4px 16px #0001
+}
+
+label{font-weight:bold}
+
+input,select,textarea{
+  display:block;
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  border:1px solid #ccd6e2;
+  border-radius:8px;
+  font:inherit
+}
+
+textarea{min-height:80px}
+
+.actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px
+}
+
+.hidden{display:none!important}
+
+.notice{
+  background:#edf6ff;
+  border-right:5px solid #1769aa;
+  padding:13px;
+  border-radius:9px;
+  margin:12px 0
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px
+}
+
+.statbox{text-align:center}
+
+.statbox b{
+  display:block;
+  font-size:28px;
+  color:#1769aa
+}
+
+.cats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px
+}
+
+.cat{cursor:pointer}
+
+.cat strong{
+  font-size:25px;
+  color:#1769aa
+}
+
+.tablewrap{
+  overflow:auto;
+  margin-top:15px
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:800px;
+  background:#fff
+}
+
+th,td{
+  border:1px solid #d7e0e8;
+  padding:8px;
+  text-align:right;
+  vertical-align:top
+}
+
+th{background:#eaf0f6}
+
+.success{
+  background:#e8f7ee;
+  padding:12px;
+  border-radius:8px;
+  margin-top:10px
+}
+
+.official{
+  background:#fff;
+  padding:20px;
+  border-radius:12px
+}
+
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:20px;
+  background:#e9f6ec
+}
+
+.small{color:#607086}
+
+footer{
+  text-align:center;
+  padding:25px;
+  color:#667
+}
+
+@media print{
+
+  header,nav,.no-print,footer{
+    display:none!important;
+  }
+
+  .section{
+    display:none!important;
+  }
+
+  .section.printing{
+    display:block!important;
+  }
+
+  .card{
+    box-shadow:none!important;
+  }
+
+  /* تقليل ارتفاع صفوف المعلومات القصيرة */
+  .section.printing tr:has(td:nth-child(1)),
+  .section.printing tr:has(th){
+    height:auto;
+  }
+
+  .section.printing table td,
+  .section.printing table th{
+    padding-top:2px!important;
+    padding-bottom:2px!important;
+    line-height:1.2!important;
+  }
+
+}
+
+</style>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
+<script>
+const SUPABASE_URL = "https://niedzlyvricaofqasohe.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_iDvPZL5m8A_bfItO0Q9muA_VHJU5-V_";
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+</script>
+</head>
+<body>
+<script>
+
+</script>
+<script>
+
+</script>
+<div id="activationBox" style="position:fixed;inset:0;background:#f4f7fb;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="background:white;padding:25px;border-radius:15px;max-width:420px;width:100%;text-align:center;box-shadow:0 4px 20px #0002">
+    <h2>🔐 تفعيل منصة المخبري</h2>
+    <p>أدخل كود التفعيل الخاص بك للمتابعة</p>
+    <input id="activationCode" type="text" placeholder="كود التفعيل">
+    <button class="primary" onclick="activatePlatform()">تفعيل المنصة</button>
+    <div id="activationMessage"></div>
+  </div>
+</div>
+  <div id="loginBox" style="display:none;position:fixed;inset:0;background:#f4f7fb;z-index:99998;align-items:center;justify-content:center;padding:20px">
+  <div style="background:white;padding:25px;border-radius:15px;max-width:420px;width:100%;text-align:center;box-shadow:0 4px 20px #0002">
+    <h2>🔐 تسجيل الدخول</h2>
+
+    <input id="loginEmail" type="email" placeholder="البريد الإلكتروني">
+
+    <input id="loginPassword" type="password" placeholder="كلمة المرور">
+
+    <button class="primary" onclick="loginUser()">دخول</button>
+
+    <div id="loginMessage"></div>
+  </div>
+</div>  
+<header>
+<button onclick="logoutUser()" class="primary" style="position:fixed;left:15px;top:15px;z-index:999999">
+  تسجيل الخروج
+</button>
+<h1>🔬 منصة المخبري</h1>
+<div>متوسطة قايد أحمد – غليزان</div>
+
+<nav id="mainNav">
+<button onclick="show('home')">🏠 الرئيسية</button>
+<button onclick="show('inventory')">📦 الجرد</button>
+<button onclick="show('chemicals')">⚗️ المحاليل</button>
+<button onclick="show('daily')">📝 التقارير</button>
+<button onclick="show('progress')">📅 التدرج</button>
+<button onclick="show('requests')">📨 الطلبات</button>
+<button onclick="show('safety')">🦺 السلامة</button>
+<button onclick="show('various')">🧪 منوعات</button>
+<button onclick="show('other')">🎧 الصوتيات والسمعيات</button>
+<button onclick="show('settings')">⚙️ الإعدادات</button>
+</nav>
+</header>
+
+<div class="container">
+
+<section id="home" class="section active">
+
+<div class="head">
+<div>
+<h2>لوحة التحكم</h2>
+<p class="small">إدارة أعمال المخبر.</p>
+</div>
+</div>
+ <!-- إشعار طلبات الأساتذة -->
+<div id="requestsNotification" style="
+  background:linear-gradient(135deg,#fff8e1,#ffffff);
+  border:1px solid #f0c36d;
+  border-right:6px solid #e6a700;
+  border-radius:14px;
+  padding:18px;
+  margin:18px 0;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+">
+
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="font-size:32px;">🔔</div>
+
+    <div>
+      <h3 style="margin:0 0 6px;">
+        طلبات الأساتذة
+      </h3>
+
+      <p id="requestsNotificationText" style="margin:0;">
+        جارٍ التحقق من الطلبات...
+      </p>
+    </div>
+  </div>
+
+  <button
+    onclick="show('requests')"
+    style="
+      margin-top:14px;
+      padding:10px 18px;
+      border:0;
+      border-radius:8px;
+      cursor:pointer;
+    "
+  >
+    📨 عرض الطلبات
+  </button>
+
+</div> 
+
+<div class="stats">
+
+<div class="statbox">
+الجرد
+<b id="sInv">0</b>
+</div>
+
+<div class="statbox">
+المحاليل
+<b id="sChem">0</b>
+</div>
+
+<div class="statbox">
+التقارير
+<b id="sDaily">0</b>
+</div>
+
+<div class="statbox">
+الطلبات
+<b id="sReq">0</b>
+</div>
+
+<div class="statbox">
+المشاريع
+<b id="sProj">0</b>
+</div>
+
+</div>
+</section>
+
+
+<section id="inventory" class="section">
+
+<div class="head">
+
+<div>
+<h2>📦 الجرد</h2>
+<p class="small">ست فئات منفصلة.</p>
+</div>
+
+<div class="actions">
+<button class="primary" onclick="toggle('invForm')">
+➕ إضافة
+</button>
+
+<button onclick="printSec('inventory')">
+🖨️ طباعة
+</button>
+</div>
+
+</div>
+
+<div id="cats" class="cats"></div>
+
+<div id="invForm" class="card hidden">
+
+<div class="grid">
+
+<label>
+رقم الجرد
+<input id="ino">
+</label>
+
+<label>
+اسم التجهيز
+<input id="iname">
+</label>
+
+<label>
+الفئة
+<select id="icat"></select>
+</label>
+
+<label>
+الكمية
+<input id="iqty" type="number" min="0" value="1">
+</label>
+
+<label>
+الحالة
+<select id="icond">
+<option>جيد</option>
+<option>يحتاج صيانة</option>
+<option>معطل</option>
+</select>
+</label>
+
+<label>
+المكان
+<input id="iloc">
+</label>
+
+<label>
+التاريخ
+<input id="idate" type="date">
+</label>
+
+<label>
+ملاحظات
+<textarea id="inote"></textarea>
+</label>
+
+</div>
+
+<div class="actions">
+
+<button class="primary" onclick="addInv()">
+💾 حفظ
+</button>
+
+<button onclick="toggle('invForm')">
+إلغاء
+</button>
+
+</div>
+
+</div>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+<tr>
+<th>رقم</th>
+<th>التجهيز</th>
+<th>الفئة</th>
+<th>الكمية</th>
+<th>الحالة</th>
+<th>المكان</th>
+<th>التاريخ</th>
+<th class="no-print">إجراء</th>
+</tr>
+</thead>
+
+<tbody id="invBody"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+<section id="chemicals" class="section">
+
+<div class="head">
+
+<div>
+<h2>⚗️ المحاليل والمواد الكيميائية</h2>
+<p class="small">المتبقي يحسب آليًا.</p>
+</div>
+
+<div class="actions">
+
+<button class="primary" onclick="toggle('chemForm')">
+➕ إضافة كمية
+</button>
+
+<button onclick="printSec('chemicals')">
+🖨️ طباعة
+</button>
+
+</div>
+
+</div>
+
+<div class="notice">
+<b>الحساب:</b>
+الرصيد السابق + الكمية الجديدة − الكمية المستعملة = الرصيد المتبقي.
+</div>
+
+<div id="chemForm" class="card hidden">
+
+<div class="grid">
+
+<label>
+اسم المادة
+<input id="cname">
+</label>
+
+<label>
+الكمية الجديدة
+<input id="cqty" type="number" min="0" step="any">
+</label>
+
+<label>
+الوحدة
+<input id="cunit" placeholder="مل، لتر، غ، كغ...">
+</label>
+
+<label>
+التاريخ
+<input id="cdate" type="date">
+</label>
+
+<label>
+الحالة
+<select id="cstate">
+<option>متوفرة</option>
+<option>قليلة</option>
+<option>منتهية</option>
+</select>
+</label>
+
+<label>
+ملاحظات
+<textarea id="cnote"></textarea>
+</label>
+
+</div>
+
+<div class="actions">
+
+<button class="primary" onclick="addChem()">
+💾 حفظ
+</button>
+
+<button onclick="toggle('chemForm')">
+إلغاء
+</button>
+
+</div>
+
+</div>
+
+<div id="chemCards"></div>
+
+</section>
+
+
+<section id="daily" class="section">
+
+<div class="head">
+
+<h2>📝 التقرير اليومي</h2>
+
+<div class="actions">
+
+<button class="primary" onclick="saveDaily()">
+💾 حفظ
+</button>
+
+<button onclick="printDaily()">
+🖨️ طباعة
+</button>
+
+<button onclick="mailDaily()">
+📧 بريد
+</button>
+
+</div>
+
+</div>
+
+<div class="card no-print">
+
+<div class="grid">
+
+<label>
+رقم التقرير
+<input id="dnumber" type="number" min="1" placeholder="رقم التقرير">
+</label>
+
+<label>
+التاريخ
+<input id="ddate" type="date">
+</label>
+
+<label>
+الأستاذ
+<input id="dteach">
+</label>
+
+<label>
+القسم
+<input id="dclass">
+</label>
+
+<label>
+الوقت
+<input id="dtime" type="time">
+</label>
+
+<label>
+التجربة
+<input id="dexp">
+</label>
+
+<label>
+الأدوات
+<input id="dequip">
+</label>
+
+<label>
+ملاحظة
+<textarea id="dnote"></textarea>
+</label>
+
+</div>
+
+<button class="primary" onclick="addDailyRow()">
+➕ إضافة صف
+</button>
+
+<div class="grid">
+
+<label>
+ملاحظات عامة
+<textarea id="dgen"></textarea>
+</label>
+
+<label>
+احتياجات المخبر
+<textarea id="dneeds"></textarea>
+</label>
+
+</div>
+
+</div>
+
+<div class="official">
+
+<h2 style="text-align:center">
+الجمهورية الجزائرية الديمقراطية الشعبية
+</h2>
+
+<h3 style="text-align:center">
+متوسطة قايد أحمد – غليزان
+</h3>
+
+<h2 style="text-align:center">
+تقرير يومي للمخبر
+</h2>
+
+<p>
+<b>الرقم:</b>
+<span id="rno">غير محفوظ</span>
+&nbsp;
+<b>التاريخ:</b>
+<span id="rdate"></span>
+</p>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+<tr>
+
+<th>الأستاذ</th>
+<th>القسم</th>
+<th>التاريخ</th>
+<th>الوقت</th>
+<th>التجربة</th>
+<th>الأدوات</th>
+<th>ملاحظة</th>
+<th>الحالة</th>
+<th class="no-print">إجراء</th>
+
+</tr>
+</thead>
+
+<tbody id="dailyBody"></tbody>
+
+</table>
+
+</div>
+
+<h4>ملاحظات عامة</h4>
+<div id="pgen"></div>
+
+<h4>احتياجات المخبر</h4>
+<div id="pneeds"></div>
+
+<div class="signatures" style="display:flex;flex-direction:row;direction:rtl;justify-content:space-between;align-items:flex-start;text-align:center;width:100%;margin-top:35px;gap:10px;">
+  <div style="flex:1;text-align:center;">مسؤول المخبر<br><br>________________</div>
+  <div style="flex:1;text-align:center;">المستشار<br><br>________________</div>
+  <div style="flex:1;text-align:center;">المدير<br><br>________________</div>
+</div>
+
+</div>
+
+<div class="card no-print">
+
+<div class="head">
+  <h3>التقارير المحفوظة</h3>
+  <div class="actions">
+    <button type="button" onclick="loadDailyFromSupabase()">🔄 تحديث التقارير</button>
+  </div>
+</div>
+
+<div id="dailyLoadMessage" class="notice" style="display:none"></div>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+<tr>
+<th>الرقم</th>
+<th>التاريخ</th>
+<th>الصفوف</th>
+<th>إجراء</th>
+</tr>
+</thead>
+
+<tbody id="savedDaily"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section id="progress" class="section">
+
+<div class="head">
+
+<div>
+<h2>📅 التدرج السنوي</h2>
+<p class="small">
+مراجع رسمية؛ المحتوى التفصيلي لا يوصف بأنه وزاري إلا إذا كان منقولًا من الوثيقة الأصلية.
+</p>
+</div>
+
+<button onclick="printSec('progress')">
+🖨️ طباعة
+</button>
+
+</div>
+
+<div class="card">
+
+<label>
+المستوى
+
+<select id="plevel" onchange="renderProgress()">
+<option value="1">الأولى متوسط</option>
+<option value="2">الثانية متوسط</option>
+<option value="3">الثالثة متوسط</option>
+<option value="4">الرابعة متوسط</option>
+</select>
+
+</label>
+
+</div>
+
+<div id="progressBox"></div>
+
+</section>
+
+
+<section id="requests" class="section">
+
+  <div class="head">
+
+    <h2>📨 طلبات الأساتذة الواردة</h2>
+
+    <div class="notice">الأساتذة يرسلون طلباتهم من صفحة الأستاذ المستقلة. هنا تتم متابعة الطلبات وتنفيذها وحذفها.</div>
+
+    <button onclick="printSec('requests')">
+      🖨️ طباعة
+    </button>
+
+  </div>
+
+  <div class="card">
+
+    <h3>📋 سجل الطلبات</h3>
+
+    <div class="notice">زر «➕ إلى التقرير» ينقل بيانات طلب الأستاذ إلى التقرير اليومي. بعد حفظ التقرير يصبح الطلب مرتبطًا به ويظهر رقم التقرير في سجل الطلبات.</div>
+
+    <div class="tablewrap">
+
+      <table>
+
+        <thead>
+<tr>
+  <th>الأستاذ</th>
+  <th>القسم</th>
+  <th>تاريخ الطلب</th>
+  <th>وقت الطلب</th>
+  <th>التجربة أو النشاط</th>
+  <th>الوسائل المطلوبة</th>
+  <th>ملاحظة</th>
+  <th>الحالة</th>
+  <th>تاريخ التنفيذ</th>
+  <th>وقت التنفيذ</th>
+  <th class="no-print">إجراء</th>
+</tr>
+        </thead>
+
+        <tbody id="reqBody"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section id="safety" class="section">
+
+<h2>🦺 السلامة</h2>
+
+<div class="card">
+
+<ul>
+
+<li>استعمال وسائل الوقاية المناسبة.</li>
+
+<li>عدم الأكل أو الشرب داخل المخبر.</li>
+
+<li>فحص التجهيزات الكهربائية قبل الاستعمال.</li>
+
+<li>احترام تعليمات المواد الكيميائية.</li>
+
+<li>إبقاء مخارج النجدة والممرات خالية.</li>
+
+<li>التبليغ عن أي حادث أو خلل.</li>
+
+<li>حفظ المواد الكيميائية في أماكنها المناسبة.</li>
+
+<li>عدم استعمال جهاز معطل.</li>
+
+</ul>
+
+</div>
+
+</section>
+
+
+<section id="various" class="section">
+
+<div class="head">
+
+<h2>🧪 منوعات ومشاريع التلاميذ</h2>
+
+<button class="primary" onclick="toggle('projForm')">
+➕ إضافة مشروع
+</button>
+
+</div>
+
+<div id="projForm" class="card hidden">
+
+<div class="grid">
+
+<label>
+عنوان المشروع
+<input id="ptitle">
+</label>
+
+<label>
+التلاميذ
+<input id="pstudents">
+</label>
+
+<label>
+القسم
+<input id="pclass">
+</label>
+
+<label>
+التاريخ
+<input id="pdate" type="date">
+</label>
+
+<label>
+النوع
+<select id="ptype">
+<option>مشروع علمي</option>
+<option>تجربة تطبيقية</option>
+<option>بيئة وإعادة تدوير</option>
+<option>فيزياء</option>
+<option>إعلام آلي</option>
+<option>مسابقة</option>
+</select>
+</label>
+
+<label>
+الوصف
+<textarea id="pdesc"></textarea>
+</label>
+
+</div>
+
+<div class="actions">
+
+<button class="primary" onclick="addProject()">
+💾 حفظ
+</button>
+
+<button onclick="toggle('projForm')">
+إلغاء
+</button>
+
+</div>
+
+</div>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+<tr>
+<th>المشروع</th>
+<th>التلاميذ</th>
+<th>القسم</th>
+<th>التاريخ</th>
+<th>النوع</th>
+<th>الوصف</th>
+<th class="no-print">إجراء</th>
+</tr>
+</thead>
+
+<tbody id="projBody"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+<section id="other" class="section">
+
+<div class="head">
+
+<h2>🎧 الصوتيات والسمعيات البصرية</h2>
+
+<div class="actions">
+
+<button class="primary" onclick="toggle('avForm')">
+➕ إضافة سجل
+</button>
+
+<button onclick="printSec('other')">
+🖨️ طباعة
+</button>
+
+</div>
+
+</div>
+
+<div id="avForm" class="card hidden">
+
+<div class="grid">
+
+<label>
+رقم السجل
+<input id="avno">
+</label>
+
+<label>
+التاريخ
+<input id="avdate" type="date">
+</label>
+
+<label>
+اسم الجهاز/الوسيلة
+<input id="avname">
+</label>
+
+<label>
+النوع
+<select id="avtype">
+<option>صوتيات</option>
+<option>سمعيات بصرية</option>
+</select>
+</label>
+
+<label>
+رقم الجرد
+<input id="avinv">
+</label>
+
+<label>
+الكمية
+<input id="avqty" type="number" min="1" value="1">
+</label>
+
+<label>
+الحالة
+<select id="avcond">
+<option>جيد</option>
+<option>يحتاج صيانة</option>
+<option>معطل</option>
+</select>
+</label>
+
+<label>
+المكان
+<input id="avloc">
+</label>
+
+<label>
+المستعمل
+<input id="avuser">
+</label>
+
+<label>
+الغرض
+<input id="avpurpose">
+</label>
+
+<label>
+ملاحظات
+<textarea id="avnote"></textarea>
+</label>
+
+</div>
+
+<div class="actions">
+
+<button class="primary" onclick="addAV()">
+💾 حفظ
+</button>
+
+<button onclick="toggle('avForm')">
+إلغاء
+</button>
+
+</div>
+
+</div>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+<tr>
+<th>الرقم</th>
+<th>التاريخ</th>
+<th>الجهاز</th>
+<th>النوع</th>
+<th>رقم الجرد</th>
+<th>الكمية</th>
+<th>الحالة</th>
+<th>المكان</th>
+<th>المستعمل</th>
+<th>الغرض</th>
+<th>ملاحظات</th>
+<th class="no-print">إجراء</th>
+</tr>
+</thead>
+
+<tbody id="avBody"></tbody>
+
+</table>
+
+</div>
+
+</section>
+
+
+<section id="settings" class="section">
+
+<div class="head">
+
+<h2>⚙️ الإعدادات</h2>
+
+</div>
+
+<div class="card">
+
+<h3>نسخ احتياطي</h3>
+
+<p class="small">
+احفظ نسخة من بيانات المنصة في ملف على هاتفك أو حاسوبك.
+</p>
+
+<button class="primary" onclick="backup()">
+💾 إنشاء نسخة احتياطية
+</button>
+
+</div>
+
+<div class="card">
+
+<h3>استرجاع البيانات</h3>
+
+<input
+type="file"
+accept=".json"
+onchange="restore(event)"
+>
+
+</div>
+
+<div class="card">
+
+<h3>حذف جميع البيانات</h3>
+
+<p>
+استخدم هذا الخيار فقط إذا كنت متأكدًا.
+</p>
+
+<button class="danger" onclick="clearAll()">
+🗑️ حذف جميع البيانات
+</button>
+
+</div>
+
+</section>
+
+
+</div>
+
+<footer>
+منصة المخبري — متوسطة قايد أحمد – غليزان
+</footer>
+
+<script>
+ const KEY='LAB_PLATFORM_FINAL_V4';
+
+const CATS=[
+  'معدات الفيزياء',
+  'معدات العلوم',
+  'معدات الإعلام الآلي',
+  'معدات الصوتيات',
+  'الأجهزة السمعية البصرية',
+  'الأدوات والتجهيزات العامة'
+];
+
+const EMPTY={
+  inventory:[],
+  chemicals:[],
+  daily:[],
+  requests:[],
+  projects:[],
+  avRecords:[]
+};
+
+let db=load();
+
+function load(){
+  try{
+    const x=JSON.parse(localStorage.getItem(KEY)||'null');
+    const data=x ? Object.assign({},EMPTY,x) : JSON.parse(JSON.stringify(EMPTY));
+    data.chemicals=(data.chemicals||[]).map(c=>({
+      ...c,
+      total:Number(c.total ?? c.qty ?? 0),
+      uses:Array.isArray(c.uses)?c.uses:[]
+    }));
+    return data;
+  }catch(e){
+    return JSON.parse(JSON.stringify(EMPTY));
+  }
+}
+
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(db));
+  renderAll();
+}
+
+
+async function loadInventoryFromSupabase(){
+
+  const { data, error } = await supabaseClient
+    .from("inventory")
+    .select("*");
+
+  if(error){
+    console.error("خطأ تحميل الجرد:", error);
+    alert("تعذر تحميل الجرد من قاعدة البيانات: " + error.message);
+    return;
+  }
+
+  if(!Array.isArray(data)){
+    alert("لم نستطع التأكد من بيانات الجرد؛ لم نغيّر القائمة المحلية.");
+    return;
+  }
+
+  db.inventory = data.map(item => ({
+    id: item.id,
+    item_number: item.item_number || "",
+    name: item.name || "",
+    category: item.category || "",
+    quantity: Number(item.quantity || 0),
+    condition: item.condition || "",
+    location: item.location || "",
+    item_date: item.item_date || "",
+    notes: item.notes || ""
+  }));
+
+  localStorage.setItem(KEY, JSON.stringify(db));
+  renderAll();
+}
+
+
+async function loadChemicalsFromSupabase(){
+  const { data, error } = await supabaseClient
+    .from("chemicals")
+    .select("*");
+
+  if(error){
+    console.error("خطأ تحميل المحاليل:", error);
+    alert("تعذر تحميل المحاليل: " + error.message);
+    return;
+  }
+
+  // إذا كانت قاعدة البيانات فارغة والهاتف يحتوي على محاليل،
+  // ننقل المحاليل المحلية إلى قاعدة البيانات.
+  if((data || []).length === 0 && db.chemicals.length > 0){
+
+    const rows = db.chemicals.map(c => {
+      const uses = Array.isArray(c.uses) ? c.uses : [];
+      const total = Number(c.total || 0);
+      const used = uses.reduce(
+        (sum, u) => sum + Number(u.qty || 0), 0
+      );
+
+      return {
+        name: c.name || "",
+        total_quantity: total,
+        used_quantity: used,
+        remaining_quantity: Math.max(0, total - used),
+        unit: c.unit || "",
+        used_by: uses.length
+          ? (uses[uses.length - 1].teacher || "")
+          : "",
+        chemical_date: c.date || today(),
+        notes: c.notes || "",
+        uses: uses
+      };
+    });
+
+    const { data: saved, error: saveError } =
+      await supabaseClient
+        .from("chemicals")
+        .insert(rows)
+        .select("*");
+
+    if(saveError){
+      console.error("فشل نقل المحاليل:", saveError);
+      alert("لم يتم نقل المحاليل: " + saveError.message);
+      return;
+    }
+
+    db.chemicals = (saved || []).map(item => ({
+      id: item.id,
+      name: item.name || "",
+      total: Number(item.total_quantity || 0),
+      unit: item.unit || "",
+      date: item.chemical_date || "",
+      state: Number(item.remaining_quantity || 0) > 0
+        ? "متوفرة" : "منتهية",
+      notes: item.notes || "",
+      uses: Array.isArray(item.uses) ? item.uses : []
+    }));
+
+    localStorage.setItem(KEY, JSON.stringify(db));
+    renderAll();
+
+    alert("تم نقل المحاليل وسجلات استعمالها بنجاح.");
+    return;
+  }
+
+  // لا نستبدل بيانات الهاتف إذا كان الجدول فارغًا.
+  if((data || []).length === 0){
+    console.warn("جدول المحاليل فارغ، ولا توجد بيانات محلية لنقلها.");
+    return;
+  }
+
+  db.chemicals = data.map(item => ({
+    id: item.id,
+    name: item.name || "",
+    total: Number(item.total_quantity || 0),
+    unit: item.unit || "",
+    date: item.chemical_date || "",
+    state: Number(item.remaining_quantity || 0) > 0
+      ? "متوفرة" : "منتهية",
+    notes: item.notes || "",
+    uses: Array.isArray(item.uses) ? item.uses : []
+  }));
+
+  localStorage.setItem(KEY, JSON.stringify(db));
+  renderAll();
+}
+
+function id(){
+  return Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+}
+
+function esc(v){
+  return String(v??'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+
+function today(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function nowTime(){
+  return new Date().toTimeString().slice(0,5);
+}
+
+function show(id){
+  document.querySelectorAll('.section').forEach(x=>{
+    x.classList.remove('active','printing');
+  });
+
+  const s=document.getElementById(id);
+
+  if(s){
+    s.classList.add('active');
+  }
+
+  window.scrollTo(0,0);
+  renderAll();
+}
+
+function toggle(id){
+  const e=document.getElementById(id);
+  if(e)e.classList.toggle('hidden');
+}
+
+function printSec(id){
+  document.querySelectorAll('.section').forEach(x=>{
+    x.classList.remove('printing');
+  });
+
+  const s=document.getElementById(id);
+
+  if(s){
+    s.classList.add('printing');
+  }
+
+  window.print();
+
+  setTimeout(()=>{
+    if(s)s.classList.remove('printing');
+  },500);
+}
+
+
+/* =========================
+   الجرد
+========================= */
+
+function renderCats(){
+
+  const box=document.getElementById('cats');
+
+  box.innerHTML=CATS.map((c,i)=>{
+
+    const n=db.inventory.filter(x=>x.category===c).length;
+
+    const icons=[
+      '⚛️',
+      '🧬',
+      '💻',
+      '🎧',
+      '📺',
+      '🧰'
+    ];
+
+    return `
+      <div class="cat" onclick="filterInv(${i})">
+        <strong>${icons[i]}</strong>
+        <h3>${esc(c)}</h3>
+        <div>${n} تجهيز</div>
+      </div>
+    `;
+
+  }).join('');
+
+  document.getElementById('icat').innerHTML=
+    CATS.map(c=>`<option>${esc(c)}</option>`).join('');
+}
+
+
+let invFilter='';
+
+
+function filterInv(i){
+
+  invFilter=CATS[i];
+
+  renderInventory();
+
+  document.getElementById('inventory')
+    .scrollIntoView({behavior:'smooth'});
+
+}
+
+
+function renderInventory(){
+
+  const body=document.getElementById('invBody');
+
+  let arr=db.inventory;
+
+  if(invFilter){
+    arr=arr.filter(x=>x.category===invFilter);
+  }
+
+  body.innerHTML=arr.map(x=>`
+
+    <tr>
+
+      <td>${esc(x.item_number)}</td>
+
+      <td>${esc(x.name)}</td>
+
+      <td>${esc(x.category)}</td>
+
+      <td>${esc(x.quantity)}</td>
+
+      <td>${esc(x.condition)}</td>
+
+      <td>${esc(x.location)}</td>
+
+      <td>${esc(x.item_date)}</td>
+
+      <td class="no-print">
+        <button class="danger"
+          onclick="delInv('${x.id}')">
+          حذف
+        </button>
+      </td>
+
+    </tr>
+
+  `).join('');
+
+}
+
+
+
+async function addInv(){
+
+  const item = {
+    item_number: document.getElementById('ino').value.trim(),
+    name: document.getElementById('iname').value.trim(),
+    category: document.getElementById('icat').value,
+    quantity: Number(document.getElementById('iqty').value || 0),
+    condition: document.getElementById('icond').value,
+    location: document.getElementById('iloc').value.trim(),
+    item_date: document.getElementById('idate').value || today(),
+    notes: document.getElementById('inote').value.trim()
+  };
+
+  if(!item.name){
+    alert('اكتب اسم التجهيز');
+    return;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("inventory")
+    .insert(item)
+    .select()
+    .single();
+
+  if(error){
+    alert("فشل حفظ التجهيز: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  db.inventory.push({
+    id: data.id,
+    item_number: data.item_number || "",
+    name: data.name || "",
+    category: data.category || "",
+    quantity: Number(data.quantity || 0),
+    condition: data.condition || "",
+    location: data.location || "",
+    item_date: data.item_date || "",
+    notes: data.notes || ""
+  });
+
+  save();
+
+  document.getElementById('ino').value = '';
+  document.getElementById('iname').value = '';
+  document.getElementById('iqty').value = 1;
+  document.getElementById('iloc').value = '';
+  document.getElementById('inote').value = '';
+
+  alert('تم حفظ التجهيز في قاعدة البيانات بنجاح');
+}
+
+async function delInv(id){
+
+  if(!confirm('هل تريد حذف هذا التجهيز؟')) return;
+
+  const item = db.inventory.find(x => String(x.id) === String(id));
+  if(!item) return;
+
+  const { error } = await supabaseClient
+    .from("inventory")
+    .delete()
+    .eq("id", id);
+
+  if(error){
+    alert("فشل حذف التجهيز من قاعدة البيانات: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  db.inventory = db.inventory.filter(
+    x => String(x.id) !== String(id)
+  );
+
+  save();
+
+  alert('تم حذف التجهيز بنجاح');
+}
+
+
+
+/* =========================
+   المواد الكيميائية
+========================= */
+
+function renderChem(){
+
+  const box=document.getElementById('chemCards');
+
+  box.innerHTML=db.chemicals.map(c=>{
+
+    const used=(c.uses||[])
+      .reduce((a,b)=>a+Number(b.qty||0),0);
+
+    const total=Number(c.total||0);
+
+    const remaining=total-used;
+
+    let state='متوفرة';
+
+    if(remaining<=0){
+      state='منتهية';
+    }else if(remaining<=total*0.2){
+      state='قليلة';
+    }
+
+    return `
+
+      <div class="card">
+
+        <div class="head">
+
+          <div>
+            <h3>⚗️ ${esc(c.name)}</h3>
+
+            <span class="badge">
+              ${esc(state)}
+            </span>
+          </div>
+
+          <button class="danger"
+            onclick="delChem('${c.id}')">
+            حذف
+          </button>
+
+        </div>
+
+        <div class="stats">
+
+          <div class="statbox">
+            إجمالي الداخل
+            <b>${total}</b>
+            ${esc(c.unit||'')}
+          </div>
+
+          <div class="statbox">
+            المستعمل
+            <b>${used}</b>
+            ${esc(c.unit||'')}
+          </div>
+
+          <div class="statbox">
+            المتبقي
+            <b>${remaining}</b>
+            ${esc(c.unit||'')}
+          </div>
+
+        </div>
+
+        <div class="actions">
+
+          <button class="primary"
+            onclick="useChem('${c.id}')">
+            تسجيل استعمال
+          </button>
+
+          <button
+            onclick="addChemStock('${c.id}')">
+            إضافة كمية
+          </button>
+
+        </div>
+
+        <div class="tablewrap">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>التاريخ</th>
+                <th>الوقت</th>
+                <th>الأستاذ</th>
+                <th>التجربة</th>
+                <th>الكمية المستعملة</th>
+                <th>المتبقي</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              ${(c.uses||[]).map(u=>`
+
+                <tr>
+                  <td>${esc(u.date)}</td>
+                  <td>${esc(u.time || '')}</td>
+                  <td>${esc(u.teacher)}</td>
+                  <td>${esc(u.experiment || '')}</td>
+                  <td>${esc(u.qty)} ${esc(c.unit||'')}</td>
+                  <td>${esc(u.remaining)} ${esc(c.unit||'')}</td>
+                </tr>
+
+              `).join('')}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    `;
+
+  }).join('');
+
+}
+
+
+
+async function addChem(){
+
+  const name = document.getElementById('cname').value.trim();
+  const qty = Number(document.getElementById('cqty').value || 0);
+  const unit = document.getElementById('cunit').value.trim();
+  const date = document.getElementById('cdate').value || today();
+  const state = document.getElementById('cstate').value;
+  const notes = document.getElementById('cnote').value.trim();
+
+  if(!name){
+    alert('اكتب اسم المادة');
+    return;
+  }
+
+  if(qty <= 0){
+    alert('أدخل كمية صحيحة');
+    return;
+  }
+
+  const local = db.chemicals.find(
+    x => x.name.trim().toLowerCase() === name.toLowerCase()
+  );
+
+  const { data: rows, error: findError } = await supabaseClient
+    .from("chemicals")
+    .select("*")
+    .ilike("name", name);
+
+  if(findError){
+    alert("تعذر التحقق من المادة: " + findError.message);
+    console.error(findError);
+    return;
+  }
+
+  const remote = (rows || []).find(
+    x => x.name.trim().toLowerCase() === name.toLowerCase()
+  );
+
+  const previousTotal = Number(
+    remote?.total_quantity ?? local?.total ?? 0
+  );
+
+  const uses = Array.isArray(remote?.uses)
+    ? remote.uses
+    : (local?.uses || []);
+
+  const used = uses.reduce(
+    (sum, item) => sum + Number(item.qty || 0), 0
+  );
+
+  const newTotal = previousTotal + qty;
+
+  const record = {
+    name: name,
+    total_quantity: newTotal,
+    used_quantity: used,
+    remaining_quantity: Math.max(0, newTotal - used),
+    unit: unit || remote?.unit || local?.unit || "",
+    used_by: remote?.used_by || "",
+    chemical_date: date,
+    notes: notes || remote?.notes || local?.notes || "",
+    uses: uses
+  };
+
+  let result;
+
+  if(remote){
+    result = await supabaseClient
+      .from("chemicals")
+      .update(record)
+      .eq("id", remote.id)
+      .select()
+      .single();
+  }else{
+    result = await supabaseClient
+      .from("chemicals")
+      .insert(record)
+      .select()
+      .single();
+  }
+
+  if(result.error){
+    alert("فشل حفظ المحلول: " + result.error.message);
+    console.error(result.error);
+    return;
+  }
+
+  const saved = result.data;
+
+  const chemical = {
+    id: saved.id,
+    name: saved.name,
+    total: Number(saved.total_quantity || 0),
+    unit: saved.unit || "",
+    date: saved.chemical_date || "",
+    state: saved.remaining_quantity > 0 ? "متوفرة" : "منتهية",
+    notes: saved.notes || "",
+    uses: Array.isArray(saved.uses) ? saved.uses : []
+  };
+
+  const index = db.chemicals.findIndex(
+    x => x.name.trim().toLowerCase() === name.toLowerCase()
+  );
+
+  if(index >= 0){
+    db.chemicals[index] = chemical;
+  }else{
+    db.chemicals.push(chemical);
+  }
+
+  save();
+
+  document.getElementById('cname').value = '';
+  document.getElementById('cqty').value = '';
+  document.getElementById('cunit').value = '';
+  document.getElementById('cnote').value = '';
+
+  alert('تم حفظ المحلول في قاعدة البيانات بنجاح');
+}
+
+
+
+async function addChemStock(cid){
+
+  const c = db.chemicals.find(x => String(x.id) === String(cid));
+  if(!c) return;
+
+  const q = Number(prompt('أدخل الكمية الجديدة:'));
+  if(!q || q <= 0) return;
+
+  const { data: remote, error: loadError } = await supabaseClient
+    .from("chemicals")
+    .select("*")
+    .eq("id", cid)
+    .maybeSingle();
+
+  if(loadError){
+    alert("تعذر تحميل بيانات المادة: " + loadError.message);
+    console.error(loadError);
+    return;
+  }
+
+  if(!remote){
+    alert("لم يُعثر على المادة في قاعدة البيانات.");
+    return;
+  }
+
+  const total = Number(remote.total_quantity || 0) + q;
+  const used = Number(remote.used_quantity || 0);
+  const remaining = total - used;
+
+  const { data: saved, error } = await supabaseClient
+    .from("chemicals")
+    .update({
+      total_quantity: total,
+      remaining_quantity: remaining
+    })
+    .eq("id", cid)
+    .select()
+    .single();
+
+  if(error){
+    alert("فشل حفظ الكمية الجديدة: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  c.total = Number(saved.total_quantity || 0);
+  c.unit = saved.unit || c.unit;
+  c.date = saved.chemical_date || c.date;
+  c.notes = saved.notes || c.notes;
+  c.uses = Array.isArray(saved.uses) ? saved.uses : (c.uses || []);
+  c.state = Number(saved.remaining_quantity || 0) > 0 ? "متوفرة" : "منتهية";
+
+  save();
+
+  alert('تم حفظ الكمية الجديدة بنجاح');
+}
+
+async function useChem(cid){
+
+  const c = db.chemicals.find(x => String(x.id) === String(cid));
+  if(!c) return;
+
+  const q = Number(prompt('كمية المادة المستعملة:'));
+  if(!q || q <= 0) return;
+
+  const { data: remote, error: loadError } = await supabaseClient
+    .from("chemicals")
+    .select("*")
+    .eq("id", cid)
+    .maybeSingle();
+
+  if(loadError){
+    alert("تعذر تحميل بيانات المحلول: " + loadError.message);
+    console.error(loadError);
+    return;
+  }
+
+  if(!remote){
+    alert("لم يُعثر على المحلول في قاعدة البيانات. لم يتم تسجيل الاستعمال.");
+    return;
+  }
+
+  const uses = Array.isArray(remote.uses) ? remote.uses : [];
+  const total = Number(remote.total_quantity || 0);
+  const used = uses.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+  const remaining = Math.max(0, total - used);
+
+  if(q > remaining){
+    alert('الكمية غير كافية. المتبقي فقط ' + remaining + ' ' + (c.unit || ''));
+    return;
+  }
+
+  const teacher = prompt('اسم الأستاذ:') || '';
+  const experiment = prompt('اسم التجربة أو النشاط:') || '';
+  const time = prompt('وقت التجربة (مثال 10:30):', nowTime()) || nowTime();
+  const date = prompt('تاريخ التجربة (YYYY-MM-DD):', today()) || today();
+
+  uses.push({
+    date: date,
+    time: time,
+    teacher: teacher,
+    experiment: experiment,
+    qty: q,
+    remaining: remaining - q
+  });
+
+  const { data: saved, error } = await supabaseClient
+    .from("chemicals")
+    .update({
+      used_quantity: used + q,
+      remaining_quantity: total - used - q,
+      used_by: teacher,
+      uses: uses
+    })
+    .eq("id", cid)
+    .select()
+    .single();
+
+  if(error){
+    alert("فشل حفظ الاستعمال: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  c.total = Number(saved.total_quantity || 0);
+  c.unit = saved.unit || c.unit;
+  c.date = saved.chemical_date || c.date;
+  c.notes = saved.notes || c.notes;
+  c.uses = Array.isArray(saved.uses) ? saved.uses : uses;
+  c.state = Number(saved.remaining_quantity || 0) > 0 ? "متوفرة" : "منتهية";
+
+  save();
+
+  alert('تم تسجيل الاستعمال في قاعدة البيانات. المتبقي: ' +
+    Number(saved.remaining_quantity || 0) + ' ' + (c.unit || ''));
+}
+
+
+async function delChem(cid){
+
+  if(!confirm('هل تريد حذف هذه المادة؟')) return;
+
+  const c = db.chemicals.find(x => String(x.id) === String(cid));
+
+  if(!c) return;
+
+  const { error } = await supabaseClient
+    .from("chemicals")
+    .delete()
+    .eq("id", cid);
+
+  if(error){
+    alert("فشل حذف المادة من قاعدة البيانات: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  db.chemicals = db.chemicals.filter(
+    x => String(x.id) !== String(cid)
+  );
+
+  save();
+
+  alert('تم حذف المادة من قاعدة البيانات');
+}
+
+
+/* =========================
+   التقارير اليومية - النسخة الموحدة
+========================= */
+
+let dailyRows = [];
+let editingDailyId = null;
+
+function getDailyNumberValue(){
+  const el=document.getElementById('dnumber');
+  const n=el ? parseInt(el.value,10) : NaN;
+  return Number.isInteger(n) && n>0 ? n : null;
+}
+
+function getNextDailyNumber(){
+  const nums=(db.daily||[]).map(x=>parseInt(x.report_number ?? x.number,10)).filter(Number.isFinite);
+  return nums.length ? Math.max(...nums)+1 : 1;
+}
+
+function dailyNumberExists(number, exceptId=null){
+  return (db.daily||[]).some(x=>{
+    const n=parseInt(x.report_number ?? x.number,10);
+    return n===number && x.id!==exceptId;
+  });
+}
+
+function normalizeDailyRow(x){
+  return {
+    teacher:x.teacher ?? x.Teacher ?? '',
+    class_name:x.class_name ?? x['Class-name'] ?? '',
+    experiment:x.experiment ?? x.request_text ?? '',
+    equipment:x.equipment ?? x.tools ?? '',
+    report_date:x.report_date ?? x.date ?? today(),
+    report_time:x.report_time ?? x.time ?? '',
+    note:x.note ?? x.notes ?? '',
+    status:x.status ?? 'مكتمل'
+  };
+}
+
+function getRequestTag(requestId){
+  return requestId ? `[[REQUEST_ID:${requestId}]]` : '';
+}
+
+function extractRequestId(note){
+  const m=String(note||'').match(/\[\[REQUEST_ID:([^\]]+)\]\]/);
+  return m ? m[1] : null;
+}
+
+function visibleDailyNote(note){
+  return String(note||'')
+    .replace(/\[\[REQUEST_ID:[^\]]+\]\]\s*/g,'')
+    .trim();
+}
+
+function dailyRowNote(note, requestId){
+  const clean=visibleDailyNote(note);
+  const tag=getRequestTag(requestId);
+  return tag ? (tag + (clean ? ' ' + clean : '')) : clean;
+}
+
+function normalizeDailyRow(row){
+  const rawNote=row.note ?? row.notes ?? '';
+  return {
+    teacher:row.teacher ?? row.Teacher ?? '',
+    class_name:row.class_name ?? row['Class-name'] ?? '',
+    experiment:row.experiment ?? '',
+    equipment:row.equipment ?? '',
+    report_date:row.report_date ?? row.date ?? '',
+    report_time:row.report_time ?? row.time ?? '',
+    note:visibleDailyNote(rawNote),
+    status:row.status ?? (extractRequestId(rawNote) ? 'طلب من الأستاذ' : 'مكتمل'),
+    request_id:row.request_id ?? extractRequestId(rawNote) ?? null
+  };
+}
+
+function getDailyNumberValue(){
+  const e=document.getElementById('dnumber');
+  const n=e ? parseInt(e.value,10) : NaN;
+  return Number.isInteger(n) && n>0 ? n : null;
+}
+
+function getNextDailyNumber(){
+  const nums=(db.daily||[])
+    .map(x=>parseInt(x.report_number ?? x.number,10))
+    .filter(Number.isFinite);
+  return nums.length ? Math.max(...nums)+1 : 1;
+}
+
+function dailyNumberExists(number,currentId=null){
+  return (db.daily||[]).some(x=>
+    x.id!==currentId &&
+    parseInt(x.report_number ?? x.number,10)===number
+  );
+}
+
+function addDailyRow(rowFromRequest=null){
+  const row=rowFromRequest || {
+    teacher:document.getElementById('dteach').value.trim(),
+    class_name:document.getElementById('dclass').value.trim(),
+    report_date:document.getElementById('ddate').value || today(),
+    report_time:document.getElementById('dtime').value || nowTime(),
+    experiment:document.getElementById('dexp').value.trim(),
+    equipment:document.getElementById('dequip').value.trim(),
+    note:document.getElementById('dnote').value.trim(),
+    status:'مكتمل',
+    request_id:null
+  };
+
+  if(!row.teacher && !row.experiment){
+    alert('أدخل اسم الأستاذ أو التجربة');
+    return false;
+  }
+
+  dailyRows.push(row);
+  renderDailyRows();
+
+  if(!rowFromRequest){
+    ['dteach','dclass','dtime','dexp','dequip','dnote'].forEach(id=>{
+      const e=document.getElementById(id);
+      if(e)e.value='';
+    });
+  }
+
+  return true;
+}
+
+function renderDailyRows(){
+  const body=document.getElementById('dailyBody');
+  if(!body)return;
+
+  if(!dailyRows.length){
+    body.innerHTML='<tr><td colspan="9" style="text-align:center">لا توجد صفوف</td></tr>';
+    return;
+  }
+
+  body.innerHTML=dailyRows.map((x,index)=>{
+    const linked=x.request_id ? '<span class="badge">📨 مرتبط بطلب</span>' : '';
+    const status=x.request_id ? 'طلب من الأستاذ' : (x.status||'مكتمل');
+    return `
+      <tr>
+        <td>${esc(x.teacher||'')}</td>
+        <td>${esc(x.class_name||'')}</td>
+        <td>${esc(x.report_date||'')}</td>
+        <td>${esc(x.report_time||'')}</td>
+        <td>${esc(x.experiment||'')}</td>
+        <td>${esc(x.equipment||'')}</td>
+        <td>${esc(x.note||'')}</td>
+        <td>${linked || esc(status)}</td>
+        <td class="no-print">
+          <button class="primary" type="button" onclick="editDailyRow(${index})">✏️ تعديل</button>
+          <button class="danger" type="button" onclick="removeDailyRow(${index})">🗑️ حذف</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function editDailyRow(index){
+  const x=dailyRows[index];
+  if(!x)return;
+
+  document.getElementById('dteach').value=x.teacher||'';
+  document.getElementById('dclass').value=x.class_name||'';
+  document.getElementById('ddate').value=x.report_date||today();
+  document.getElementById('dtime').value=x.report_time||'';
+  document.getElementById('dexp').value=x.experiment||'';
+  document.getElementById('dequip').value=x.equipment||'';
+  document.getElementById('dnote').value=x.note||'';
+
+  dailyRows.splice(index,1);
+  renderDailyRows();
+}
+
+function removeDailyRow(index){
+  if(index<0 || index>=dailyRows.length)return;
+  if(!confirm('هل تريد حذف هذا الصف؟'))return;
+  dailyRows.splice(index,1);
+  renderDailyRows();
+}
+
+async function markRequestsExecuted(requestIds,reportNumber){
+  const ids=[...new Set((requestIds||[]).filter(Boolean))];
+  if(!ids.length)return;
+
+  const now=new Date();
+  const executionDate=now.toISOString().slice(0,10);
+  const executionTime=now.toTimeString().slice(0,5);
+
+  for(const requestId of ids){
+    const {data:current,error:readError}=await supabaseClient
+      .from('requests')
+      .select('notes')
+      .eq('id',requestId)
+      .maybeSingle();
+
+    if(readError){
+      console.error('قراءة الطلب المرتبط:',readError);
+      continue;
+    }
+
+    let notes=current?.notes || '';
+    notes=notes.replace(/\n?\[التقرير\s*#?\d+\]\s*$/,'').trim();
+    notes=(notes ? notes+'\n' : '')+'[التقرير #'+reportNumber+']';
+
+    const {error}=await supabaseClient
+      .from('requests')
+      .update({
+        status:'تم التنفيذ',
+        execution_date:executionDate,
+        execution_time:executionTime,
+        is_read:true,
+        notes:notes
+      })
+      .eq('id',requestId);
+
+    if(error)console.error('تحديث الطلب المرتبط:',error);
+  }
+}
+
+async function saveDaily(){
+  if(!dailyRows.length){
+    alert('أضف صفًا واحدًا على الأقل');
+    return;
+  }
+
+  const reportDate=document.getElementById('ddate').value || today();
+  const general=(document.getElementById('dgen')?.value || '').trim();
+  const needs=(document.getElementById('dneeds')?.value || '').trim();
+  const currentId=editingDailyId;
+  const oldReport=currentId ? db.daily.find(x=>x.id===currentId) : null;
+  const reportNumber=getDailyNumberValue() || (oldReport ? parseInt(oldReport.report_number ?? oldReport.number,10) : getNextDailyNumber());
+
+  if(!Number.isInteger(reportNumber) || reportNumber<1){
+    alert('رقم التقرير يجب أن يكون رقمًا صحيحًا أكبر من صفر');
+    return;
+  }
+
+  if(dailyNumberExists(reportNumber,currentId)){
+    alert('❌ رقم التقرير '+reportNumber+' مستخدم بالفعل. اختر رقمًا آخر.');
+    return;
+  }
+
+  const reportId=currentId
+    ? (oldReport?.report_id || crypto.randomUUID())
+    : crypto.randomUUID();
+
+  const requestIds=dailyRows.map(x=>x.request_id).filter(Boolean);
+
+  const ok=await saveDailyToSupabase({
+    reportId,
+    oldReportId:oldReport?.report_id || null,
+    oldReportNumber:oldReport ? (oldReport.report_number ?? oldReport.number) : null,
+    reportNumber,
+    reportDate,
+    general,
+    needs
+  });
+
+  if(!ok)return;
+
+  const localRows=JSON.parse(JSON.stringify(dailyRows));
+
+  if(currentId){
+    const x=db.daily.find(y=>y.id===currentId);
+    if(!x)return;
+    x.report_id=reportId;
+    x.report_number=reportNumber;
+    x.number=reportNumber;
+    x.date=reportDate;
+    x.rows=localRows;
+    x.general=general;
+    x.needs=needs;
+  }else{
+    db.daily.push({
+      id:id(),
+      report_id:reportId,
+      report_number:reportNumber,
+      number:reportNumber,
+      date:reportDate,
+      rows:localRows,
+      general,
+      needs
+    });
+  }
+
+  await markRequestsExecuted(requestIds,reportNumber);
+
+  save();
+  editingDailyId=null;
+  dailyRows=[];
+  clearDailyForm();
+  renderDailyRows();
+  renderSavedDaily();
+  updateDailyOfficial();
+  await renderRequests();
+  await updateRequestsNotification();
+
+  alert(currentId ? '✅ تم تعديل التقرير بنجاح' : '✅ تم حفظ التقرير بنجاح');
+}
+
+function clearDailyForm(){
+  const ids=['dnumber','dteach','dclass','dtime','dexp','dequip','dnote','dgen','dneeds'];
+  ids.forEach(id=>{
+    const e=document.getElementById(id);
+    if(e)e.value='';
+  });
+  const ddate=document.getElementById('ddate');
+  if(ddate)ddate.value=today();
+  const dtime=document.getElementById('dtime');
+  if(dtime)dtime.value=nowTime();
+  const rno=document.getElementById('rno');
+  const rdate=document.getElementById('rdate');
+  const pgen=document.getElementById('pgen');
+  const pneeds=document.getElementById('pneeds');
+  if(rno)rno.textContent='غير محفوظ';
+  if(rdate)rdate.textContent='';
+  if(pgen)pgen.textContent='';
+  if(pneeds)pneeds.textContent='';
+}
+
+async function saveDailyToSupabase(opts={}){
+  if(!dailyRows.length){
+    alert('لا توجد صفوف لإرسالها');
+    return false;
+  }
+
+  const {reportId,oldReportId,oldReportNumber,reportNumber,reportDate,general,needs}=opts;
+  if(!reportId || !reportNumber){
+    alert('❌ بيانات التقرير غير مكتملة');
+    return false;
+  }
+
+  if(oldReportId){
+    const {error}=await supabaseClient.from('daily_reports').delete().eq('report_id',oldReportId);
+    if(error){
+      console.error(error);
+      alert('❌ تعذر تحديث التقرير في Supabase\n'+error.message);
+      return false;
+    }
+  }else if(oldReportNumber){
+    const {error}=await supabaseClient.from('daily_reports').delete().eq('report_number',oldReportNumber);
+    if(error){
+      console.error(error);
+      alert('❌ تعذر تحديث التقرير القديم في Supabase\n'+error.message);
+      return false;
+    }
+  }
+
+  const rows=dailyRows.map(x=>({
+    teacher:x.teacher||'',
+    class_name:x.class_name||'',
+    experiment:x.experiment||'',
+    equipment:x.equipment||'',
+    report_date:x.report_date||reportDate,
+    report_time:x.report_time||'',
+    note:dailyRowNote(x.note||'',x.request_id||null),
+    report_id:reportId,
+    report_number:reportNumber,
+    general:general||'',
+    needs:needs||''
+  }));
+
+  const {error}=await supabaseClient.from('daily_reports').insert(rows);
+  if(error){
+    console.error(error);
+    alert('❌ لم يتم حفظ التقرير في Supabase\n'+error.message);
+    return false;
+  }
+
+  return true;
+}
+
+async function loadDailyFromSupabase(){
+  const msg=document.getElementById('dailyLoadMessage');
+  if(msg){
+    msg.style.display='block';
+    msg.textContent='⏳ جارٍ تحميل التقارير المحفوظة من قاعدة البيانات...';
+  }
+
+  const {data,error}=await supabaseClient
+    .from('daily_reports')
+    .select('*')
+    .order('report_date',{ascending:false})
+    .order('report_time',{ascending:false});
+
+  if(error){
+    console.error('loadDailyFromSupabase:',error);
+    if(msg)msg.textContent='❌ تعذر تحميل التقارير: '+error.message;
+    return false;
+  }
+
+  if(!Array.isArray(data)){
+    if(msg)msg.textContent='❌ لم تُرجع قاعدة البيانات بيانات صالحة للتقارير.';
+    return false;
+  }
+
+  const groups=new Map();
+  data.forEach(row=>{
+    const number=row.report_number ?? row.number ?? '';
+    const date=row.report_date ?? row.date ?? '';
+    const key=row.report_id
+      ? 'id_'+String(row.report_id)
+      : 'legacy_'+String(number)+'_'+String(date);
+
+    if(!groups.has(key)){
+      const parsedNumber=parseInt(number,10);
+      groups.set(key,{
+        id:id(),
+        report_id:row.report_id || null,
+        report_number:Number.isFinite(parsedNumber)?parsedNumber:0,
+        number:Number.isFinite(parsedNumber)?parsedNumber:0,
+        date:date || today(),
+        rows:[],
+        general:row.general || '',
+        needs:row.needs || ''
+      });
+    }
+
+    const report=groups.get(key);
+    report.rows.push(normalizeDailyRow(row));
+    if(!report.general && row.general)report.general=row.general;
+    if(!report.needs && row.needs)report.needs=row.needs;
+    if(!report.date && date)report.date=date;
+  });
+
+  const remoteReports=[...groups.values()];
+  if(remoteReports.length){
+    db.daily=remoteReports;
+    localStorage.setItem(KEY,JSON.stringify(db));
+  }
+
+  renderSavedDaily();
+  renderStats();
+  await renderRequests();
+
+  const shownCount=db.daily?.length || 0;
+  if(msg){
+    msg.style.display='block';
+    if(remoteReports.length){
+      msg.textContent='✅ تم تحميل '+remoteReports.length+' تقريرًا محفوظًا من قاعدة البيانات.';
+    }else if(shownCount){
+      msg.textContent='⚠️ لم تُرجع قاعدة البيانات تقارير، لذلك تم عرض '+shownCount+' تقريرًا محفوظًا محليًا.';
+    }else{
+      msg.textContent='ℹ️ لا توجد تقارير محفوظة حاليًا.';
+    }
+  }
+
+  return true;
+}
+
+function renderSavedDaily(){
+  const body=document.getElementById('savedDaily');
+  if(!body)return;
+
+  if(!db.daily || !db.daily.length){
+    body.innerHTML='<tr><td colspan="4" style="text-align:center">لا توجد تقارير محفوظة</td></tr>';
+    return;
+  }
+
+  const arr=[...db.daily].sort((a,b)=>{
+    const na=parseInt(a.report_number ?? a.number,10)||0;
+    const nb=parseInt(b.report_number ?? b.number,10)||0;
+    return nb-na;
+  });
+
+  body.innerHTML=arr.map(report=>{
+    const number=report.report_number ?? report.number ?? '';
+    const rowsCount=Array.isArray(report.rows)?report.rows.length:0;
+    return `
+      <tr>
+        <td>${esc(number)}</td>
+        <td>${esc(report.date||'')}</td>
+        <td>${rowsCount}</td>
+        <td class="no-print">
+          <button type="button" onclick="openDailyReport('${report.id}')">👁️ فتح</button>
+          <button type="button" class="primary" onclick="editDaily('${report.id}')">✏️ تعديل</button>
+          <button type="button" onclick="printSavedDaily('${report.id}')">🖨️ طباعة</button>
+          <button type="button" class="danger" onclick="deleteDaily('${report.id}')">🗑️ حذف</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateDailyOfficial(){
+  const report=editingDailyId ? db.daily.find(x=>x.id===editingDailyId) : null;
+  const number=getDailyNumberValue();
+  const date=document.getElementById('ddate')?.value || '';
+  const general=document.getElementById('dgen')?.value || '';
+  const needs=document.getElementById('dneeds')?.value || '';
+
+  const rno=document.getElementById('rno');
+  const rdate=document.getElementById('rdate');
+  const pgen=document.getElementById('pgen');
+  const pneeds=document.getElementById('pneeds');
+
+  if(rno)rno.textContent=number || (report ? (report.report_number||report.number||'') : 'غير محفوظ');
+  if(rdate)rdate.textContent=date || (report?.date||'');
+  if(pgen)pgen.textContent=general || (report?.general||'');
+  if(pneeds)pneeds.textContent=needs || (report?.needs||'');
+}
+
+function fillDailyForm(report){
+  const dnumber=document.getElementById('dnumber');
+  const ddate=document.getElementById('ddate');
+  const dgen=document.getElementById('dgen');
+  const dneeds=document.getElementById('dneeds');
+
+  if(dnumber)dnumber.value=report.report_number ?? report.number ?? '';
+  if(ddate)ddate.value=report.date || today();
+  if(dgen)dgen.value=report.general || '';
+  if(dneeds)dneeds.value=report.needs || '';
+}
+
+function openDailyReport(id){
+  const report=db.daily.find(x=>x.id===id);
+  if(!report){alert('❌ لم يتم العثور على التقرير');return;}
+
+  editingDailyId=null;
+  dailyRows=JSON.parse(JSON.stringify(report.rows||[]));
+  fillDailyForm(report);
+  renderDailyRows();
+  updateDailyOfficial();
+  show('daily');
+}
+
+function editDaily(id){
+  const report=db.daily.find(x=>x.id===id);
+  if(!report){alert('❌ لم يتم العثور على التقرير');return;}
+
+  editingDailyId=id;
+  dailyRows=JSON.parse(JSON.stringify(report.rows||[]));
+  fillDailyForm(report);
+  renderDailyRows();
+  updateDailyOfficial();
+  show('daily');
+  alert('✏️ تم تحميل التقرير للتعديل. يمكنك تغيير رقم التقرير ثم الضغط على حفظ.');
+}
+
+async function deleteDaily(id){
+  const report=db.daily.find(x=>x.id===id);
+  if(!report){alert('❌ لم يتم العثور على التقرير');return;}
+  if(!confirm('هل أنت متأكد من حذف التقرير رقم '+(report.report_number||report.number||'')+'؟'))return;
+
+  let query=supabaseClient.from('daily_reports').delete();
+  if(report.report_id){
+    query=query.eq('report_id',report.report_id);
+  }else if(report.report_number || report.number){
+    query=query.eq('report_number',report.report_number || report.number);
+  }else{
+    alert('❌ لا يوجد معرف للتقرير في Supabase');
+    return;
+  }
+
+  const {error}=await query;
+  if(error){
+    console.error(error);
+    alert('❌ تعذر حذف التقرير من Supabase\n'+error.message);
+    return;
+  }
+
+  db.daily=db.daily.filter(x=>x.id!==id);
+  if(editingDailyId===id){
+    editingDailyId=null;
+    dailyRows=[];
+    clearDailyForm();
+    renderDailyRows();
+  }
+  save();
+  renderSavedDaily();
+  await renderRequests();
+  await updateRequestsNotification();
+  alert('✅ تم حذف التقرير بنجاح');
+}
+
+function printSavedDaily(id){
+  openDailyReport(id);
+  printDaily();
+}
+
+function printDaily(){
+  const official=document.querySelector('#daily .official');
+  if(!official){
+    alert('❌ تعذر العثور على نموذج التقرير للطباعة');
+    return;
+  }
+
+  // طباعة نسخة مستقلة من التقرير مع فرض حدود سوداء واضحة على كل خلايا الجدول
+  const report=official.cloneNode(true);
+  report.querySelectorAll('.no-print,button').forEach(el=>el.remove());
+
+  const printWindow=window.open('', '_blank', 'width=1100,height=800');
+  if(!printWindow){
+    alert('❌ منع المتصفح نافذة الطباعة. اسمح بالنوافذ المنبثقة لهذا الموقع ثم أعد المحاولة.');
+    return;
+  }
+
+  printWindow.document.open();
+  printWindow.document.write(`<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تقرير يومي للمخبر</title>
+<style>
+@page{size:A4 landscape;margin:10mm}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff;color:#000;font-family:Arial,Tahoma,sans-serif;direction:rtl}
+.report{width:100%;background:#fff;color:#000}
+h2,h3,h4,p{text-align:inherit}
+table{display:table!important;width:100%!important;min-width:0!important;border-collapse:collapse!important;border-spacing:0!important;table-layout:fixed!important;background:#fff!important;color:#000!important}
+thead{display:table-header-group!important}
+tbody{display:table-row-group!important}
+tr{display:table-row!important;break-inside:avoid;page-break-inside:avoid}
+th,td{display:table-cell!important;border:1.5px solid #000!important;padding:6px 5px!important;color:#000!important;background:#fff!important;text-align:right;vertical-align:middle;overflow-wrap:anywhere;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+th{font-weight:bold!important}
+.tablewrap{width:100%!important;overflow:visible!important}
+.signatures{display:flex!important;flex-direction:row!important;direction:rtl!important;justify-content:space-between!important;align-items:flex-start!important;text-align:center!important;width:100%!important;margin-top:35px!important;gap:10px!important;break-inside:avoid!important}
+.signatures>div{flex:1 1 0!important;text-align:center!important;direction:rtl!important}
+@media screen{body{padding:18px}.report{max-width:1200px;margin:auto}}
+</style>
+</head>
+<body><main class="report">${report.innerHTML}</main>
+<script>
+window.addEventListener('load',function(){setTimeout(function(){window.focus();window.print();},300)});
+<\/script>
+</body></html>`);
+  printWindow.document.close();
+}
+
+function mailDaily(){
+  const number=document.getElementById('rno')?.textContent || '';
+  const date=document.getElementById('rdate')?.textContent || '';
+  const subject=encodeURIComponent('التقرير اليومي للمخبر رقم '+number);
+  const body=encodeURIComponent(
+    'تقرير يومي للمخبر - متوسطة قايد أحمد – غليزان\n'+
+    'رقم التقرير: '+number+'\n'+
+    'التاريخ: '+date+'\n\n'+
+    'يمكن إرفاق النسخة المطبوعة أو PDF من جهازك.'
+  );
+  location.href='mailto:?subject='+subject+'&body='+body;
+}
+
+
+/* =========================
+   التدرج السنوي
+========================= */
+
+const PROG={
+
+  1:{
+    t:'السنة الأولى متوسط',
+    s:'وثائق وزارة التربية الوطنية للمخططات السنوية',
+    u:'https://education.gov.dz/wp-content/uploads/2015/04/1-AM-sc-phy.pdf'
+  },
+
+  2:{
+    t:'السنة الثانية متوسط',
+    s:'المخطط السنوي للعلوم الفيزيائية والتكنولوجيا',
+    u:'https://education.gov.dz/wp-content/uploads/2015/04/2-AM-sc-phy.pdf'
+  },
+
+  3:{
+    t:'السنة الثالثة متوسط',
+    s:'الوثائق الرسمية البيداغوجية للتعليم المتوسط',
+    u:'https://www.education.gov.dz/2017/11/15/%D8%A7%D9%84%D9%88%D8%AB%D8%A7%D8%A6%D9%82-%D8%A7%D9%84%D8%B1%D8%B3%D9%85%D9%8A%D8%A9-%D8%A7%D9%84%D8%A8%D9%8A%D8%AF%D8%A7%D8%BA%D9%88%D8%AC%D9%8A%D8%A9-%D9%84%D9%85%D8%B1%D8%AD%D9%84%D8%AA%D9%8A/'
+  },
+
+  4:{
+    t:'السنة الرابعة متوسط',
+    s:'وثائق المخططات السنوية للعلوم الفيزيائية والتكنولوجيا',
+    u:'https://education.gov.dz/wp-content/uploads/2015/04/4-AM-sc-phy.pdf'
+  }
+
+};
+
+
+function renderProgress(){
+
+  const level=
+    document.getElementById('plevel').value;
+
+  const p=PROG[level];
+
+  document.getElementById('progressBox').innerHTML=`
+
+    <div class="card">
+
+      <h2>${esc(p.t)}</h2>
+
+      <p>${esc(p.s)}</p>
+
+      <div class="notice">
+        التدرج السنوي الرسمي يُرجع إلى الوثيقة الأصلية.
+      </div>
+
+      <a
+        href="${p.u}"
+        target="_blank"
+        rel="noopener">
+
+        <button class="primary">
+          📄 فتح الوثيقة الرسمية
+        </button>
+
+      </a>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================
+   المشاريع
+========================= */
+
+function addProject(){
+
+  const x={
+
+    id:id(),
+
+    title:
+      document.getElementById('ptitle').value.trim(),
+
+    students:
+      document.getElementById('pstudents').value.trim(),
+
+    class_name:
+      document.getElementById('pclass').value.trim(),
+
+    date:
+      document.getElementById('pdate').value||today(),
+
+    type:
+      document.getElementById('ptype').value,
+
+    description:
+      document.getElementById('pdesc').value.trim()
+
+  };
+
+  if(!x.title){
+
+    alert('اكتب عنوان المشروع');
+
+    return;
+  }
+
+  db.projects.push(x);
+
+  save();
+
+  document.getElementById('ptitle').value='';
+  document.getElementById('pstudents').value='';
+  document.getElementById('pclass').value='';
+  document.getElementById('pdesc').value='';
+
+  alert('تم حفظ المشروع');
+}
+
+
+function renderProjects(){
+
+  document.getElementById('projBody').innerHTML=
+    db.projects.map(x=>`
+
+      <tr>
+
+        <td>${esc(x.title)}</td>
+        <td>${esc(x.students)}</td>
+        <td>${esc(x.class_name)}</td>
+        <td>${esc(x.date)}</td>
+        <td>${esc(x.type)}</td>
+        <td>${esc(x.description)}</td>
+
+        <td class="no-print">
+
+          <button class="danger"
+            onclick="delProject('${x.id}')">
+            حذف
+          </button>
+
+        </td>
+
+      </tr>
+
+    `).join('');
+
+}
+
+
+function delProject(id){
+
+  if(!confirm('حذف المشروع؟'))return;
+
+  db.projects=db.projects.filter(x=>x.id!==id);
+
+  save();
+}
+
+
+/* =========================
+   الصوتيات والسمعيات
+========================= */
+
+function addAV(){
+
+  const x={
+
+    id:id(),
+
+    no:
+      document.getElementById('avno').value.trim(),
+
+    date:
+      document.getElementById('avdate').value||today(),
+
+    name:
+      document.getElementById('avname').value.trim(),
+
+    type:
+      document.getElementById('avtype').value,
+
+    inventory:
+      document.getElementById('avinv').value.trim(),
+
+    quantity:
+      Number(document.getElementById('avqty').value||1),
+
+    condition:
+      document.getElementById('avcond').value,
+
+    location:
+      document.getElementById('avloc').value.trim(),
+
+    user:
+      document.getElementById('avuser').value.trim(),
+
+    purpose:
+      document.getElementById('avpurpose').value.trim(),
+
+    notes:
+      document.getElementById('avnote').value.trim()
+
+  };
+
+  if(!x.name){
+
+    alert('اكتب اسم الجهاز');
+
+    return;
+  }
+
+  db.avRecords.push(x);
+
+  save();
+
+  document.getElementById('avno').value='';
+  document.getElementById('avname').value='';
+  document.getElementById('avinv').value='';
+  document.getElementById('avloc').value='';
+  document.getElementById('avuser').value='';
+  document.getElementById('avpurpose').value='';
+  document.getElementById('avnote').value='';
+
+  alert('تم حفظ السجل');
+}
+
+
+function renderAV(){
+
+  document.getElementById('avBody').innerHTML=
+    db.avRecords.map(x=>`
+
+      <tr>
+
+        <td>${esc(x.no)}</td>
+        <td>${esc(x.date)}</td>
+        <td>${esc(x.name)}</td>
+        <td>${esc(x.type)}</td>
+        <td>${esc(x.inventory)}</td>
+        <td>${esc(x.quantity)}</td>
+        <td>${esc(x.condition)}</td>
+        <td>${esc(x.location)}</td>
+        <td>${esc(x.user)}</td>
+        <td>${esc(x.purpose)}</td>
+        <td>${esc(x.notes)}</td>
+
+        <td class="no-print">
+
+          <button class="danger"
+            onclick="delAV('${x.id}')">
+            حذف
+          </button>
+
+        </td>
+
+      </tr>
+
+    `).join('');
+
+}
+
+
+function delAV(id){
+
+  if(!confirm('حذف السجل؟'))return;
+
+  db.avRecords=
+    db.avRecords.filter(x=>x.id!==id);
+
+  save();
+}
+
+
+/* =========================
+   النسخ الاحتياطي
+========================= */
+
+function backup(){
+
+  const data=JSON.stringify(
+    db,
+    null,
+    2
+  );
+
+  const blob=new Blob(
+    [data],
+    {type:'application/json'}
+  );
+
+  const url=URL.createObjectURL(blob);
+
+  const a=document.createElement('a');
+
+  a.href=url;
+
+  a.download=
+    'منصة-المخبري-نسخة-احتياطية-'+
+    today()+'.json';
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+
+function restore(event){
+
+  const file=
+    event.target.files[0];
+
+  if(!file)return;
+
+  const reader=new FileReader();
+
+  reader.onload=function(){
+
+    try{
+
+      const data=
+        JSON.parse(reader.result);
+
+      if(!data ||
+         !Array.isArray(data.inventory)){
+
+        throw new Error('invalid');
+
+      }
+
+      db=Object.assign(
+        {},
+        EMPTY,
+        data
+      );
+
+      save();
+
+      alert('تم استرجاع البيانات بنجاح');
+
+    }catch(e){
+
+      alert(
+        'الملف غير صالح أو تالف'
+      );
+
+    }
+
+  };
+
+  reader.readAsText(file);
+}
+
+
+function clearAll(){
+
+  if(!confirm(
+    'سيتم حذف جميع بيانات المنصة. هل أنت متأكد؟'
+  ))return;
+
+  if(!confirm(
+    'تأكيد نهائي: سيتم فقدان البيانات غير المحفوظة في نسخة احتياطية.'
+  ))return;
+
+  db=
+    JSON.parse(
+      JSON.stringify(EMPTY)
+    );
+
+  save();
+
+  alert('تم حذف جميع البيانات');
+}
+
+
+/* =========================
+   العرض العام
+========================= */
+
+function renderStats(){
+
+  document.getElementById('sInv').textContent=
+    db.inventory.length;
+
+  document.getElementById('sChem').textContent=
+    db.chemicals.length;
+
+  document.getElementById('sDaily').textContent=
+    db.daily.length;
+
+  document.getElementById('sReq').textContent=
+    db.requests.length;
+
+  document.getElementById('sProj').textContent=
+    db.projects.length;
+}
+
+
+function renderAll(){
+
+  renderStats();
+  renderCats();
+  renderInventory();
+  renderChem();
+  renderDailyRows();
+  renderSavedDaily();
+  renderRequests();
+  renderProjects();
+  renderAV();
+  renderProgress();
+
+  updateRequestsNotification();
+}
+
+
+async function updateRequestsNotification(){
+
+  const box = document.getElementById("requestsNotificationText");
+
+  if(!box) return;
+
+  const { count, error } = await supabaseClient
+    .from("requests")
+    .select("*", { count: "exact", head: true })
+    .eq("is_read", false);
+
+  if(error){
+
+    console.error("Requests notification error:", error);
+
+    box.textContent = "تعذر التحقق من الطلبات";
+
+    return;
+  }
+
+  if(count === 0){
+
+    box.textContent =
+      "لا توجد طلبات من الأساتذة حاليًا";
+
+  }else if(count === 1){
+
+    box.textContent =
+      "لديك طلب واحد من الأساتذة";
+
+  }else{
+
+    box.textContent =
+      "لديك " + count + " طلبات من الأساتذة";
+  }
+
+}
+/* =========================
+   تشغيل أولي
+========================= */
+
+document.addEventListener(
+  'DOMContentLoaded',
+  async ()=>{
+        
+
+const dates=[
+      'idate',
+      'cdate',
+      'ddate',
+      'tdate',
+      'pdate',
+      'avdate'
+    ];
+
+    dates.forEach(x=>{
+
+      const e=document.getElementById(x);
+
+      if(e)e.value=today();
+
+    });
+
+    const times=[
+      'dtime',
+      'ttime'
+    ];
+
+    times.forEach(x=>{
+
+      const e=document.getElementById(x);
+
+      if(e)e.value=nowTime();
+
+    });
+
+    renderAll();
+    renderSavedDaily();
+    renderStats();
+  }
+);
+</script> 
+ <script>
+async function activatePlatform(){
+
+  const code = document.getElementById("activationCode").value.trim();
+  const message = document.getElementById("activationMessage");
+
+  if(!code){
+    message.textContent = "أدخل كود التفعيل";
+    return;
+  }
+
+  message.textContent = "جارٍ التحقق...";
+
+  const { data, error } = await supabaseClient.rpc(
+    "check_activation",
+    { p_code: code }
+  );
+
+  if(error){
+    message.textContent = "حدث خطأ في الاتصال";
+    console.error(error);
+    return;
+  }
+
+  if(data === true){
+    localStorage.setItem("LAB_ACTIVATED","true");
+    document.getElementById("activationBox").style.display = "none";
+    document.getElementById("loginBox").style.display = "flex";
+    message.textContent = "";
+    document.getElementById("loginEmail")?.focus();
+  }else{
+    message.textContent = "❌ كود التفعيل غير صحيح أو غير نشط";
+  }
+}
+</script> 
+ <script>
+async function loginUser(){
+
+  const email=document.getElementById("loginEmail").value.trim();
+  const password=document.getElementById("loginPassword").value;
+  const message=document.getElementById("loginMessage");
+
+  if(!email || !password){
+    message.textContent="أدخل البريد الإلكتروني وكلمة المرور";
+    return;
+  }
+
+  message.textContent="جارٍ تسجيل الدخول...";
+
+  const {data,error}=await supabaseClient.auth.signInWithPassword({
+    email:email,
+    password:password
+  });
+
+  if(error){
+    console.error(error);
+    message.textContent="❌ البريد الإلكتروني أو كلمة المرور غير صحيحة";
+    return;
+  }
+
+  document.getElementById("loginBox").style.display="none";
+  message.textContent="";
+
+  // مهم جدًا: لا نحمل التقارير قبل المصادقة.
+  await loadDailyFromSupabase();
+  await loadInventoryFromSupabase();
+await loadChemicalsFromSupabase();
+  await renderRequests();
+  await updateRequestsNotification();
+  renderAll();
+}
+
+</script> 
+  
+ <script>
+async function logoutUser(){
+  await supabaseClient.auth.signOut();
+  location.reload();
+}
+</script> 
+<script>
+
+</script>  
+ 
+  
+
+ 
+
+<script>
+/* =========================
+   الطلبات - النسخة الموحدة
+========================= */
+
+async function getLinkedRequestsMap(){
+  const map=new Map();
+
+  const {data,error}=await supabaseClient
+    .from('daily_reports')
+    .select('report_id,report_number,note');
+
+  if(error){
+    console.error('Linked requests lookup:',error);
+    return map;
+  }
+
+  (data||[]).forEach(row=>{
+    const requestId=extractRequestId(row.note||'');
+    if(!requestId)return;
+    if(!map.has(requestId)){
+      map.set(requestId,{
+        report_id:row.report_id || null,
+        report_number:row.report_number ?? ''
+      });
+    }
+  });
+
+  return map;
+}
+
+async function addRequestToDaily(requestId){
+  if(!requestId)return;
+
+  const linked=await getLinkedRequestsMap();
+  if(linked.has(String(requestId))){
+    const info=linked.get(String(requestId));
+    alert('✅ هذا الطلب مرتبط بالفعل بالتقرير رقم '+(info.report_number||'—')+'.');
+    const localReport=db.daily.find(x=>String(x.report_id||'')===String(info.report_id||''));
+    if(localReport)openDailyReport(localReport.id);
+    return;
+  }
+
+  const {data:req,error}=await supabaseClient
+    .from('requests')
+    .select('*')
+    .eq('id',requestId)
+    .maybeSingle();
+
+  if(error){
+    console.error(error);
+    alert('❌ تعذر قراءة الطلب\n'+error.message);
+    return;
+  }
+
+  if(!req){
+    alert('❌ لم يتم العثور على الطلب');
+    return;
+  }
+
+  // لا نسمح بإضاعة صفوف غير محفوظة بدون تنبيه.
+  if(dailyRows.length && !confirm('لديك صفوف غير محفوظة حاليًا في التقرير. هل تريد إضافة الطلب إليها؟')){
+    return;
+  }
+
+  editingDailyId=null;
+  dailyRows.push({
+    teacher:req.teacher || '',
+    class_name:req.class_name || '',
+    report_date:req.request_date || today(),
+    report_time:req.request_time || nowTime(),
+    experiment:req.request_text || '',
+    equipment:req.tools || '',
+    note:visibleDailyNote(req.notes || ''),
+    status:'طلب من الأستاذ',
+    request_id:String(req.id)
+  });
+
+  const ddate=document.getElementById('ddate');
+  if(ddate)ddate.value=req.request_date || today();
+
+  const dnumber=document.getElementById('dnumber');
+  if(dnumber)dnumber.value=getDailyNumberValue() || getNextDailyNumber();
+
+  renderDailyRows();
+  updateDailyOfficial();
+  show('daily');
+
+  alert('✅ تمت إضافة طلب الأستاذ إلى التقرير اليومي. اضغط «حفظ» لإتمام الربط وتسجيل التنفيذ.');
+}
+
+function linkedReportButton(requestId,linkedMap){
+  const info=linkedMap.get(String(requestId));
+  if(!info){
+    return `<button type="button" class="primary" onclick="addRequestToDaily('${requestId}')">➕ إلى التقرير</button>`;
+  }
+
+  const localReport=db.daily.find(x=>String(x.report_id||'')===String(info.report_id||''));
+  if(localReport){
+    return `<button type="button" onclick="openDailyReport('${localReport.id}')">✅ التقرير #${esc(info.report_number||'')}</button>`;
+  }
+
+  return `<button type="button" disabled>✅ مرتبط بالتقرير #${esc(info.report_number||'')}</button>`;
+}
+
+async function executeRequest(id){
+  const now=new Date();
+  const {error}=await supabaseClient.from('requests').update({
+    status:'تم التنفيذ',
+    execution_date:now.toISOString().slice(0,10),
+    execution_time:now.toTimeString().slice(0,5),
+    is_read:true
+  }).eq('id',id);
+
+  if(error){
+    console.error(error);
+    alert('❌ تعذر تسجيل تنفيذ الطلب\n\n'+error.message);
+    return;
+  }
+
+  await renderRequests();
+  await updateRequestsNotification();
+}
+
+async function deleteReq(id){
+  if(!confirm('هل تريد حذف هذا الطلب نهائيًا؟'))return;
+
+  const {error}=await supabaseClient.from('requests').delete().eq('id',id);
+
+  if(error){
+    console.error(error);
+    alert('❌ لم يتم حذف الطلب\n\n'+error.message);
+    return;
+  }
+
+  await renderRequests();
+  await updateRequestsNotification();
+  alert('✅ تم حذف الطلب بنجاح');
+}
+
+async function renderRequests(){
+  const body=document.getElementById('reqBody');
+  if(!body)return;
+
+  const {data,error}=await supabaseClient
+    .from('requests')
+    .select('*')
+    .order('request_date',{ascending:false})
+    .order('request_time',{ascending:false});
+
+  if(error){
+    console.error(error);
+    body.innerHTML='<tr><td colspan="11">❌ تعذر تحميل الطلبات: '+esc(error.message)+'</td></tr>';
+    return;
+  }
+
+  if(!data || !data.length){
+    body.innerHTML='<tr><td colspan="11">لا توجد طلبات</td></tr>';
+    return;
+  }
+
+  const linkedMap=await getLinkedRequestsMap();
+
+  body.innerHTML=data.map(x=>`
+    <tr>
+      <td>${esc(x.teacher||'')}</td>
+      <td>${esc(x.class_name||'')}</td>
+      <td>${esc(x.request_date||'')}</td>
+      <td>${esc(x.request_time||'')}</td>
+      <td>${esc(x.request_text||'')}</td>
+      <td>${esc(x.tools||'')}</td>
+      <td>${esc(visibleDailyNote(x.notes||''))}</td>
+      <td>${esc(x.status||'جديد')}</td>
+      <td>${esc(x.execution_date||'—')}</td>
+      <td>${esc(x.execution_time||'—')}</td>
+      <td class="no-print">
+        <div class="actions" style="margin-top:0">
+          ${linkedReportButton(x.id,linkedMap)}
+          ${
+            x.status==='تم التنفيذ'
+            ? '<button type="button" disabled>✅ تم التنفيذ</button>'
+            : `<button type="button" onclick="executeRequest('${x.id}')">▶️ تنفيذ</button>`
+          }
+          <button class="danger" type="button" onclick="deleteReq('${x.id}')">🗑️ حذف</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+</script>
+
+</body>
+</html> 
