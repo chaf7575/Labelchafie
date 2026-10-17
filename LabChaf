@@ -194,6 +194,7 @@ footer{
   color:#667
 }
 
+
 @media print{
 
   header,nav,.no-print,footer{
@@ -212,17 +213,63 @@ footer{
     box-shadow:none!important;
   }
 
-  /* تقليل ارتفاع صفوف المعلومات القصيرة */
-  .section.printing tr:has(td:nth-child(1)),
-  .section.printing tr:has(th){
-    height:auto;
+  /* التحكم في عرض أعمدة التقرير */
+  .section.printing table{
+    width:100%!important;
+    table-layout:fixed!important;
+    border-collapse:collapse!important;
+  }
+
+  .section.printing table th:nth-child(1),
+  .section.printing table td:nth-child(1){
+    width:9%;
+  }
+
+  .section.printing table th:nth-child(2),
+  .section.printing table td:nth-child(2){
+    width:7%;
+  }
+
+  .section.printing table th:nth-child(3),
+  .section.printing table td:nth-child(3){
+    width:8%;
+  }
+
+  .section.printing table th:nth-child(4),
+  .section.printing table td:nth-child(4){
+    width:6%;
+  }
+
+  .section.printing table th:nth-child(5),
+  .section.printing table td:nth-child(5){
+    width:20%;
+  }
+
+  .section.printing table th:nth-child(6),
+  .section.printing table td:nth-child(6){
+    width:25%;
+  }
+
+  .section.printing table th:nth-child(7),
+  .section.printing table td:nth-child(7){
+    width:12%;
+  }
+
+  .section.printing table th:nth-child(8),
+  .section.printing table td:nth-child(8){
+    width:13%;
+  }
+
+  /* تقليل ارتفاع الصفوف */
+  .section.printing tr{
+    height:auto!important;
   }
 
   .section.printing table td,
   .section.printing table th{
-    padding-top:2px!important;
-    padding-bottom:2px!important;
+    padding:2px!important;
     line-height:1.2!important;
+    overflow-wrap:anywhere;
   }
 
 }
@@ -680,6 +727,60 @@ const supabaseClient = window.supabase.createClient(
 <b>التاريخ:</b>
 <span id="rdate"></span>
 </p>
+
+<div class="no-print" style="border:1px solid #ccd6e2;border-radius:10px;padding:12px;margin:10px 0;background:#f8fbff">
+
+  <strong>تعديل عرض الأعمدة قبل الطباعة</strong>
+
+  <p>اضغط (+) لتوسيع العمود، أو (−) لتضييقه.</p>
+
+  <div id="reportColumnControls" style="display:flex;flex-wrap:wrap;gap:10px">
+
+    <div>الأستاذ
+      <button type="button" onclick="adjustReportColumn(0,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(0,-1)">−</button>
+    </div>
+
+    <div>القسم
+      <button type="button" onclick="adjustReportColumn(1,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(1,-1)">−</button>
+    </div>
+
+    <div>التاريخ
+      <button type="button" onclick="adjustReportColumn(2,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(2,-1)">−</button>
+    </div>
+
+    <div>الوقت
+      <button type="button" onclick="adjustReportColumn(3,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(3,-1)">−</button>
+    </div>
+
+    <div>التجربة
+      <button type="button" onclick="adjustReportColumn(4,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(4,-1)">−</button>
+    </div>
+
+    <div>الأدوات
+      <button type="button" onclick="adjustReportColumn(5,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(5,-1)">−</button>
+    </div>
+
+    <div>ملاحظة
+      <button type="button" onclick="adjustReportColumn(6,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(6,-1)">−</button>
+    </div>
+
+    <div>الحالة
+      <button type="button" onclick="adjustReportColumn(7,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(7,-1)">−</button>
+    </div>
+
+  </div>
+
+  <button type="button" onclick="resetReportColumnWidths()">إعادة العرض الافتراضي</button>
+
+</div>
 
 <div class="tablewrap">
 
@@ -2562,6 +2663,7 @@ function printSavedDaily(id){
 }
 
 function printDaily(){
+  applyReportColumnWidths();
   const official=document.querySelector('#daily .official');
   if(!official){
     alert('❌ تعذر العثور على نموذج التقرير للطباعة');
@@ -2610,6 +2712,50 @@ window.addEventListener('load',function(){setTimeout(function(){window.focus();w
 </body></html>`);
   printWindow.document.close();
 }
+
+const defaultReportColumnWidths = [9, 7, 8, 6, 20, 25, 12, 13];
+let reportColumnWidths = [...defaultReportColumnWidths];
+
+function applyReportColumnWidths() {
+  const table = document.querySelector('#daily .official table');
+  if (!table) return;
+
+  let cols = table.querySelector('colgroup');
+  if (!cols) {
+    cols = document.createElement('colgroup');
+    table.insertBefore(cols, table.firstChild);
+  }
+
+  cols.innerHTML = '';
+
+  reportColumnWidths.forEach(width => {
+    const col = document.createElement('col');
+    col.style.width = width + '%';
+    cols.appendChild(col);
+  });
+
+  table.style.tableLayout = 'fixed';
+  table.style.width = '100%';
+}
+
+function adjustReportColumn(index, change) {
+  const donor = index === 5 ? 4 : 5;
+
+  if (reportColumnWidths[index] + change < 4 ||
+      reportColumnWidths[index] + change > 40 ||
+      reportColumnWidths[donor] - change < 4) return;
+
+  reportColumnWidths[index] += change;
+  reportColumnWidths[donor] -= change;
+  applyReportColumnWidths();
+}
+
+function resetReportColumnWidths() {
+  reportColumnWidths = [...defaultReportColumnWidths];
+  applyReportColumnWidths();
+}
+
+document.addEventListener('DOMContentLoaded', applyReportColumnWidths);
 
 function mailDaily(){
   const number=document.getElementById('rno')?.textContent || '';
