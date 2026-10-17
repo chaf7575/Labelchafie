@@ -2713,6 +2713,50 @@ window.addEventListener('load',function(){setTimeout(function(){window.focus();w
   printWindow.document.close();
 }
 
+const defaultReportColumnWidths = [9, 7, 8, 6, 20, 25, 12, 13];
+let reportColumnWidths = [...defaultReportColumnWidths];
+
+function applyReportColumnWidths() {
+  const table = document.querySelector('#daily .official table');
+  if (!table) return;
+
+  let cols = table.querySelector('colgroup');
+  if (!cols) {
+    cols = document.createElement('colgroup');
+    table.insertBefore(cols, table.firstChild);
+  }
+
+  cols.innerHTML = '';
+
+  reportColumnWidths.forEach(width => {
+    const col = document.createElement('col');
+    col.style.width = width + '%';
+    cols.appendChild(col);
+  });
+
+  table.style.tableLayout = 'fixed';
+  table.style.width = '100%';
+}
+
+function adjustReportColumn(index, change) {
+  const donor = index === 5 ? 4 : 5;
+
+  if (reportColumnWidths[index] + change < 4 ||
+      reportColumnWidths[index] + change > 40 ||
+      reportColumnWidths[donor] - change < 4) return;
+
+  reportColumnWidths[index] += change;
+  reportColumnWidths[donor] -= change;
+  applyReportColumnWidths();
+}
+
+function resetReportColumnWidths() {
+  reportColumnWidths = [...defaultReportColumnWidths];
+  applyReportColumnWidths();
+}
+
+document.addEventListener('DOMContentLoaded', applyReportColumnWidths);
+
 function mailDaily(){
   const number=document.getElementById('rno')?.textContent || '';
   const date=document.getElementById('rdate')?.textContent || '';
