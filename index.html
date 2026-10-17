@@ -728,6 +728,60 @@ const supabaseClient = window.supabase.createClient(
 <span id="rdate"></span>
 </p>
 
+<div class="no-print" style="border:1px solid #ccd6e2;border-radius:10px;padding:12px;margin:10px 0;background:#f8fbff">
+
+  <strong>تعديل عرض الأعمدة قبل الطباعة</strong>
+
+  <p>اضغط (+) لتوسيع العمود، أو (−) لتضييقه.</p>
+
+  <div id="reportColumnControls" style="display:flex;flex-wrap:wrap;gap:10px">
+
+    <div>الأستاذ
+      <button type="button" onclick="adjustReportColumn(0,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(0,-1)">−</button>
+    </div>
+
+    <div>القسم
+      <button type="button" onclick="adjustReportColumn(1,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(1,-1)">−</button>
+    </div>
+
+    <div>التاريخ
+      <button type="button" onclick="adjustReportColumn(2,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(2,-1)">−</button>
+    </div>
+
+    <div>الوقت
+      <button type="button" onclick="adjustReportColumn(3,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(3,-1)">−</button>
+    </div>
+
+    <div>التجربة
+      <button type="button" onclick="adjustReportColumn(4,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(4,-1)">−</button>
+    </div>
+
+    <div>الأدوات
+      <button type="button" onclick="adjustReportColumn(5,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(5,-1)">−</button>
+    </div>
+
+    <div>ملاحظة
+      <button type="button" onclick="adjustReportColumn(6,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(6,-1)">−</button>
+    </div>
+
+    <div>الحالة
+      <button type="button" onclick="adjustReportColumn(7,1)">+</button>
+      <button type="button" onclick="adjustReportColumn(7,-1)">−</button>
+    </div>
+
+  </div>
+
+  <button type="button" onclick="resetReportColumnWidths()">إعادة العرض الافتراضي</button>
+
+</div>
+
 <div class="tablewrap">
 
 <table>
@@ -2609,6 +2663,7 @@ function printSavedDaily(id){
 }
 
 function printDaily(){
+  applyReportColumnWidths();
   const official=document.querySelector('#daily .official');
   if(!official){
     alert('❌ تعذر العثور على نموذج التقرير للطباعة');
