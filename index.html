@@ -327,6 +327,7 @@ const supabaseClient = window.supabase.createClient(
 <button onclick="show('chemicals')">⚗️ المحاليل</button>
 <button onclick="show('daily')">📝 التقارير</button>
 <button onclick="show('progress')">📅 التدرج</button>
+ <button onclick="show('labSchedule')">🗓️ استعمال زمن المخبر</button> 
 <button onclick="show('requests')">📨 الطلبات</button>
 <button onclick="show('safety')">🦺 السلامة</button>
 <button onclick="show('various')">🧪 منوعات</button>
@@ -1255,7 +1256,88 @@ onchange="restore(event)"
 
 
 </div>
+<section id="labSchedule" class="section">
 
+  <div class="head">
+    <h2>🗓️ استعمال زمن المخبر</h2>
+  </div>
+
+  <div class="card">
+    <h3>📎 إرفاق استعمال الزمن</h3>
+    <p class="small">اختر صورة أو ملف PDF لاستعمال زمن الأساتذة.</p>
+
+    <input
+      type="file"
+      id="labScheduleFile"
+      accept="image/*,.pdf,application/pdf"
+    >
+
+    <div id="labScheduleFileInfo" class="small"></div>
+  </div>
+
+  <div class="card">
+    <h3>➕ إضافة حصة مخبرية</h3>
+
+    <label>اسم الأستاذ</label>
+    <input id="lsTeacher" type="text" placeholder="اسم الأستاذ">
+
+    <label>المادة</label>
+    <select id="lsSubject">
+      <option value="علوم الطبيعة والحياة">علوم الطبيعة والحياة</option>
+      <option value="العلوم الفيزيائية">العلوم الفيزيائية</option>
+    </select>
+
+    <label>القسم</label>
+    <input id="lsClass" type="text" placeholder="مثال: 2 متوسط 1">
+
+    <label>اليوم</label>
+    <select id="lsDay">
+      <option value="الأحد">الأحد</option>
+      <option value="الاثنين">الاثنين</option>
+      <option value="الثلاثاء">الثلاثاء</option>
+      <option value="الأربعاء">الأربعاء</option>
+      <option value="الخميس">الخميس</option>
+    </select>
+
+    <label>وقت البداية</label>
+    <input id="lsStart" type="time">
+
+    <label>وقت النهاية</label>
+    <input id="lsEnd" type="time">
+
+    <label>المخبر</label>
+    <input id="lsLab" type="text" placeholder="اسم أو رقم المخبر">
+
+    <button class="primary" onclick="addLabSchedule()">
+      حفظ الحصة
+    </button>
+  </div>
+
+  <div class="card">
+    <h3>📋 حصص المخبر المسجلة</h3>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>اليوم</th>
+            <th>الأستاذ</th>
+            <th>المادة</th>
+            <th>القسم</th>
+            <th>التوقيت</th>
+            <th>المخبر</th>
+            <th>إجراء</th>
+          </tr>
+        </thead>
+        <tbody id="labScheduleBody">
+          <tr>
+            <td colspan="7">لم تتم إضافة حصص بعد.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</section>
 <footer>
 منصة المخبري — متوسطة قايد أحمد – غليزان
 </footer>
@@ -3549,6 +3631,162 @@ async function renderRequests(){
     </tr>
   `).join('');
 }
+  /* ===== وظائف استعمال زمن المخبر ===== */
+
+const LAB_SCHEDULE_KEY = "LAB_SCHEDULE_V1";
+
+function getLabSchedule() {
+  try {
+    return JSON.parse(localStorage.getItem(LAB_SCHEDULE_KEY) || "[]");
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveLabSchedule(rows) {
+  localStorage.setItem(LAB_SCHEDULE_KEY, JSON.stringify(rows));
+}
+
+function addLabSchedule() {
+  const teacher = document.getElementById("lsTeacher").value.trim();
+  const subject = document.getElementById("lsSubject").value;
+  const className = document.getElementById("lsClass").value.trim();
+  const day = document.getElementById("lsDay").value;
+  const start = document.getElementById("lsStart").value;
+  const end = document.getElementById("lsEnd").value;
+  const lab = document.getElementById("lsLab").value.trim();
+
+  if (!teacher || !className || !start || !end || !lab) {
+    alert("يرجى ملء جميع الحقول.");
+    return;
+  }
+
+  if (start >= end) {
+    alert("وقت النهاية يجب أن يكون بعد وقت البداية.");
+    return;
+  }
+
+  const rows = getLabSchedule();
+
+  const conflict = rows.some(r =>
+    r.day === day &&
+    r.lab === lab &&
+    start < r.end &&
+    end > r.start
+  );
+
+  if (conflict) {
+    alert("هذا المخبر محجوز في هذا التوقيت.");
+    return;
+  }
+
+  rows.push({
+    id: Date.now(),
+    teacher,
+    subject,
+    className,
+    day,
+    start,
+    end,
+    lab
+  });
+
+  saveLabSchedule(rows);
+  renderLabSchedule();
+
+  ["lsTeacher", "lsClass", "lsStart", "lsEnd", "lsLab"].forEach(id => {
+    document.getElementById(id).value = "";
+  });
+
+  alert("تم حفظ الحصة بنجاح.");
+}
+
+function renderLabSchedule() {
+  const body = document.getElementById("labScheduleBody");
+  if (!body) return;
+
+  const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
+  const rows = getLabSchedule().sort((a, b) =>
+    days.indexOf(a.day) - days.indexOf(b.day) ||
+    a.start.localeCompare(b.start)
+  );
+
+  if (!rows.length) {
+    body.innerHTML =
+      '<tr><td colspan="7">لم تتم إضافة حصص بعد.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = rows.map(r => `
+    <tr>
+      <td>${escapeLabText(r.day)}</td>
+      <td>${escapeLabText(r.teacher)}</td>
+      <td>${escapeLabText(r.subject)}</td>
+      <td>${escapeLabText(r.className)}</td>
+      <td>${escapeLabText(r.start)} - ${escapeLabText(r.end)}</td>
+      <td>${escapeLabText(r.lab)}</td>
+      <td>
+        <button type="button" onclick="deleteLabSchedule(${Number(r.id)})">
+          حذف
+        </button>
+      </td>
+    </tr>
+  `).join("");
+}
+
+function escapeLabText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[ch]);
+}
+
+function deleteLabSchedule(id) {
+  if (!confirm("هل تريد حذف هذه الحصة؟")) return;
+
+  saveLabSchedule(getLabSchedule().filter(r => r.id !== id));
+  renderLabSchedule();
+}
+
+document.getElementById("labScheduleFile").addEventListener("change", function () {
+  const file = this.files && this.files[0];
+  const info = document.getElementById("labScheduleFileInfo");
+
+  if (!file) {
+    info.textContent = "";
+    return;
+  }
+
+  if (file.size > 1024 * 1024) {
+    info.textContent = "الملف أكبر من 1 ميغابايت. اختر ملفًا أصغر.";
+    this.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function () {
+    try {
+      localStorage.setItem("LAB_SCHEDULE_FILE_V1", JSON.stringify({
+        name: file.name,
+        type: file.type,
+        data: reader.result
+      }));
+      info.textContent = "تم حفظ الملف على هذا الجهاز: " + file.name;
+    } catch (e) {
+      info.textContent = "تعذر حفظ الملف. جرّب ملفًا أصغر.";
+    }
+  };
+
+  reader.onerror = function () {
+    info.textContent = "تعذرت قراءة الملف.";
+  };
+
+  reader.readAsDataURL(file);
+});
 </script>
 
 </body>
