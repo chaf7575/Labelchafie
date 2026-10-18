@@ -3831,6 +3831,52 @@ document.getElementById("labScheduleFile").addEventListener("change", async func
   }
 });
 
+/* إظهار ملف استعمال الزمن المحفوظ في Supabase */
+
+async function showSavedLabScheduleFile() {
+  const info = document.getElementById("labScheduleFileInfo");
+  if (!info) return;
+
+  try {
+    const { data: userData, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError || !userData.user) return;
+
+    const filePath = userData.user.id + "/schedule-file";
+
+    const { data: fileData, error } = await supabaseClient
+      .storage
+      .from("lab-schedules")
+      .download(filePath);
+
+    if (error || !fileData) return;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "⬇️ تنزيل ملف استعمال الزمن المحفوظ";
+
+    button.onclick = function () {
+      const url = URL.createObjectURL(fileData);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "استعمال-زمن-المخبر.docx";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    };
+
+    info.appendChild(document.createElement("br"));
+    info.appendChild(button);
+
+  } catch (e) {
+    console.error("تعذر تحميل استعمال الزمن:", e);
+  }
+}
+
+showSavedLabScheduleFile();
+
 </script>
 
 </body>
