@@ -2186,6 +2186,23 @@ function getDailyNumberValue(){
   return Number.isInteger(n) && n>0 ? n : null;
 }
 
+async function generateWeeklyDailyReports(){
+  const schedule = getLabSchedule();
+
+  if(!Array.isArray(schedule)){
+    alert('تعذر قراءة استعمال زمن المخبر.');
+    return;
+  }
+
+  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+
+  if(!confirm('سيتم إنشاء تقارير للأيام الخمسة من الأحد إلى الخميس. هل تريد المتابعة؟')){
+    return;
+  }
+
+  alert('توقف مؤقت: قبل إنشاء التقارير، يجب تجهيز طريقة حفظ اليوم الذي لا توجد فيه حصص حتى لا تتكرر التقارير أو تُفقد البيانات.');
+}
+
 function getNextDailyNumber(){
   const nums=(db.daily||[]).map(x=>parseInt(x.report_number ?? x.number,10)).filter(Number.isFinite);
   return nums.length ? Math.max(...nums)+1 : 1;
