@@ -3633,6 +3633,7 @@ async function renderRequests(){
 }
   /* ===== وظائف استعمال زمن المخبر ===== */
 
+
 const LAB_SCHEDULE_KEY = "LAB_SCHEDULE_V1";
 
 function getLabSchedule() {
@@ -3647,7 +3648,92 @@ function saveLabSchedule(rows) {
   localStorage.setItem(LAB_SCHEDULE_KEY, JSON.stringify(rows));
 }
 
-function addLabSchedule() {
+function mapLabScheduleRow(r) {
+  return {
+    id: r.id,
+    teacher: r.teacher,
+    subject: r.subject,
+    className: r.class_name,
+    day: r.day,
+    start: String(r.start_time || "").slice(0, 5),
+    end: String(r.end_time || "").slice(0, 5),
+    lab: r.lab
+  };
+}
+
+async function loadLabScheduleFromSupabase() {
+  const body = document.getElementById("labScheduleBody");
+  try {
+    const { data: userData, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError || !userData.user) {
+      renderLabSchedule();
+      return;
+    }
+
+    const userId = userData.user.id;
+
+    let { data: remoteRows, error } = await supabaseClient
+      .from("lab_schedule_entries")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (error) throw error;
+
+    const localRows = getLabSchedule();
+    const migrationKey = "LAB_SCHEDULE_MIGRATED_" + userId;
+
+    // نقل الحصص القديمة من الجهاز إلى قاعدة البيانات مرة واحدة
+    if (
+      (!remoteRows || remoteRows.length === 0) &&
+      localRows.length > 0 &&
+      localStorage.getItem(migrationKey) !== "true"
+    ) {
+      const rowsToInsert = localRows.map(r => ({
+        user_id: userId,
+        teacher: r.teacher,
+        subject: r.subject,
+        class_name: r.className,
+        day: r.day,
+        start_time: r.start,
+        end_time: r.end,
+        lab: r.lab
+      }));
+
+      const { error: insertError } = await supabaseClient
+        .from("lab_schedule_entries")
+        .insert(rowsToInsert);
+
+      if (insertError) throw insertError;
+
+      localStorage.setItem(migrationKey, "true");
+
+      const result = await supabaseClient
+        .from("lab_schedule_entries")
+        .select("*")
+        .eq("user_id", userId);
+
+      if (result.error) throw result.error;
+      remoteRows = result.data || [];
+    }
+
+    saveLabSchedule((remoteRows || []).map(mapLabScheduleRow));
+    renderLabSchedule();
+
+  } catch (e) {
+    console.error("خطأ في تحميل حصص المخبر:", e);
+    renderLabSchedule();
+    if (body) {
+      const msg = document.getElementById("labScheduleSyncError");
+      if (msg) {
+        msg.textContent = "تعذرت المزامنة. تحقق من الاتصال ثم أعد تحميل الصفحة.";
+      }
+    }
+  }
+}
+
+async function addLabSchedule() {
   const teacher = document.getElementById("lsTeacher").value.trim();
   const subject = document.getElementById("lsSubject").value;
   const className = document.getElementById("lsClass").value.trim();
@@ -3666,39 +3752,65 @@ function addLabSchedule() {
     return;
   }
 
-  const rows = getLabSchedule();
+  try {
+    const { data: userData, error: userError } =
+      await supabaseClient.auth.getUser();
 
-  const conflict = rows.some(r =>
-    r.day === day &&
-    r.lab === lab &&
-    start < r.end &&
-    end > r.start
-  );
+    if (userError || !userData.user) {
+      alert("يرجى تسجيل الدخول إلى المنصة أولًا.");
+      return;
+    }
 
-  if (conflict) {
-    alert("هذا المخبر محجوز في هذا التوقيت.");
-    return;
+    const userId = userData.user.id;
+
+    const { data: remoteRows, error: loadError } = await supabaseClient
+      .from("lab_schedule_entries")
+      .select("*")
+      .eq("user_id", userId);
+
+    if (loadError) throw loadError;
+
+    const rows = (remoteRows || []).map(mapLabScheduleRow);
+
+    const conflict = rows.some(r =>
+      r.day === day &&
+      r.lab === lab &&
+      start < r.end &&
+      end > r.start
+    );
+
+    if (conflict) {
+      alert("هذا المخبر محجوز في هذا التوقيت.");
+      return;
+    }
+
+    const { error: insertError } = await supabaseClient
+      .from("lab_schedule_entries")
+      .insert({
+        user_id: userId,
+        teacher,
+        subject,
+        class_name: className,
+        day,
+        start_time: start,
+        end_time: end,
+        lab
+      });
+
+    if (insertError) throw insertError;
+
+    await loadLabScheduleFromSupabase();
+
+    ["lsTeacher", "lsClass", "lsStart", "lsEnd", "lsLab"].forEach(id => {
+      document.getElementById(id).value = "";
+    });
+
+    alert("تم حفظ الحصة ومزامنتها بنجاح.");
+
+  } catch (e) {
+    console.error("خطأ في حفظ الحصة:", e);
+    alert("تعذر حفظ الحصة: " + (e.message || "تحقق من الاتصال"));
   }
-
-  rows.push({
-    id: Date.now(),
-    teacher,
-    subject,
-    className,
-    day,
-    start,
-    end,
-    lab
-  });
-
-  saveLabSchedule(rows);
-  renderLabSchedule();
-
-  ["lsTeacher", "lsClass", "lsStart", "lsEnd", "lsLab"].forEach(id => {
-    document.getElementById(id).value = "";
-  });
-
-  alert("تم حفظ الحصة بنجاح.");
 }
 
 function renderLabSchedule() {
@@ -3706,7 +3818,7 @@ function renderLabSchedule() {
   if (!body) return;
 
   const days = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"];
-  const rows = getLabSchedule().sort((a, b) =>
+  const rows = getLabSchedule().slice().sort((a, b) =>
     days.indexOf(a.day) - days.indexOf(b.day) ||
     a.start.localeCompare(b.start)
   );
@@ -3726,7 +3838,8 @@ function renderLabSchedule() {
       <td>${escapeLabText(r.start)} - ${escapeLabText(r.end)}</td>
       <td>${escapeLabText(r.lab)}</td>
       <td>
-        <button type="button" onclick="deleteLabSchedule(${Number(r.id)})">
+        <button type="button"
+          onclick="deleteLabSchedule('${escapeLabText(r.id)}')">
           حذف
         </button>
       </td>
@@ -3744,92 +3857,36 @@ function escapeLabText(value) {
   })[ch]);
 }
 
-function deleteLabSchedule(id) {
+async function deleteLabSchedule(id) {
   if (!confirm("هل تريد حذف هذه الحصة؟")) return;
-
-  saveLabSchedule(getLabSchedule().filter(r => r.id !== id));
-  renderLabSchedule();
-}
-
-
-document.getElementById("labScheduleFile").addEventListener("change", async function () {
-  const file = this.files && this.files[0];
-  const info = document.getElementById("labScheduleFileInfo");
-
-  if (!file) return;
-
-  if (file.size > 10 * 1024 * 1024) {
-    alert("حجم الملف أكبر من 10 ميغابايت.");
-    this.value = "";
-    return;
-  }
-
-  info.textContent = "جارٍ رفع الملف إلى المنصة...";
 
   try {
     const { data: userData, error: userError } =
       await supabaseClient.auth.getUser();
 
     if (userError || !userData.user) {
-      throw new Error("يرجى تسجيل الدخول إلى المنصة أولًا.");
+      alert("يرجى تسجيل الدخول أولًا.");
+      return;
     }
 
-    const userId = userData.user.id;
-    const filePath = userId + "/schedule-file";
+    const { error } = await supabaseClient
+      .from("lab_schedule_entries")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userData.user.id);
 
-    const { error: uploadError } = await supabaseClient
-      .storage
-      .from("lab-schedules")
-      .upload(filePath, file, {
-        upsert: true,
-        contentType: file.type || "application/octet-stream",
-        metadata: {
-          originalName: file.name
-        }
-      });
+    if (error) throw error;
 
-    if (uploadError) throw uploadError;
-
-    info.innerHTML = "";
-
-    const message = document.createElement("p");
-    message.textContent = "تم رفع الملف بنجاح: " + file.name;
-    info.appendChild(message);
-
-    const downloadButton = document.createElement("button");
-    downloadButton.type = "button";
-    downloadButton.textContent = "⬇️ تنزيل ملف استعمال الزمن";
-
-    downloadButton.onclick = async function () {
-      try {
-        const { data, error } = await supabaseClient
-          .storage
-          .from("lab-schedules")
-          .download(filePath);
-
-        if (error) throw error;
-
-        const url = URL.createObjectURL(data);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = file.name;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-      } catch (e) {
-        alert("تعذر تنزيل الملف: " + e.message);
-      }
-    };
-
-    info.appendChild(downloadButton);
+    await loadLabScheduleFromSupabase();
+    alert("تم حذف الحصة.");
 
   } catch (e) {
-    console.error(e);
-    info.textContent = "تعذر رفع الملف: " + (e.message || "خطأ غير معروف");
+    console.error("خطأ في حذف الحصة:", e);
+    alert("تعذر حذف الحصة: " + (e.message || "تحقق من الاتصال"));
   }
-});
+}
+
+loadLabScheduleFromSupabase();
 
 /* إظهار ملف استعمال الزمن المحفوظ في Supabase */
 
