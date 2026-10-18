@@ -2308,7 +2308,7 @@ async function generateWeeklyDailyReports(){
         .insert(rowsToSave);
 
       if(error){
-        console.error('تعذر حفظ تقرير '+item.day,error);
+      console.error('تفاصيل خطأ حفظ التقرير:', JSON.stringify(error, null, 2));
         alert(
           'توقف الإنشاء عند يوم '+item.day+
           '. رسالة قاعدة البيانات: '+error.message+
