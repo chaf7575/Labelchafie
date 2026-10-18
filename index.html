@@ -2205,7 +2205,8 @@ async function generateWeeklyDailyReports(){
       return;
     }
 
-    const schedule = getLabSchedule();
+  await loadLabScheduleFromSupabase();
+const schedule = getLabSchedule();
 
     if(!Array.isArray(schedule)){
       alert('تعذر قراءة استعمال زمن المخبر.');
