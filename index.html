@@ -2186,21 +2186,168 @@ function getDailyNumberValue(){
   return Number.isInteger(n) && n>0 ? n : null;
 }
 
+
 async function generateWeeklyDailyReports(){
-  const schedule = getLabSchedule();
+  const button = document.querySelector(
+    'button[onclick="generateWeeklyDailyReports()"]'
+  );
 
-  if(!Array.isArray(schedule)){
-    alert('تعذر قراءة استعمال زمن المخبر.');
-    return;
+  if(button) button.disabled = true;
+
+  try {
+    const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+
+    // تحميل أحدث التقارير قبل إنشاء تقارير جديدة
+    const loaded = await loadDailyFromSupabase();
+
+    if(loaded === false){
+      alert('تعذر تحميل التقارير الحالية. لم يتم إنشاء أي تقرير.');
+      return;
+    }
+
+    const schedule = getLabSchedule();
+
+    if(!Array.isArray(schedule)){
+      alert('تعذر قراءة استعمال زمن المخبر.');
+      return;
+    }
+
+    // تحديد تواريخ الأحد إلى الخميس من الأسبوع الحالي
+    const now = new Date();
+    const sunday = new Date(now);
+    sunday.setDate(now.getDate() - now.getDay());
+    sunday.setHours(12,0,0,0);
+
+    const dateForDay = days.map((day,index)=>{
+      const d = new Date(sunday);
+      d.setDate(sunday.getDate() + index);
+
+      const date =
+        d.getFullYear() + '-' +
+        String(d.getMonth()+1).padStart(2,'0') + '-' +
+        String(d.getDate()).padStart(2,'0');
+
+      return {day,date};
+    });
+
+    // منع إنشاء تقرير ثانٍ لليوم نفسه
+    const existingDates = new Set(
+      (db.daily || []).map(r => r.date).filter(Boolean)
+    );
+
+    const pending = dateForDay.filter(x =>
+      !existingDates.has(x.date)
+    );
+
+    if(!pending.length){
+      alert('توجد تقارير محفوظة بالفعل لجميع أيام هذا الأسبوع.');
+      return;
+    }
+
+    const sessions = pending.map(({day,date})=>{
+      const rows = schedule
+        .filter(s => s.day === day)
+        .sort((a,b) => (a.start || '').localeCompare(b.start || ''))
+        .map(s => ({
+          teacher: s.teacher || '',
+          class_name: s.className || '',
+          report_date: date,
+          report_time: s.start || '',
+          experiment: '',
+          equipment: '',
+          note: [
+            s.subject ? 'المادة: ' + s.subject : '',
+            s.lab ? 'المخبر: ' + s.lab : '',
+            s.end ? 'نهاية الحصة: ' + s.end : ''
+          ].filter(Boolean).join(' | '),
+          status: 'مكتمل',
+          request_id: null
+        }));
+
+      // علامة واضحة لليوم الذي لا توجد فيه حصص
+      if(!rows.length){
+        rows.push({
+          teacher: '',
+          class_name: '',
+          report_date: date,
+          report_time: '',
+          experiment: '',
+          equipment: '',
+          note: 'لا توجد حصص مبرمجة لهذا اليوم',
+          status: 'يوم دون حصص',
+          request_id: null
+        });
+      }
+
+      return {day,date,rows};
+    });
+
+    const firstNumber = getNextDailyNumber();
+
+    for(let i=0; i<sessions.length; i++){
+      const item = sessions[i];
+      const reportNumber = firstNumber + i;
+      const reportId = crypto.randomUUID();
+
+      const rowsToSave = item.rows.map(x => ({
+        teacher: x.teacher || '',
+        class_name: x.class_name || '',
+        experiment: x.experiment || '',
+        equipment: x.equipment || '',
+        report_date: x.report_date,
+        report_time: x.report_time || '',
+        note: x.note || '',
+        report_id: reportId,
+        report_number: reportNumber,
+        general: '',
+        needs: ''
+      }));
+
+      const {error} = await supabaseClient
+        .from('daily_reports')
+        .insert(rowsToSave);
+
+      if(error){
+        console.error('تعذر حفظ تقرير '+item.day,error);
+        alert(
+          'توقف الإنشاء عند يوم '+item.day+
+          '. رسالة قاعدة البيانات: '+error.message+
+          '\nلم نحذف أي تقرير سابق.'
+        );
+
+        await loadDailyFromSupabase();
+        return;
+      }
+
+      db.daily.push({
+        id: id(),
+        report_id: reportId,
+        report_number: reportNumber,
+        number: reportNumber,
+        date: item.date,
+        rows: item.rows,
+        general: '',
+        needs: ''
+      });
+
+      save();
+    }
+
+    renderSavedDaily();
+    renderStats();
+
+    alert(
+      'تم إنشاء '+sessions.length+
+      ' تقريرًا جديدًا وحفظها في قاعدة البيانات. '+
+      '\nيمكنك فتح كل تقرير وتعديل التجربة والأدوات ثم حفظه.'
+    );
+
+  } catch(e) {
+    console.error('خطأ في إنشاء التقارير الأسبوعية:',e);
+    alert('تعذر إنشاء التقارير: '+(e.message || 'خطأ غير معروف'));
+  } finally {
+    if(button) button.disabled = false;
   }
-
-  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
-
-  if(!confirm('سيتم إنشاء تقارير للأيام الخمسة من الأحد إلى الخميس. هل تريد المتابعة؟')){
-    return;
-  }
-
-  alert('توقف مؤقت: قبل إنشاء التقارير، يجب تجهيز طريقة حفظ اليوم الذي لا توجد فيه حصص حتى لا تتكرر التقارير أو تُفقد البيانات.');
 }
 
 function getNextDailyNumber(){
