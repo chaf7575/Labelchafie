@@ -3756,7 +3756,7 @@ document.getElementById("labScheduleFile").addEventListener("change", function (
   const info = document.getElementById("labScheduleFileInfo");
 
   if (!file) {
-    info.textContent = "";
+    info.innerHTML = "";
     return;
   }
 
@@ -3775,7 +3775,58 @@ document.getElementById("labScheduleFile").addEventListener("change", function (
         type: file.type,
         data: reader.result
       }));
-      info.textContent = "تم حفظ الملف على هذا الجهاز: " + file.name;
+
+      info.innerHTML = "";
+
+      const openButton = document.createElement("button");
+      openButton.type = "button";
+      openButton.textContent = "📂 فتح الملف";
+      openButton.onclick = function () {
+        const saved = JSON.parse(localStorage.getItem("LAB_SCHEDULE_FILE_V1") || "null");
+        if (!saved || !saved.data) {
+          alert("لم يتم العثور على الملف.");
+          return;
+        }
+
+        const win = window.open();
+        if (!win) {
+          alert("اسمح بفتح النوافذ المنبثقة في المتصفح.");
+          return;
+        }
+
+        if (saved.type.startsWith("image/")) {
+          win.document.write(
+            '<img src="' + saved.data + '" style="max-width:100%;height:auto">'
+          );
+        } else if (saved.type === "application/pdf") {
+          win.location.href = saved.data;
+        } else {
+          win.close();
+          const a = document.createElement("a");
+          a.href = saved.data;
+          a.download = saved.name;
+          a.click();
+          alert("تم تنزيل الملف. افتحه ببرنامج Word للطباعة.");
+        }
+      };
+
+      const downloadButton = document.createElement("button");
+      downloadButton.type = "button";
+      downloadButton.textContent = "⬇️ تنزيل الملف";
+      downloadButton.onclick = function () {
+        const saved = JSON.parse(localStorage.getItem("LAB_SCHEDULE_FILE_V1") || "null");
+        if (!saved || !saved.data) return;
+
+        const a = document.createElement("a");
+        a.href = saved.data;
+        a.download = saved.name;
+        a.click();
+      };
+
+      info.append("تم حفظ الملف على هذا الجهاز: " + file.name + " ");
+      info.appendChild(openButton);
+      info.appendChild(downloadButton);
+
     } catch (e) {
       info.textContent = "تعذر حفظ الملف. جرّب ملفًا أصغر.";
     }
