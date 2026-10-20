@@ -2441,6 +2441,7 @@ function addDailyRow(rowFromRequest=null){
     report_time:document.getElementById('dtime').value || nowTime(),
     experiment:document.getElementById('dexp').value.trim(),
     equipment:document.getElementById('dequip').value.trim(),
+    chemicals_used:[],
     note:document.getElementById('dnote').value.trim(),
     status:'مكتمل',
     request_id:null
