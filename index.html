@@ -4192,19 +4192,29 @@ document.getElementById("labScheduleFile").addEventListener("change", async func
         const foundDay = normalizeDay(cells[0]);
         if (foundDay) currentDay = foundDay;
 
-        const timeIndex = cells.findIndex(cell =>
-          timePattern.test(cell)
-        );
+       
+const timeIndex = cells.findIndex(cell =>
+  timePattern.test(cell)
+);
 
-        if (timeIndex < 0 || !currentDay) return;
+if (timeIndex < 0 || !currentDay) return;
 
-        const timeMatch = cells[timeIndex].match(timePattern);
-        if (!timeMatch) return;
+const timeMatch = cells[timeIndex].match(timePattern);
+if (!timeMatch) return;
 
-        const start = timeMatch[1].padStart(2, "0") + ":00";
-        const end = timeMatch[2].padStart(2, "0") + ":00";
+const start = timeMatch[1].padStart(2, "0") + ":00";
+const end = timeMatch[2].padStart(2, "0") + ":00";
 
-        const roomCells = cells.slice(timeIndex + 1, timeIndex + 7);
+const roomCells = cells.slice(timeIndex + 1, timeIndex + 7);
+
+console.log("صف استعمال الزمن:", {
+  day: currentDay,
+  time: cells[timeIndex],
+  cells: cells,
+  rooms: roomCells
+});
+
+
 
         roomCells.forEach((value, index) => {
           if (!value || /^[\s—–-]+$/.test(value)) return;
