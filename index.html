@@ -4287,6 +4287,83 @@ console.log("صف استعمال الزمن:", {
     resultTable.appendChild(tbody);
     preview.appendChild(resultTable);
 
+    const saveButton = document.createElement("button");
+    saveButton.textContent = "💾 حفظ استعمال الزمن في قاعدة البيانات";
+    saveButton.type = "button";
+    saveButton.style.cssText =
+      "display:block;margin:15px auto;padding:12px 20px;background:#198754;color:white;border:0;border-radius:8px;cursor:pointer;font-size:16px;";
+
+    saveButton.disabled = extractedLessons.length === 0;
+
+    saveButton.addEventListener("click", async function () {
+      if (!extractedLessons.length) {
+        alert("لا توجد حصص لحفظها.");
+        return;
+      }
+
+      if (!confirm("سيتم حفظ " + extractedLessons.length +
+          " حصة في قاعدة البيانات. هل تريد المتابعة؟")) {
+        return;
+      }
+
+      saveButton.disabled = true;
+      saveButton.textContent = "⏳ جارٍ الحفظ...";
+
+      try {
+        const { data: userData, error: userError } =
+          await supabaseClient.auth.getUser();
+
+        if (userError || !userData.user) {
+          throw new Error("يرجى تسجيل الدخول إلى المنصة أولًا.");
+        }
+
+        const userId = userData.user.id;
+
+        const { data: existing, error: checkError } =
+          await supabaseClient
+            .from("lab_schedule")
+            .select("id")
+            .eq("user_id", userId)
+            .limit(1);
+
+        if (checkError) throw checkError;
+
+        if (existing && existing.length > 0) {
+          throw new Error(
+            "توجد حصص محفوظة لهذا الحساب. أوقفنا الحفظ لتجنب التكرار."
+          );
+        }
+
+        const rows = extractedLessons.map(lesson => ({
+          user_id: userId,
+          teacher: lesson.teacher,
+          subject: lesson.subject || null,
+          class_name: lesson.className,
+          day: lesson.day,
+          start_time: lesson.start,
+          end_time: lesson.end,
+          lab: lesson.lab
+        }));
+
+        const { error: saveError } = await supabaseClient
+          .from("lab_schedule")
+          .insert(rows);
+
+        if (saveError) throw saveError;
+
+        saveButton.textContent = "✅ تم حفظ استعمال الزمن";
+        alert("تم حفظ " + rows.length + " حصة بنجاح.");
+
+      } catch (error) {
+        console.error("خطأ في حفظ استعمال الزمن:", error);
+        alert("تعذر الحفظ: " + error.message);
+        saveButton.disabled = false;
+        saveButton.textContent = "💾 إعادة محاولة الحفظ";
+      }
+    });
+
+    preview.appendChild(saveButton);
+
     if (extractedLessons.length === 0) {
       count.textContent =
         "لم يتم استخراج أي حصة. راجع تنسيق ملف Word.";
