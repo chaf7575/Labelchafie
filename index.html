@@ -4321,7 +4321,7 @@ console.log("صف استعمال الزمن:", {
 
         const { data: existing, error: checkError } =
           await supabaseClient
-            .from("lab_schedule")
+           .from("lab schedule entries")
             .select("id")
             .eq("user_id", userId)
             .limit(1);
