@@ -4337,7 +4337,7 @@ console.log("صف استعمال الزمن:", {
         const rows = extractedLessons.map(lesson => ({
           user_id: userId,
           teacher: lesson.teacher,
-          subject: lesson.subject || null,
+         subject: lesson.subject || "",
           class_name: lesson.className,
           day: lesson.day,
           start_time: lesson.start,
