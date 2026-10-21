@@ -4155,25 +4155,104 @@ console.log("تحذيرات قراءة Word:", result.messages);
       info.parentNode.appendChild(preview);
     }
 
-   preview.innerHTML = "<h3>معاينة جدول استعمال الزمن</h3>";
+
+preview.innerHTML = "<h3>معاينة جدول استعمال الزمن والحصص المستخرجة</h3>";
+
+const extractedLessons = [];
+const dayNames = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"];
+const timePattern = /(\d{1,2})\s*[–-]\s*(\d{1,2})/;
 
 tables.forEach((table) => {
-  const tableCopy = table.cloneNode(true);
+  const rows = Array.from(table.rows);
+  let currentDay = "";
 
-  tableCopy.style.cssText =
-    "width:100%;border-collapse:collapse;direction:rtl;text-align:center;margin-bottom:20px;";
+  rows.forEach((row) => {
+    const cells = Array.from(row.cells).map(cell =>
+      cell.innerText.trim().replace(/\s+/g, " ")
+    );
 
-  tableCopy.querySelectorAll("th, td").forEach(cell => {
-    cell.style.cssText =
-      "border:1px solid #555;padding:8px;min-width:65px;vertical-align:middle;";
+    if (cells.length < 8) return;
+
+    if (dayNames.includes(cells[0])) {
+      currentDay = cells[0];
+    }
+
+    const timeCell = cells.find(cell => timePattern.test(cell));
+    if (!currentDay || !timeCell) return;
+
+    const timeMatch = timeCell.match(timePattern);
+    const start = timeMatch[1].padStart(2, "0") + ":00";
+    const end = timeMatch[2].padStart(2, "0") + ":00";
+
+    const timeIndex = cells.indexOf(timeCell);
+    const roomCells = cells.slice(timeIndex + 1, timeIndex + 7);
+    const roomNames = [
+      "مخبر 1", "مخبر 2", "مخبر 3",
+      "ورشة 1", "ورشة 2", "ورشة 3"
+    ];
+
+    roomCells.forEach((value, index) => {
+      if (!value || /^[—–-]+$/.test(value)) return;
+
+      const match = value.match(/^([1-4]\s*م\s*\d+)\s*(.*)$/);
+      if (!match) return;
+
+      extractedLessons.push({
+        day: currentDay,
+        start,
+        end,
+        className: match[1].replace(/\s+/g, ""),
+        teacher: match[2].trim(),
+        lab: roomNames[index],
+        subject: ""
+      });
+    });
   });
-
-  tableCopy.querySelectorAll("p").forEach(p => {
-    p.style.margin = "2px";
-  });
-
-  preview.appendChild(tableCopy);
 });
+
+const previewTable = document.createElement("table");
+previewTable.style.cssText =
+  "width:100%;border-collapse:collapse;direction:rtl;text-align:center;";
+
+previewTable.innerHTML = `
+  <thead>
+    <tr>
+      <th>اليوم</th><th>الأستاذ</th><th>القسم</th>
+      <th>التوقيت</th><th>المخبر أو الورشة</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+`;
+
+const tbody = previewTable.querySelector("tbody");
+
+extractedLessons.forEach(lesson => {
+  const tr = document.createElement("tr");
+
+  [
+    lesson.day,
+    lesson.teacher,
+    lesson.className,
+    lesson.start + " - " + lesson.end,
+    lesson.lab
+  ].forEach(value => {
+    const td = document.createElement("td");
+    td.textContent = value;
+    td.style.cssText = "border:1px solid #555;padding:6px;";
+    tr.appendChild(td);
+  });
+
+  tbody.appendChild(tr);
+});
+
+preview.appendChild(previewTable);
+
+const count = document.createElement("p");
+count.textContent = "عدد الحصص المستخرجة: " + extractedLessons.length;
+preview.appendChild(count);
+
+window.extractedLabSchedulePreview = extractedLessons;
+
     info.textContent =
       "تمت قراءة الملف. هذه معاينة فقط؛ لم يتم حفظ أي حصص.";
   } catch (error) {
