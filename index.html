@@ -4346,7 +4346,7 @@ console.log("صف استعمال الزمن:", {
         }));
 
         const { error: saveError } = await supabaseClient
-         .from("lab schedule entries")
+         .from("lab_schedule_entries")
           .insert(rows);
 
         if (saveError) throw saveError;
