@@ -4130,7 +4130,12 @@ document.getElementById("labScheduleFile").addEventListener("change", async func
 
   try {
     const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.convertToHtml({ arrayBuffer });
+  const result = await mammoth.convertToHtml({
+  arrayBuffer: arrayBuffer,
+  includeDefaultStyleMap: true
+});
+console.log("محتوى ملف Word:", result.value);
+console.log("تحذيرات قراءة Word:", result.messages);
     const parser = new DOMParser();
     const doc = parser.parseFromString(result.value, "text/html");
     const tables = Array.from(doc.querySelectorAll("table"));
