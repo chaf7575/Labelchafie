@@ -4155,28 +4155,25 @@ console.log("تحذيرات قراءة Word:", result.messages);
       info.parentNode.appendChild(preview);
     }
 
-    preview.innerHTML = "<h3>معاينة محتوى ملف Word</h3>";
+   preview.innerHTML = "<h3>معاينة جدول استعمال الزمن</h3>";
 
-    tables.forEach((table, tableIndex) => {
-      const heading = document.createElement("p");
-      heading.textContent = "الجدول رقم " + (tableIndex + 1);
-      preview.appendChild(heading);
+tables.forEach((table) => {
+  const tableCopy = table.cloneNode(true);
 
-      const output = document.createElement("pre");
-      output.style.cssText =
-        "white-space:pre-wrap;direction:rtl;text-align:right;font-size:14px;";
+  tableCopy.style.cssText =
+    "width:100%;border-collapse:collapse;direction:rtl;text-align:center;margin-bottom:20px;";
 
-      output.textContent = Array.from(table.rows).map((row, rowIndex) => {
-        const cells = Array.from(row.cells).map(cell =>
-          cell.innerText.trim().replace(/\s+/g, " ")
-        );
+  tableCopy.querySelectorAll("th, td").forEach(cell => {
+    cell.style.cssText =
+      "border:1px solid #555;padding:8px;min-width:65px;vertical-align:middle;";
+  });
 
-        return "السطر " + (rowIndex + 1) + ": " + cells.join(" | ");
-      }).join("\n");
+  tableCopy.querySelectorAll("p").forEach(p => {
+    p.style.margin = "2px";
+  });
 
-      preview.appendChild(output);
-    });
-
+  preview.appendChild(tableCopy);
+});
     info.textContent =
       "تمت قراءة الملف. هذه معاينة فقط؛ لم يتم حفظ أي حصص.";
   } catch (error) {
