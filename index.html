@@ -2828,32 +2828,26 @@ function clearDailyForm(){
   if(pneeds)pneeds.textContent='';
 }
 
+
 async function saveDailyToSupabase(opts={}){
   if(!dailyRows.length){
     alert('لا توجد صفوف لإرسالها');
     return false;
   }
 
-  const {reportId,oldReportId,oldReportNumber,reportNumber,reportDate,general,needs}=opts;
+  const {
+    reportId,
+    oldReportId,
+    oldReportNumber,
+    reportNumber,
+    reportDate,
+    general,
+    needs
+  }=opts;
+
   if(!reportId || !reportNumber){
     alert('❌ بيانات التقرير غير مكتملة');
     return false;
-  }
-
-  if(oldReportId){
-    const {error}=await supabaseClient.from('daily_reports').delete().eq('report_id',oldReportId);
-    if(error){
-      console.error(error);
-      alert('❌ تعذر تحديث التقرير في Supabase\n'+error.message);
-      return false;
-    }
-  }else if(oldReportNumber){
-    const {error}=await supabaseClient.from('daily_reports').delete().eq('report_number',oldReportNumber);
-    if(error){
-      console.error(error);
-      alert('❌ تعذر تحديث التقرير القديم في Supabase\n'+error.message);
-      return false;
-    }
   }
 
   const rows=dailyRows.map(x=>({
@@ -2864,17 +2858,102 @@ async function saveDailyToSupabase(opts={}){
     report_date:x.report_date||reportDate,
     report_time:x.report_time||'',
     note:dailyRowNote(x.note||'',x.request_id||null),
-   chemicals_used: Array.isArray(x.chemicals_used) ? x.chemicals_used : [], 
+    chemicals_used:Array.isArray(x.chemicals_used)
+      ? x.chemicals_used
+      : [],
     report_id:reportId,
     report_number:reportNumber,
     general:general||'',
     needs:needs||''
   }));
 
-  const {error}=await supabaseClient.from('daily_reports').insert(rows);
-  if(error){
-    console.error(error);
-    alert('❌ لم يتم حفظ التقرير في Supabase\n'+error.message);
+  // حفظ الصفوف الجديدة أولًا إذا كان التقرير جديدًا
+  if(!oldReportId && !oldReportNumber){
+    const {error}=await supabaseClient
+      .from('daily_reports')
+      .insert(rows);
+
+    if(error){
+      console.error(error);
+      alert('❌ لم يتم حفظ التقرير في Supabase\n'+error.message);
+      return false;
+    }
+
+    return true;
+  }
+
+  // الاحتفاظ بنسخة التقرير القديم قبل أي تغيير
+  let oldQuery=supabaseClient
+    .from('daily_reports')
+    .select('*');
+
+  if(oldReportId){
+    oldQuery=oldQuery.eq('report_id',oldReportId);
+  }else{
+    oldQuery=oldQuery.eq(
+      'report_number',
+      oldReportNumber
+    );
+  }
+
+  const {data:oldRows,error:readError}=await oldQuery;
+
+  if(readError){
+    console.error(readError);
+    alert('❌ تعذر قراءة التقرير القديم\n'+readError.message);
+    return false;
+  }
+
+  // حذف التقرير القديم
+  let deleteQuery=supabaseClient
+    .from('daily_reports')
+    .delete();
+
+  if(oldReportId){
+    deleteQuery=deleteQuery.eq('report_id',oldReportId);
+  }else{
+    deleteQuery=deleteQuery.eq(
+      'report_number',
+      oldReportNumber
+    );
+  }
+
+  const {error:deleteError}=await deleteQuery;
+
+  if(deleteError){
+    console.error(deleteError);
+    alert('❌ تعذر تحديث التقرير القديم\n'+deleteError.message);
+    return false;
+  }
+
+  // إدخال التقرير الجديد
+  const {error:insertError}=await supabaseClient
+    .from('daily_reports')
+    .insert(rows);
+
+  if(insertError){
+    console.error(insertError);
+
+    // محاولة استعادة التقرير القديم إذا فشل الإدخال
+    if(oldRows && oldRows.length){
+      const {error:restoreError}=await supabaseClient
+        .from('daily_reports')
+        .insert(oldRows);
+
+      if(restoreError){
+        console.error('فشلت استعادة التقرير القديم:',restoreError);
+        alert(
+          '❌ فشل حفظ التقرير الجديد واستعادة التقرير القديم.\n'+
+          restoreError.message
+        );
+        return false;
+      }
+    }
+
+    alert(
+      '❌ لم يتم حفظ التعديل، وتمت محاولة استعادة التقرير القديم.\n'+
+      insertError.message
+    );
     return false;
   }
 
