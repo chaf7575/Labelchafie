@@ -2531,32 +2531,30 @@ function addDailyChemical(){
 }
 
 
-function addDailyRow(rowFromRequest=null){
-  const row=rowFromRequest || {
-    teacher:document.getElementById('dteach').value.trim(),
-    class_name:document.getElementById('dclass').value.trim(),
-    report_date:document.getElementById('ddate').value || today(),
-    report_time:document.getElementById('dtime').value || nowTime(),
-    experiment:document.getElementById('dexp').value.trim(),
-    equipment:document.getElementById('dequip').value.trim(),
-    note:document.getElementById('dnote').value.trim(),
-    status:'مكتمل',
-    request_id:null
+
+function addDailyRow(rowFromRequest = null) {
+  const row = rowFromRequest || {
+    teacher: document.getElementById('dteach').value.trim(),
+    class_name: document.getElementById('dclass').value.trim(),
+    report_date: document.getElementById('ddate').value || today(),
+    report_time: document.getElementById('dtime').value || nowTime(),
+    experiment: document.getElementById('dexp').value.trim(),
+    equipment: document.getElementById('dequip').value.trim(),
+    note: document.getElementById('dnote').value.trim(),
+    status: 'مكتمل',
+    request_id: null
   };
 
-  if(!row.teacher && !row.experiment){
+  if (!row.teacher && !row.experiment) {
     alert('أدخل اسم الأستاذ أو التجربة');
     return false;
   }
 
-  row.chemicals_used = [
-  if (pendingDailyChemicals.length) {
-  row.chemicals_used = pendingDailyChemicals.map(c => ({...c}));
-} else {
-  row.chemicals_used = Array.isArray(row.chemicals_used)
-    ? row.chemicals_used.map(c => ({...c}))
-    : [];
-}
+  row.chemicals_used = pendingDailyChemicals.length
+    ? pendingDailyChemicals.map(c => ({ ...c }))
+    : (Array.isArray(row.chemicals_used)
+        ? row.chemicals_used.map(c => ({ ...c }))
+        : []);
 
   dailyRows.push(row);
   pendingDailyChemicals = [];
@@ -2564,18 +2562,15 @@ function addDailyRow(rowFromRequest=null){
   renderDailyRows();
   renderDailyChemicalPreview();
 
-  if(!rowFromRequest){
-    ['dteach','dclass','dtime','dexp','dequip','dnote'].forEach(id=>{
-      const e=document.getElementById(id);
-      if(e)e.value='';
+  if (!rowFromRequest) {
+    ['dteach', 'dclass', 'dtime', 'dexp', 'dequip', 'dnote'].forEach(id => {
+      const e = document.getElementById(id);
+      if (e) e.value = '';
     });
   }
 
   return true;
 }
-
-
-
 
 function renderDailyRows(){
   const body=document.getElementById('dailyBody');
@@ -2630,7 +2625,13 @@ function editDailyRow(index){
   renderDailyChemicalOptions();
   renderDailyChemicalPreview();
 
-  dailyRows.splice(index, 1);
+ // الاحتفاظ بالصف الأصلي حتى لا تضيع بياناته أثناء التعديل
+dailyRows[index] = {
+  ...dailyRows[index],
+  chemicals_used: Array.isArray(dailyRows[index].chemicals_used)
+    ? dailyRows[index].chemicals_used.map(c => ({...c}))
+    : []
+};
   renderDailyRows();
 }
 
