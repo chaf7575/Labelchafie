@@ -2684,6 +2684,44 @@ async function markRequestsExecuted(requestIds,reportNumber){
   }
 }
 
+async function syncDailyChemicalUsage(reportId, rows){
+  const usages = [];
+
+  (rows || []).forEach(row => {
+    (row.chemicals_used || []).forEach(c => {
+      usages.push({
+        chemical_id: String(c.chemical_id),
+        qty: Number(c.qty),
+        date: row.report_date || today(),
+        time: row.report_time || '',
+        teacher: row.teacher || '',
+        experiment: row.experiment || ''
+      });
+    });
+  });
+
+  const { error } = await supabaseClient.rpc(
+    'sync_report_chemical_usage',
+    {
+      p_report_id: String(reportId),
+      p_usages: usages
+    }
+  );
+
+  if(error){
+    console.error('خطأ مزامنة استعمال المواد:', error);
+    alert(
+      '⚠️ حُفظ التقرير، لكن تعذرت مزامنة استهلاك المواد.\n' +
+      error.message +
+      '\nلا تعاود تسجيل الاستعمال يدويًا؛ أخبرني بهذا الخطأ أولًا.'
+    );
+    return false;
+  }
+
+  await loadChemicalsFromSupabase();
+  return true;
+}
+
 async function saveDaily(){
   if(!dailyRows.length){
     alert('أضف صفًا واحدًا على الأقل');
