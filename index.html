@@ -2577,19 +2577,20 @@ function addDailyRow(rowFromRequest=null){
 
 
 
+
 function renderDailyRows(){
   const body=document.getElementById('dailyBody');
   if(!body)return;
 
   if(!dailyRows.length){
-    body.innerHTML='<tr><td colspan="8" style="text-align:center">لا توجد صفوف</td></tr>';
+    body.innerHTML='<tr><td colspan="10" style="text-align:center">لا توجد صفوف</td></tr>';
     return;
   }
 
   body.innerHTML=dailyRows.map((x,index)=>{
-    const chemicals = (x.chemicals_used || []).map(c =>
-      `${esc(c.name)}: ${esc(c.qty)} ${esc(c.unit || '')}`
-    ).join('<br>') || '—';
+    const chemicals=(x.chemicals_used||[]).map(c=>
+      `${esc(c.name)}: ${esc(c.qty)} ${esc(c.unit||'')}`
+    ).join('<br>')||'—';
 
     return `
       <tr>
@@ -2600,11 +2601,16 @@ function renderDailyRows(){
         <td>${esc(x.experiment||'')}</td>
         <td>${esc(x.equipment||'')}</td>
         <td>${chemicals}</td>
+        <td class="no-print">
+          <button class="primary" type="button" onclick="editDailyRow(${index})">✏️ تعديل</button>
+          <button class="danger" type="button" onclick="removeDailyRow(${index})">🗑️ حذف</button>
+        </td>
         <td>${esc(x.note||'')}</td>
       </tr>
     `;
   }).join('');
 }
+
 
 function editDailyRow(index){
   const x = dailyRows[index];
