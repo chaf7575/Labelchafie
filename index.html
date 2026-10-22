@@ -2449,7 +2449,7 @@ function dailyNumberExists(number,currentId=null){
 }
 
 let pendingDailyChemicals = [];
-
+let editingDailyRowIndex = null;
 function renderDailyChemicalOptions(){
   const select = document.getElementById('dailyChemicalSelect');
   if(!select) return;
@@ -2532,6 +2532,7 @@ function addDailyChemical(){
 
 
 
+
 function addDailyRow(rowFromRequest = null) {
   const row = rowFromRequest || {
     teacher: document.getElementById('dteach').value.trim(),
@@ -2550,13 +2551,26 @@ function addDailyRow(rowFromRequest = null) {
     return false;
   }
 
-  row.chemicals_used = pendingDailyChemicals.length
-    ? pendingDailyChemicals.map(c => ({ ...c }))
-    : (Array.isArray(row.chemicals_used)
-        ? row.chemicals_used.map(c => ({ ...c }))
-        : []);
+  row.chemicals_used = pendingDailyChemicals.map(c => ({ ...c }));
 
-  dailyRows.push(row);
+  if (
+    !rowFromRequest &&
+    Number.isInteger(editingDailyRowIndex) &&
+    editingDailyRowIndex >= 0 &&
+    editingDailyRowIndex < dailyRows.length
+  ) {
+    const oldRow = dailyRows[editingDailyRowIndex];
+
+    dailyRows[editingDailyRowIndex] = {
+      ...oldRow,
+      ...row,
+      chemicals_used: pendingDailyChemicals.map(c => ({ ...c }))
+    };
+  } else {
+    dailyRows.push(row);
+  }
+
+  editingDailyRowIndex = null;
   pendingDailyChemicals = [];
 
   renderDailyRows();
@@ -2606,9 +2620,12 @@ function renderDailyRows(){
 }
 
 
-function editDailyRow(index){
+
+function editDailyRow(index) {
   const x = dailyRows[index];
-  if(!x) return;
+  if (!x) return;
+
+  editingDailyRowIndex = index;
 
   document.getElementById('dteach').value = x.teacher || '';
   document.getElementById('dclass').value = x.class_name || '';
@@ -2619,20 +2636,11 @@ function editDailyRow(index){
   document.getElementById('dnote').value = x.note || '';
 
   pendingDailyChemicals = Array.isArray(x.chemicals_used)
-    ? x.chemicals_used.map(c => ({...c}))
+    ? x.chemicals_used.map(c => ({ ...c }))
     : [];
 
   renderDailyChemicalOptions();
   renderDailyChemicalPreview();
-
- // الاحتفاظ بالصف الأصلي حتى لا تضيع بياناته أثناء التعديل
-dailyRows[index] = {
-  ...dailyRows[index],
-  chemicals_used: Array.isArray(dailyRows[index].chemicals_used)
-    ? dailyRows[index].chemicals_used.map(c => ({...c}))
-    : []
-};
-  renderDailyRows();
 }
 
 function removeDailyRow(index){
