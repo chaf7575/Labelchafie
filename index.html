@@ -2575,6 +2575,7 @@ function addDailyRow(rowFromRequest=null){
   return true;
 }
 
+
 function renderDailyRows(){
   const body=document.getElementById('dailyBody');
   if(!body)return;
@@ -2587,6 +2588,11 @@ function renderDailyRows(){
   body.innerHTML=dailyRows.map((x,index)=>{
     const linked=x.request_id ? '<span class="badge">📨 مرتبط بطلب</span>' : '';
     const status=x.request_id ? 'طلب من الأستاذ' : (x.status||'مكتمل');
+
+    const chemicals = (x.chemicals_used || []).map(c =>
+      `${esc(c.name)}: ${esc(c.qty)} ${esc(c.unit || '')}`
+    ).join('<br>') || '—';
+
     return `
       <tr>
         <td>${esc(x.teacher||'')}</td>
@@ -2595,6 +2601,7 @@ function renderDailyRows(){
         <td>${esc(x.report_time||'')}</td>
         <td>${esc(x.experiment||'')}</td>
         <td>${esc(x.equipment||'')}</td>
+        <td>${chemicals}</td>
         <td>${esc(x.note||'')}</td>
         <td>${linked || esc(status)}</td>
         <td class="no-print">
@@ -2605,7 +2612,6 @@ function renderDailyRows(){
     `;
   }).join('');
 }
-
 
 function editDailyRow(index){
   const x = dailyRows[index];
