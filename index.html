@@ -2533,6 +2533,7 @@ function addDailyChemical(){
   renderDailyChemicalPreview();
 }
 
+
 function addDailyRow(rowFromRequest=null){
   const row=rowFromRequest || {
     teacher:document.getElementById('dteach').value.trim(),
@@ -2541,7 +2542,6 @@ function addDailyRow(rowFromRequest=null){
     report_time:document.getElementById('dtime').value || nowTime(),
     experiment:document.getElementById('dexp').value.trim(),
     equipment:document.getElementById('dequip').value.trim(),
-    chemicals_used:[],
     note:document.getElementById('dnote').value.trim(),
     status:'مكتمل',
     request_id:null
@@ -2552,8 +2552,16 @@ function addDailyRow(rowFromRequest=null){
     return false;
   }
 
+  row.chemicals_used = [
+    ...(row.chemicals_used || []),
+    ...pendingDailyChemicals.map(c => ({...c}))
+  ];
+
   dailyRows.push(row);
+  pendingDailyChemicals = [];
+
   renderDailyRows();
+  renderDailyChemicalPreview();
 
   if(!rowFromRequest){
     ['dteach','dclass','dtime','dexp','dequip','dnote'].forEach(id=>{
