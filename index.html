@@ -2804,6 +2804,7 @@ async function saveDailyToSupabase(opts={}){
     report_date:x.report_date||reportDate,
     report_time:x.report_time||'',
     note:dailyRowNote(x.note||'',x.request_id||null),
+   chemicals_used: Array.isArray(x.chemicals_used) ? x.chemicals_used : [], 
     report_id:reportId,
     report_number:reportNumber,
     general:general||'',
