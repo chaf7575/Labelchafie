@@ -1510,7 +1510,7 @@ async function loadChemicalsFromSupabase(){
 
     localStorage.setItem(KEY, JSON.stringify(db));
     renderAll();
-
+renderDailyChemicalOptions();
     alert("تم نقل المحاليل وسجلات استعمالها بنجاح.");
     return;
   }
@@ -1535,6 +1535,7 @@ async function loadChemicalsFromSupabase(){
 
   localStorage.setItem(KEY, JSON.stringify(db));
   renderAll();
+  renderDailyChemicalOptions();
 }
 
 function id(){
