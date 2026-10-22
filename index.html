@@ -2550,9 +2550,13 @@ function addDailyRow(rowFromRequest=null){
   }
 
   row.chemicals_used = [
-    ...(row.chemicals_used || []),
-    ...pendingDailyChemicals.map(c => ({...c}))
-  ];
+  if (pendingDailyChemicals.length) {
+  row.chemicals_used = pendingDailyChemicals.map(c => ({...c}));
+} else {
+  row.chemicals_used = Array.isArray(row.chemicals_used)
+    ? row.chemicals_used.map(c => ({...c}))
+    : [];
+}
 
   dailyRows.push(row);
   pendingDailyChemicals = [];
