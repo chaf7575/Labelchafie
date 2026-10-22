@@ -2392,6 +2392,7 @@ function normalizeDailyRow(x){
     report_date:x.report_date ?? x.date ?? today(),
     report_time:x.report_time ?? x.time ?? '',
     note:x.note ?? x.notes ?? '',
+    chemicals_used: Array.isArray(x.chemicals_used) ? x.chemicals_used : [],
     status:x.status ?? 'مكتمل'
   };
 }
