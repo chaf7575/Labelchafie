@@ -2578,19 +2578,17 @@ function addDailyRow(rowFromRequest=null){
 }
 
 
+
 function renderDailyRows(){
   const body=document.getElementById('dailyBody');
   if(!body)return;
 
   if(!dailyRows.length){
-    body.innerHTML='<tr><td colspan="9" style="text-align:center">لا توجد صفوف</td></tr>';
+    body.innerHTML='<tr><td colspan="8" style="text-align:center">لا توجد صفوف</td></tr>';
     return;
   }
 
   body.innerHTML=dailyRows.map((x,index)=>{
-    const linked=x.request_id ? '<span class="badge">📨 مرتبط بطلب</span>' : '';
-    const status=x.request_id ? 'طلب من الأستاذ' : (x.status||'مكتمل');
-
     const chemicals = (x.chemicals_used || []).map(c =>
       `${esc(c.name)}: ${esc(c.qty)} ${esc(c.unit || '')}`
     ).join('<br>') || '—';
@@ -2605,11 +2603,6 @@ function renderDailyRows(){
         <td>${esc(x.equipment||'')}</td>
         <td>${chemicals}</td>
         <td>${esc(x.note||'')}</td>
-        <td>${linked || esc(status)}</td>
-        <td class="no-print">
-          <button class="primary" type="button" onclick="editDailyRow(${index})">✏️ تعديل</button>
-          <button class="danger" type="button" onclick="removeDailyRow(${index})">🗑️ حذف</button>
-        </td>
       </tr>
     `;
   }).join('');
@@ -2710,10 +2703,10 @@ async function syncDailyChemicalUsage(reportId, rows){
 
   if(error){
     console.error('خطأ مزامنة استعمال المواد:', error);
-    alert(
-      '⚠️ حُفظ التقرير، لكن تعذرت مزامنة استهلاك المواد.\n' +
+       alert(
+      '❌ تعذرت مزامنة استهلاك المواد الكيميائية.\n' +
       error.message +
-      '\nلا تعاود تسجيل الاستعمال يدويًا؛ أخبرني بهذا الخطأ أولًا.'
+      '\nلم يتم تأكيد تحديث المخزون. لا تعاود الحفظ أو الخصم قبل مراجعة الخطأ.'
     );
     return false;
   }
