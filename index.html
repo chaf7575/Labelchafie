@@ -682,6 +682,24 @@ const supabaseClient = window.supabase.createClient(
 </label>
 
 <label>
+  المادة الكيميائية
+  <select id="dailyChemicalSelect">
+    <option value="">-- اختر المادة --</option>
+  </select>
+</label>
+
+<label>
+  الكمية المستعملة
+  <input id="dailyChemicalQty" type="number" min="0.01" step="any" placeholder="أدخل الكمية">
+</label>
+
+<button class="primary" type="button" onclick="addDailyChemical()">
+  ➕ إضافة المادة
+</button>
+
+<div id="dailyChemicalPreview"></div>
+
+<label>
 ملاحظة
 <textarea id="dnote"></textarea>
 </label>
@@ -2431,6 +2449,88 @@ function dailyNumberExists(number,currentId=null){
     x.id!==currentId &&
     parseInt(x.report_number ?? x.number,10)===number
   );
+}
+
+let pendingDailyChemicals = [];
+
+function renderDailyChemicalOptions(){
+  const select = document.getElementById('dailyChemicalSelect');
+  if(!select) return;
+
+  const selected = select.value;
+
+  select.innerHTML =
+    '<option value="">-- اختر المادة --</option>' +
+    (db.chemicals || []).map(c =>
+      `<option value="${esc(c.id)}">${esc(c.name)} (${esc(c.unit || '')})</option>`
+    ).join('');
+
+  if((db.chemicals || []).some(c => String(c.id) === selected)){
+    select.value = selected;
+  }
+}
+
+function renderDailyChemicalPreview(){
+  const box = document.getElementById('dailyChemicalPreview');
+  if(!box) return;
+
+  box.innerHTML = pendingDailyChemicals.length
+    ? '<p><strong>المواد المختارة:</strong></p><ul>' +
+      pendingDailyChemicals.map(c =>
+        `<li>${esc(c.name)}: ${esc(c.qty)} ${esc(c.unit || '')}</li>`
+      ).join('') +
+      '</ul>'
+    : '<p>لم تُضف أي مادة كيميائية.</p>';
+}
+
+function addDailyChemical(){
+  const select = document.getElementById('dailyChemicalSelect');
+  const qtyInput = document.getElementById('dailyChemicalQty');
+
+  const chemical = (db.chemicals || []).find(
+    c => String(c.id) === String(select?.value || '')
+  );
+
+  const qty = Number(qtyInput?.value);
+
+  if(!chemical){
+    alert('اختر مادة كيميائية أولًا.');
+    return;
+  }
+
+  if(!Number.isFinite(qty) || qty <= 0){
+    alert('أدخل كمية صحيحة أكبر من صفر.');
+    return;
+  }
+
+  const used = (chemical.uses || []).reduce(
+    (sum, item) => sum + Number(item.qty || 0), 0
+  );
+
+  const alreadySelected = pendingDailyChemicals
+    .filter(item => String(item.chemical_id) === String(chemical.id))
+    .reduce((sum, item) => sum + Number(item.qty || 0), 0);
+
+  const remaining = Number(chemical.total || 0) - used;
+
+  if(qty + alreadySelected > remaining){
+    alert(
+      'الكمية المتاحة هي ' +
+      Math.max(0, remaining - alreadySelected) +
+      ' ' + (chemical.unit || '')
+    );
+    return;
+  }
+
+  pendingDailyChemicals.push({
+    chemical_id: String(chemical.id),
+    name: chemical.name,
+    qty: qty,
+    unit: chemical.unit || ''
+  });
+
+  qtyInput.value = '';
+  renderDailyChemicalPreview();
 }
 
 function addDailyRow(rowFromRequest=null){
