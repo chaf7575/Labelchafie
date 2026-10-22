@@ -942,6 +942,7 @@ const supabaseClient = window.supabase.createClient(
       <table>
 
         <thead>
+
 <tr>
   <th>الأستاذ</th>
   <th>القسم</th>
@@ -950,11 +951,8 @@ const supabaseClient = window.supabase.createClient(
   <th>التجربة أو النشاط</th>
   <th>الوسائل المطلوبة</th>
   <th>ملاحظة</th>
-  <th>الحالة</th>
-  <th>تاريخ التنفيذ</th>
-  <th>وقت التنفيذ</th>
-  <th class="no-print">إجراء</th>
 </tr>
+
         </thead>
 
         <tbody id="reqBody"></tbody>
@@ -4033,6 +4031,7 @@ async function deleteReq(id){
   alert('✅ تم حذف الطلب بنجاح');
 }
 
+
 async function renderRequests(){
   const body=document.getElementById('reqBody');
   if(!body)return;
@@ -4045,16 +4044,14 @@ async function renderRequests(){
 
   if(error){
     console.error(error);
-    body.innerHTML='<tr><td colspan="11">❌ تعذر تحميل الطلبات: '+esc(error.message)+'</td></tr>';
+    body.innerHTML='<tr><td colspan="7">❌ تعذر تحميل الطلبات: '+esc(error.message)+'</td></tr>';
     return;
   }
 
   if(!data || !data.length){
-    body.innerHTML='<tr><td colspan="11">لا توجد طلبات</td></tr>';
+    body.innerHTML='<tr><td colspan="7">لا توجد طلبات</td></tr>';
     return;
   }
-
-  const linkedMap=await getLinkedRequestsMap();
 
   body.innerHTML=data.map(x=>`
     <tr>
@@ -4065,23 +4062,10 @@ async function renderRequests(){
       <td>${esc(x.request_text||'')}</td>
       <td>${esc(x.tools||'')}</td>
       <td>${esc(visibleDailyNote(x.notes||''))}</td>
-      <td>${esc(x.status||'جديد')}</td>
-      <td>${esc(x.execution_date||'—')}</td>
-      <td>${esc(x.execution_time||'—')}</td>
-      <td class="no-print">
-        <div class="actions" style="margin-top:0">
-          ${linkedReportButton(x.id,linkedMap)}
-          ${
-            x.status==='تم التنفيذ'
-            ? '<button type="button" disabled>✅ تم التنفيذ</button>'
-            : `<button type="button" onclick="executeRequest('${x.id}')">▶️ تنفيذ</button>`
-          }
-          <button class="danger" type="button" onclick="deleteReq('${x.id}')">🗑️ حذف</button>
-        </div>
-      </td>
     </tr>
   `).join('');
 }
+
   /* ===== وظائف استعمال زمن المخبر ===== */
 
 
