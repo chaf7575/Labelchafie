@@ -4641,6 +4641,46 @@ function normalizeDailyRow(row){
     chemicals_used:Array.isArray(row.chemicals_used) ? row.chemicals_used : []
   };
 }
+  const REPORT_COLS_DEFAULT=[9,7,9,6,20,20,15,14];
+let reportCols=[...REPORT_COLS_DEFAULT];
+
+function applyReportColumnWidths(){
+  const table=document.querySelector('#daily .official table');
+  if(!table)return;
+  const old=table.querySelector('colgroup');
+  if(old)old.remove();
+  const cols=document.createElement('colgroup');
+  const add=(w,noPrint)=>{
+    const c=document.createElement('col');
+    c.style.width=w+'%';
+    if(noPrint)c.className='no-print';
+    cols.appendChild(c);
+  };
+  reportCols.forEach((w,i)=>{
+    if(i===7)add(12,true);
+    add((w*0.88).toFixed(2));
+  });
+  table.insertBefore(cols,table.firstChild);
+  table.style.tableLayout='fixed';
+  table.style.width='100%';
+}
+
+function adjustReportColumn(index,change){
+  const donor=index===4?5:4;
+  if(reportCols[index]+change<4||
+     reportCols[index]+change>40||
+     reportCols[donor]-change<4)return;
+  reportCols[index]+=change;
+  reportCols[donor]-=change;
+  applyReportColumnWidths();
+}
+
+function resetReportColumnWidths(){
+  reportCols=[...REPORT_COLS_DEFAULT];
+  applyReportColumnWidths();
+}
+
+applyReportColumnWidths();
 </script>
 
 </body>
