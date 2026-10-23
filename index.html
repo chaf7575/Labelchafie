@@ -4621,7 +4621,21 @@ console.log("صف استعمال الزمن:", {
     info.textContent = "تعذرت قراءة الملف. تأكد أنه ملف DOCX صالح.";
   }
 });
-
+function normalizeDailyRow(row){
+  const rawNote=row.note ?? row.notes ?? '';
+  return {
+    teacher:row.teacher ?? row.Teacher ?? '',
+    class_name:row.class_name ?? row['Class-name'] ?? '',
+    experiment:row.experiment ?? '',
+    equipment:row.equipment ?? '',
+    report_date:row.report_date ?? row.date ?? '',
+    report_time:row.report_time ?? row.time ?? '',
+    note:visibleDailyNote(rawNote),
+    status:row.status ?? (extractRequestId(rawNote) ? 'طلب من الأستاذ' : 'مكتمل'),
+    request_id:row.request_id ?? extractRequestId(rawNote) ?? null,
+    chemicals_used:Array.isArray(row.chemicals_used) ? row.chemicals_used : []
+  };
+}
 </script>
 
 </body>
