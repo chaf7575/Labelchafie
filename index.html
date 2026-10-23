@@ -2418,7 +2418,12 @@ function getNextDailyNumber(){
 }
 
 
-
+function dailyNumberExists(number,currentId=null){
+  return (db.daily||[]).some(x=>
+    x.id!==currentId &&
+    parseInt(x.report_number ?? x.number,10)===number
+  );
+}
 let pendingDailyChemicals = [];
 let editingDailyRowIndex = null;
 function renderDailyChemicalOptions(){
