@@ -2195,11 +2195,7 @@ async function delChem(cid){
 let dailyRows = [];
 let editingDailyId = null;
 
-function getDailyNumberValue(){
-  const el=document.getElementById('dnumber');
-  const n=el ? parseInt(el.value,10) : NaN;
-  return Number.isInteger(n) && n>0 ? n : null;
-}
+
 
 
 async function generateWeeklyDailyReports(){
@@ -2366,31 +2362,9 @@ const schedule = getLabSchedule();
   }
 }
 
-function getNextDailyNumber(){
-  const nums=(db.daily||[]).map(x=>parseInt(x.report_number ?? x.number,10)).filter(Number.isFinite);
-  return nums.length ? Math.max(...nums)+1 : 1;
-}
 
-function dailyNumberExists(number, exceptId=null){
-  return (db.daily||[]).some(x=>{
-    const n=parseInt(x.report_number ?? x.number,10);
-    return n===number && x.id!==exceptId;
-  });
-}
 
-function normalizeDailyRow(x){
-  return {
-    teacher:x.teacher ?? x.Teacher ?? '',
-    class_name:x.class_name ?? x['Class-name'] ?? '',
-    experiment:x.experiment ?? x.request_text ?? '',
-    equipment:x.equipment ?? x.tools ?? '',
-    report_date:x.report_date ?? x.date ?? today(),
-    report_time:x.report_time ?? x.time ?? '',
-    note:x.note ?? x.notes ?? '',
-    chemicals_used: Array.isArray(x.chemicals_used) ? x.chemicals_used : [],
-    status:x.status ?? 'مكتمل'
-  };
-}
+
 
 function getRequestTag(requestId){
   return requestId ? `[[REQUEST_ID:${requestId}]]` : '';
@@ -2424,8 +2398,10 @@ function normalizeDailyRow(row){
     report_time:row.report_time ?? row.time ?? '',
     note:visibleDailyNote(rawNote),
     status:row.status ?? (extractRequestId(rawNote) ? 'طلب من الأستاذ' : 'مكتمل'),
-    request_id:row.request_id ?? extractRequestId(rawNote) ?? null
+       request_id:row.request_id ?? extractRequestId(rawNote) ?? null,
+    chemicals_used:Array.isArray(row.chemicals_used) ? row.chemicals_used : []
   };
+
 }
 
 function getDailyNumberValue(){
@@ -2441,12 +2417,7 @@ function getNextDailyNumber(){
   return nums.length ? Math.max(...nums)+1 : 1;
 }
 
-function dailyNumberExists(number,currentId=null){
-  return (db.daily||[]).some(x=>
-    x.id!==currentId &&
-    parseInt(x.report_number ?? x.number,10)===number
-  );
-}
+
 
 let pendingDailyChemicals = [];
 let editingDailyRowIndex = null;
