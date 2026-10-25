@@ -938,6 +938,7 @@ const supabaseClient = window.supabase.createClient(
 
         <thead>
 
+```html
 <tr>
   <th>الأستاذ</th>
   <th>القسم</th>
@@ -946,7 +947,9 @@ const supabaseClient = window.supabase.createClient(
   <th>التجربة أو النشاط</th>
   <th>الوسائل المطلوبة</th>
   <th>ملاحظة</th>
+  <th class="no-print">إجراء</th>
 </tr>
+```
 
         </thead>
 
@@ -4022,40 +4025,54 @@ async function deleteReq(id){
 }
 
 
+```js
 async function renderRequests(){
-  const body=document.getElementById('reqBody');
-  if(!body)return;
+  const body = document.getElementById('reqBody');
+  if(!body) return;
 
-  const {data,error}=await supabaseClient
+  const {data, error} = await supabaseClient
     .from('requests')
     .select('*')
-    .order('request_date',{ascending:false})
-    .order('request_time',{ascending:false});
+    .order('request_date', {ascending:false})
+    .order('request_time', {ascending:false});
 
   if(error){
     console.error(error);
-    body.innerHTML='<tr><td colspan="7">❌ تعذر تحميل الطلبات: '+esc(error.message)+'</td></tr>';
+    body.innerHTML =
+      '<tr><td colspan="8">❌ تعذر تحميل الطلبات: ' +
+      esc(error.message) + '</td></tr>';
     return;
   }
 
   if(!data || !data.length){
-    body.innerHTML='<tr><td colspan="7">لا توجد طلبات</td></tr>';
+    body.innerHTML =
+      '<tr><td colspan="8">لا توجد طلبات</td></tr>';
     return;
   }
 
-  body.innerHTML=data.map(x=>`
+  body.innerHTML = data.map(x => `
     <tr>
-      <td>${esc(x.teacher||'')}</td>
-      <td>${esc(x.class_name||'')}</td>
-      <td>${esc(x.request_date||'')}</td>
-      <td>${esc(x.request_time||'')}</td>
-      <td>${esc(x.request_text||'')}</td>
-      <td>${esc(x.tools||'')}</td>
-      <td>${esc(visibleDailyNote(x.notes||''))}</td>
+      <td>${esc(x.teacher || '')}</td>
+      <td>${esc(x.class_name || '')}</td>
+      <td>${esc(x.request_date || '')}</td>
+      <td>${esc(x.request_time || '')}</td>
+      <td>${esc(x.request_text || '')}</td>
+      <td>${esc(x.tools || '')}</td>
+      <td>${esc(visibleDailyNote(x.notes || ''))}</td>
+      <td class="no-print">
+        <button type="button"
+          onclick="executeRequest('${String(x.id).replace(/'/g, '&#39;')}')">
+          ✅ تنفيذ
+        </button>
+        <button type="button"
+          onclick="addRequestToDaily('${String(x.id).replace(/'/g, '&#39;')}')">
+          ➕ إلى التقرير
+        </button>
+      </td>
     </tr>
   `).join('');
 }
-
+```
   /* ===== وظائف استعمال زمن المخبر ===== */
 
 
