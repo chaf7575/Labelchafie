@@ -2459,7 +2459,8 @@ function renderDailyChemicalPreview(){
     : '<p>لم تُضف أي مادة كيميائية.</p>';
 }
 
-function addDailyChemical(){
+
+async function addDailyChemical(){
   const select = document.getElementById('dailyChemicalSelect');
   const qtyInput = document.getElementById('dailyChemicalQty');
 
@@ -2479,37 +2480,82 @@ function addDailyChemical(){
     return;
   }
 
-  const used = (chemical.uses || []).reduce(
-    (sum, item) => sum + Number(item.qty || 0), 0
-  );
-
   const alreadySelected = pendingDailyChemicals
     .filter(item => String(item.chemical_id) === String(chemical.id))
     .reduce((sum, item) => sum + Number(item.qty || 0), 0);
 
-  const remaining = Number(chemical.total || 0) - used;
+  // قراءة الرصيد الحالي من قاعدة البيانات
+  const { data: stock, error: stockError } = await supabaseClient
+    .from('chemicals')
+    .select('remaining_quantity, unit, name')
+    .eq('id', chemical.id)
+    .single();
+
+  if(stockError || !stock){
+    console.error('خطأ قراءة رصيد المادة:', stockError);
+    alert('تعذرت قراءة رصيد المادة من قاعدة البيانات.');
+    return;
+  }
+
+  const remaining = Number(stock.remaining_quantity || 0);
 
   if(qty + alreadySelected > remaining){
     alert(
       'الكمية المتاحة هي ' +
       Math.max(0, remaining - alreadySelected) +
-      ' ' + (chemical.unit || '')
+      ' ' + (stock.unit || chemical.unit || '')
     );
     return;
   }
 
+  // مفتاح فريد لمنع الخصم المكرر
+  const usageKey =
+    'chem-' + Date.now() + '-' +
+    Math.random().toString(36).slice(2, 10);
+
+  const teacher =
+    document.getElementById('dteach')?.value.trim() || '';
+
+  // خصم الكمية مباشرة من Supabase
+  const { data, error } = await supabaseClient.rpc(
+    'deduct_chemical_usage',
+    {
+      p_usage_key: usageKey,
+      p_chemical_id: String(chemical.id),
+      p_chemical_name: stock.name || chemical.name,
+      p_quantity: qty,
+      p_unit: stock.unit || chemical.unit || '',
+      p_report_id: null
+    }
+  );
+
+  if(error || !data?.success){
+    console.error('خطأ خصم المادة:', error || data);
+    alert(
+      'لم يتم خصم الكمية. ' +
+      (error?.message || 'تحقق من الرصيد واتصال قاعدة البيانات.')
+    );
+    return;
+  }
+
+  // حفظ بيانات العملية مع المادة المختارة
   pendingDailyChemicals.push({
+    usage_key: usageKey,
     chemical_id: String(chemical.id),
-    name: chemical.name,
+    name: stock.name || chemical.name,
     qty: qty,
-    unit: chemical.unit || ''
+    unit: stock.unit || chemical.unit || '',
+    teacher: teacher
   });
+
+  // تحديث الرصيد المحلي للعرض
+  chemical.remaining = Math.max(0, remaining - qty);
 
   qtyInput.value = '';
   renderDailyChemicalPreview();
+
+  alert('تمت إضافة المادة وخصم الكمية بنجاح.');
 }
-
-
 
 
 function addDailyRow(rowFromRequest = null) {
