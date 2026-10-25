@@ -1776,90 +1776,76 @@ async function delInv(id){
    المواد الكيميائية
 ========================= */
 
+
 function renderChem(){
 
-  const box=document.getElementById('chemCards');
+  const box = document.getElementById('chemCards');
+  if(!box) return;
 
-  box.innerHTML=db.chemicals.map(c=>{
+  box.innerHTML = (db.chemicals || []).map(c => {
 
-    const used=(c.uses||[])
-      .reduce((a,b)=>a+Number(b.qty||0),0);
+    const total = Number(c.total || 0);
 
-    const total=Number(c.total||0);
+    // استعمال الرصيد المحفوظ في Supabase إن كان متاحًا
+    const remaining = Number.isFinite(Number(c.remaining_quantity))
+      ? Number(c.remaining_quantity)
+      : Math.max(0, total - (c.uses || []).reduce(
+          (sum, item) => sum + Number(item.qty || 0), 0
+        ));
 
-    const remaining=total-used;
+    const used = Math.max(0, total - remaining);
 
-    let state='متوفرة';
+    let state = 'متوفرة';
 
-    if(remaining<=0){
-      state='منتهية';
-    }else if(remaining<=total*0.2){
-      state='قليلة';
+    if(remaining <= 0){
+      state = 'منتهية';
+    }else if(remaining <= total * 0.2){
+      state = 'قليلة';
     }
 
     return `
-
       <div class="card">
-
         <div class="head">
-
           <div>
             <h3>⚗️ ${esc(c.name)}</h3>
-
-            <span class="badge">
-              ${esc(state)}
-            </span>
+            <span class="badge">${esc(state)}</span>
           </div>
-
-          <button class="danger"
-            onclick="delChem('${c.id}')">
-            حذف
-          </button>
-
+          <button class="danger" onclick="delChem('${c.id}')">حذف</button>
         </div>
 
         <div class="stats">
-
           <div class="statbox">
             إجمالي الداخل
             <b>${total}</b>
-            ${esc(c.unit||'')}
+            ${esc(c.unit || '')}
           </div>
 
           <div class="statbox">
             المستعمل
             <b>${used}</b>
-            ${esc(c.unit||'')}
+            ${esc(c.unit || '')}
           </div>
 
           <div class="statbox">
             المتبقي
             <b>${remaining}</b>
-            ${esc(c.unit||'')}
+            ${esc(c.unit || '')}
           </div>
-
         </div>
 
         <div class="actions">
-
-          <button class="primary"
-            onclick="useChem('${c.id}')">
+          <button class="primary" onclick="useChem('${c.id}')">
             تسجيل استعمال
           </button>
 
-          <button
-            onclick="addChemStock('${c.id}')">
+          <button onclick="addChemStock('${c.id}')">
             إضافة كمية
           </button>
-
         </div>
 
         <div class="tablewrap">
-
           <table>
-
             <thead>
-
               <tr>
                 <th>التاريخ</th>
                 <th>الوقت</th>
@@ -1868,39 +1854,26 @@ function renderChem(){
                 <th>الكمية المستعملة</th>
                 <th>المتبقي</th>
               </tr>
-
             </thead>
-
             <tbody>
-
-              ${(c.uses||[]).map(u=>`
-
+              ${(c.uses || []).map(u => `
                 <tr>
-                  <td>${esc(u.date)}</td>
+                  <td>${esc(u.date || '')}</td>
                   <td>${esc(u.time || '')}</td>
-                  <td>${esc(u.teacher)}</td>
+                  <td>${esc(u.teacher || '')}</td>
                   <td>${esc(u.experiment || '')}</td>
-                  <td>${esc(u.qty)} ${esc(c.unit||'')}</td>
-                  <td>${esc(u.remaining)} ${esc(c.unit||'')}</td>
+                  <td>${esc(u.qty)} ${esc(c.unit || '')}</td>
+                  <td>${esc(u.remaining ?? '')} ${esc(c.unit || '')}</td>
                 </tr>
-
               `).join('')}
-
             </tbody>
-
           </table>
-
         </div>
-
       </div>
-
     `;
 
   }).join('');
-
 }
-
-
 
 async function addChem(){
 
