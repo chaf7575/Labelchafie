@@ -1498,6 +1498,7 @@ async function loadChemicalsFromSupabase(){
       id: item.id,
       name: item.name || "",
       total: Number(item.total_quantity || 0),
+      remaining_quantity: Number(item.remaining_quantity || 0),
       unit: item.unit || "",
       date: item.chemical_date || "",
       state: Number(item.remaining_quantity || 0) > 0
@@ -1523,6 +1524,7 @@ renderDailyChemicalOptions();
     id: item.id,
     name: item.name || "",
     total: Number(item.total_quantity || 0),
+   remaining_quantity: Number(item.remaining_quantity || 0), 
     unit: item.unit || "",
     date: item.chemical_date || "",
     state: Number(item.remaining_quantity || 0) > 0
