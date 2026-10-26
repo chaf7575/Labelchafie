@@ -2495,12 +2495,16 @@ async function addDailyChemical(){
   const { data, error } = await supabaseClient.rpc(
     'deduct_chemical_usage',
     {
-      p_usage_key: usageKey,
-      p_chemical_id: String(chemical.id),
-      p_chemical_name: stock.name || chemical.name,
-      p_quantity: qty,
-      p_unit: stock.unit || chemical.unit || '',
-      p_report_id: null
+    p_usage_key: usageKey,
+p_chemical_id: String(chemical.id),
+p_chemical_name: stock.name || chemical.name,
+p_quantity: qty,
+p_unit: stock.unit || chemical.unit || '',
+p_report_id: null,
+p_teacher: document.getElementById('dteach')?.value.trim() || '',
+p_date: document.getElementById('ddate')?.value || today(),
+p_time: document.getElementById('dtime')?.value || nowTime(),
+p_experiment: document.getElementById('dexp')?.value.trim() || ''
     }
   );
 
