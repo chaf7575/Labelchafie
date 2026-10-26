@@ -2279,19 +2279,22 @@ const schedule = getLabSchedule();
       const reportNumber = firstNumber + i;
       const reportId = crypto.randomUUID();
 
-      const rowsToSave = item.rows.map(x => ({
-        teacher: x.teacher || '',
-        class_name: x.class_name || '',
-        experiment: x.experiment || '',
-        equipment: x.equipment || '',
-        report_date: x.report_date,
-       report_time: x.report_time || null,
-        note: x.note || '',
-        report_id: reportId,
-        report_number: reportNumber,
-        general: '',
-        needs: ''
-      }));
+     
+const rowsToSave = item.rows.map(x => ({
+  teacher: x.teacher || '',
+  class_name: x.class_name || '',
+  experiment: x.experiment || '',
+  equipment: x.equipment || '',
+  report_date: x.report_date,
+  report_time: x.report_time || null,
+  note: x.note || '',
+  chemicals_used: [],
+  report_id: reportId,
+  report_number: reportNumber,
+  general: '',
+  needs: ''
+}));
+
 
       const {error} = await supabaseClient
         .from('daily_reports')
@@ -2435,7 +2438,8 @@ function renderDailyChemicalPreview(){
 }
 
 
-async function addDailyChemical(){
+
+async function addDailyChemical() {
   const select = document.getElementById('dailyChemicalSelect');
   const qtyInput = document.getElementById('dailyChemicalQty');
 
@@ -2445,12 +2449,12 @@ async function addDailyChemical(){
 
   const qty = Number(qtyInput?.value);
 
-  if(!chemical){
+  if (!chemical) {
     alert('اختر مادة كيميائية أولًا.');
     return;
   }
 
-  if(!Number.isFinite(qty) || qty <= 0){
+  if (!Number.isFinite(qty) || qty <= 0) {
     alert('أدخل كمية صحيحة أكبر من صفر.');
     return;
   }
@@ -2459,14 +2463,13 @@ async function addDailyChemical(){
     .filter(item => String(item.chemical_id) === String(chemical.id))
     .reduce((sum, item) => sum + Number(item.qty || 0), 0);
 
-  // قراءة الرصيد الحالي من قاعدة البيانات
   const { data: stock, error: stockError } = await supabaseClient
     .from('chemicals')
-    .select('remaining_quantity, unit, name')
+    .select('id, remaining_quantity, unit, name')
     .eq('id', chemical.id)
     .single();
 
-  if(stockError || !stock){
+  if (stockError || !stock) {
     console.error('خطأ قراءة رصيد المادة:', stockError);
     alert('تعذرت قراءة رصيد المادة من قاعدة البيانات.');
     return;
@@ -2474,7 +2477,7 @@ async function addDailyChemical(){
 
   const remaining = Number(stock.remaining_quantity || 0);
 
-  if(qty + alreadySelected > remaining){
+  if (qty + alreadySelected > remaining) {
     alert(
       'الكمية المتاحة هي ' +
       Math.max(0, remaining - alreadySelected) +
@@ -2483,57 +2486,21 @@ async function addDailyChemical(){
     return;
   }
 
-  // مفتاح فريد لمنع الخصم المكرر
-  const usageKey =
-    'chem-' + Date.now() + '-' +
-    Math.random().toString(36).slice(2, 10);
-
-  const teacher =
-    document.getElementById('dteach')?.value.trim() || '';
-
-  // خصم الكمية مباشرة من Supabase
-  const { data, error } = await supabaseClient.rpc(
-    'deduct_chemical_usage',
-    {
-    p_usage_key: usageKey,
-p_chemical_id: String(chemical.id),
-p_chemical_name: stock.name || chemical.name,
-p_quantity: qty,
-p_unit: stock.unit || chemical.unit || '',
-p_report_id: null,
-p_teacher: document.getElementById('dteach')?.value.trim() || '',
-p_date: document.getElementById('ddate')?.value || today(),
-p_time: document.getElementById('dtime')?.value || nowTime(),
-p_experiment: document.getElementById('dexp')?.value.trim() || ''
-    }
-  );
-
-  if(error || !data?.success){
-    console.error('خطأ خصم المادة:', error || data);
-    alert(
-      'لم يتم خصم الكمية. ' +
-      (error?.message || 'تحقق من الرصيد واتصال قاعدة البيانات.')
-    );
-    return;
-  }
-
-  // حفظ بيانات العملية مع المادة المختارة
   pendingDailyChemicals.push({
-    usage_key: usageKey,
-    chemical_id: String(chemical.id),
+    chemical_id: String(stock.id),
     name: stock.name || chemical.name,
-    qty: qty,
+    qty,
     unit: stock.unit || chemical.unit || '',
-    teacher: teacher
+    teacher: document.getElementById('dteach')?.value.trim() || '',
+    date: document.getElementById('ddate')?.value || today(),
+    time: document.getElementById('dtime')?.value || nowTime(),
+    experiment: document.getElementById('dexp')?.value.trim() || ''
   });
-
-  // تحديث الرصيد المحلي للعرض
-  chemical.remaining = Math.max(0, remaining - qty);
 
   qtyInput.value = '';
   renderDailyChemicalPreview();
-await loadChemicalsFromSupabase();
-  alert('تمت إضافة المادة وخصم الكمية بنجاح.');
+
+  alert('تمت إضافة المادة إلى التقرير مؤقتًا. لم يُخصم الرصيد بعد.');
 }
 
 
@@ -2555,23 +2522,39 @@ function addDailyRow(rowFromRequest = null) {
     return false;
   }
 
-  row.chemicals_used = pendingDailyChemicals.map(c => ({ ...c }));
-
-  if (
+  const editing =
     !rowFromRequest &&
     Number.isInteger(editingDailyRowIndex) &&
     editingDailyRowIndex >= 0 &&
-    editingDailyRowIndex < dailyRows.length
-  ) {
-    const oldRow = dailyRows[editingDailyRowIndex];
+    editingDailyRowIndex < dailyRows.length;
 
+  const oldRow = editing ? dailyRows[editingDailyRowIndex] : null;
+
+  const selectedChemicals = pendingDailyChemicals.map(c => ({
+    ...c,
+    teacher: row.teacher || c.teacher || '',
+    date: row.report_date || c.date || today(),
+    time: row.report_time || c.time || '',
+    experiment: row.experiment || c.experiment || ''
+  }));
+
+  // إذا لم تُختر مواد جديدة أثناء تعديل الصف، نحافظ على مواده السابقة.
+  row.chemicals_used = selectedChemicals.length
+    ? selectedChemicals
+    : (Array.isArray(row.chemicals_used)
+        ? row.chemicals_used
+        : (oldRow && Array.isArray(oldRow.chemicals_used)
+            ? oldRow.chemicals_used
+            : []));
+
+  if (editing) {
     dailyRows[editingDailyRowIndex] = {
       ...oldRow,
       ...row,
-      chemicals_used: pendingDailyChemicals.map(c => ({ ...c }))
+      chemicals_used: row.chemicals_used
     };
   } else {
-    dailyRows.push(row);
+    dailyRows.push({ ...row });
   }
 
   editingDailyRowIndex = null;
@@ -2838,8 +2821,9 @@ function clearDailyForm(){
 }
 
 
-async function saveDailyToSupabase(opts={}){
-  if(!dailyRows.length){
+
+async function saveDailyToSupabase(opts = {}) {
+  if (!dailyRows.length) {
     alert('لا توجد صفوف لإرسالها');
     return false;
   }
@@ -2852,118 +2836,106 @@ async function saveDailyToSupabase(opts={}){
     reportDate,
     general,
     needs
-  }=opts;
+  } = opts;
 
-  if(!reportId || !reportNumber){
+  if (!reportId || !reportNumber) {
     alert('❌ بيانات التقرير غير مكتملة');
     return false;
   }
 
-  const rows=dailyRows.map(x=>({
-    teacher:x.teacher||'',
-    class_name:x.class_name||'',
-    experiment:x.experiment||'',
-    equipment:x.equipment||'',
-    report_date:x.report_date||reportDate,
-    report_time:x.report_time||'',
-    note:dailyRowNote(x.note||'',x.request_id||null),
-    chemicals_used:Array.isArray(x.chemicals_used)
+  const rows = dailyRows.map(x => ({
+    teacher: x.teacher || '',
+    class_name: x.class_name || '',
+    experiment: x.experiment || '',
+    equipment: x.equipment || '',
+    report_date: x.report_date || reportDate,
+    report_time: x.report_time || '',
+    note: dailyRowNote(x.note || '', x.request_id || null),
+    chemicals_used: Array.isArray(x.chemicals_used)
       ? x.chemicals_used
       : [],
-    report_id:reportId,
-    report_number:reportNumber,
-    general:general||'',
-    needs:needs||''
+    report_id: reportId,
+    report_number: reportNumber,
+    general: general || '',
+    needs: needs || ''
   }));
 
-  // حفظ الصفوف الجديدة أولًا إذا كان التقرير جديدًا
-  if(!oldReportId && !oldReportNumber){
-    const {error}=await supabaseClient
-      .from('daily_reports')
-      .insert(rows);
+  let oldRows = [];
 
-    if(error){
+  if (oldReportId || oldReportNumber) {
+    let oldQuery = supabaseClient
+      .from('daily_reports')
+      .select('*');
+
+    if (oldReportId) {
+      oldQuery = oldQuery.eq('report_id', oldReportId);
+    } else {
+      oldQuery = oldQuery.eq('report_number', oldReportNumber);
+    }
+
+    const { data, error } = await oldQuery;
+
+    if (error) {
       console.error(error);
-      alert('❌ لم يتم حفظ التقرير في Supabase\n'+error.message);
+      alert('❌ تعذرت قراءة التقرير القديم\n' + error.message);
       return false;
     }
 
-    return true;
+    oldRows = data || [];
   }
 
-  // الاحتفاظ بنسخة التقرير القديم قبل أي تغيير
-  let oldQuery=supabaseClient
-    .from('daily_reports')
-    .select('*');
+  // إذا كان تعديلًا، نحذف الصفوف القديمة بعد الاحتفاظ بنسخة منها.
+  if (oldReportId || oldReportNumber) {
+    let deleteQuery = supabaseClient
+      .from('daily_reports')
+      .delete();
 
-  if(oldReportId){
-    oldQuery=oldQuery.eq('report_id',oldReportId);
-  }else{
-    oldQuery=oldQuery.eq(
-      'report_number',
-      oldReportNumber
-    );
+    if (oldReportId) {
+      deleteQuery = deleteQuery.eq('report_id', oldReportId);
+    } else {
+      deleteQuery = deleteQuery.eq('report_number', oldReportNumber);
+    }
+
+    const { error } = await deleteQuery;
+
+    if (error) {
+      console.error(error);
+      alert('❌ تعذر حذف الصفوف القديمة\n' + error.message);
+      return false;
+    }
   }
 
-  const {data:oldRows,error:readError}=await oldQuery;
-
-  if(readError){
-    console.error(readError);
-    alert('❌ تعذر قراءة التقرير القديم\n'+readError.message);
-    return false;
-  }
-
-  // حذف التقرير القديم
-  let deleteQuery=supabaseClient
-    .from('daily_reports')
-    .delete();
-
-  if(oldReportId){
-    deleteQuery=deleteQuery.eq('report_id',oldReportId);
-  }else{
-    deleteQuery=deleteQuery.eq(
-      'report_number',
-      oldReportNumber
-    );
-  }
-
-  const {error:deleteError}=await deleteQuery;
-
-  if(deleteError){
-    console.error(deleteError);
-    alert('❌ تعذر تحديث التقرير القديم\n'+deleteError.message);
-    return false;
-  }
-
-  // إدخال التقرير الجديد
-  const {error:insertError}=await supabaseClient
+  const { error: insertError } = await supabaseClient
     .from('daily_reports')
     .insert(rows);
 
-  if(insertError){
+  if (insertError) {
     console.error(insertError);
 
-    // محاولة استعادة التقرير القديم إذا فشل الإدخال
-    if(oldRows && oldRows.length){
-      const {error:restoreError}=await supabaseClient
+    // استعادة الصفوف القديمة إذا فشل الحفظ.
+    if (oldRows.length) {
+      const { error: restoreError } = await supabaseClient
         .from('daily_reports')
         .insert(oldRows);
 
-      if(restoreError){
-        console.error('فشلت استعادة التقرير القديم:',restoreError);
-        alert(
-          '❌ فشل حفظ التقرير الجديد واستعادة التقرير القديم.\n'+
-          restoreError.message
-        );
+      if (restoreError) {
+        console.error('فشلت استعادة التقرير القديم:', restoreError);
+        alert('❌ فشل الحفظ والاستعادة. راجع وحدة التحكم.');
         return false;
       }
     }
 
-    alert(
-      '❌ لم يتم حفظ التعديل، وتمت محاولة استعادة التقرير القديم.\n'+
-      insertError.message
-    );
+    alert('❌ لم يتم حفظ التقرير\n' + insertError.message);
     return false;
+  }
+
+  // تحديث معرّف التقرير في قائمة المواد المؤقتة فقط.
+  // لا نجري خصمًا هنا لتجنب خصم الكمية مرتين.
+  if (Array.isArray(pendingDailyChemicals)) {
+    pendingDailyChemicals = pendingDailyChemicals.map(item => ({
+      ...item,
+      report_id: reportId
+    }));
   }
 
   return true;
@@ -3137,73 +3109,80 @@ function editDaily(id){
 }
 
 
-async function deleteDaily(id){
-  const report=db.daily.find(x=>x.id===id);
-  if(!report){
+
+async function deleteDaily(id) {
+  const report = db.daily.find(x => x.id === id);
+
+  if (!report) {
     alert('❌ لم يتم العثور على التقرير');
     return;
   }
 
-  if(!confirm('هل أنت متأكد من حذف التقرير رقم '+(report.report_number||report.number||'')+'؟'))return;
+  if (!confirm(
+    'هل أنت متأكد من حذف التقرير رقم ' +
+    (report.report_number || report.number || '') + '؟'
+  )) return;
 
-  const reportId=report.report_id;
+  const reportId = report.report_id;
 
-  if(!reportId){
-    alert('❌ لا يوجد معرف التقرير اللازم لاسترجاع المواد الكيميائية.');
+  if (!reportId) {
+    alert('❌ لا يوجد معرّف للتقرير.');
     return;
   }
 
-  // استرجاع كميات المواد المرتبطة بالتقرير قبل حذفه
-  const {error: chemicalError}=await supabaseClient.rpc(
-    'sync_report_chemical_usage',
-    {
-      p_report_id: String(reportId),
-      p_usages: []
-    }
+  // قراءة جميع صفوف التقرير قبل الحذف
+  const { data: reportRows, error: readError } = await supabaseClient
+    .from('daily_reports')
+    .select('chemicals_used')
+    .eq('report_id', String(reportId));
+
+  if (readError) {
+    console.error(readError);
+    alert('❌ تعذرت قراءة مواد التقرير؛ لم يُحذف شيء.\n' + readError.message);
+    return;
+  }
+
+  const hasChemicals = (reportRows || []).some(row =>
+    Array.isArray(row.chemicals_used) && row.chemicals_used.length > 0
   );
 
-  if(chemicalError){
-    console.error(chemicalError);
+  if (hasChemicals) {
     alert(
-      '❌ تعذر استرجاع كميات المواد الكيميائية، لذلك لم يُحذف التقرير.\n'+
-      chemicalError.message
+      '⛔ لم يُحذف التقرير لأنّه يحتوي على مواد كيميائية.\n' +
+      'يجب أولًا ربط عمليات الخصم بمعرّف التقرير واسترجاعها بطريقة مضمونة، ' +
+      'حتى لا تتغير الأرصدة بصورة خاطئة.'
     );
     return;
   }
 
-  // حذف التقرير بعد نجاح استرجاع الكميات
-  const {error}=await supabaseClient
+  const { error } = await supabaseClient
     .from('daily_reports')
     .delete()
-    .eq('report_id',reportId);
+    .eq('report_id', String(reportId));
 
-  if(error){
+  if (error) {
     console.error(error);
-    alert(
-      '⚠️ تم استرجاع كميات المواد، لكن تعذر حذف التقرير.\n'+
-      error.message
-    );
-    await loadChemicalsFromSupabase();
+    alert('❌ تعذر حذف التقرير.\n' + error.message);
     return;
   }
 
-  db.daily=db.daily.filter(x=>x.id!==id);
+  db.daily = db.daily.filter(x => x.id !== id);
 
-  if(editingDailyId===id){
-    editingDailyId=null;
-    dailyRows=[];
+  if (editingDailyId === id) {
+    editingDailyId = null;
+    dailyRows = [];
     clearDailyForm();
     renderDailyRows();
   }
 
-  await loadChemicalsFromSupabase();
   save();
   renderSavedDaily();
   await renderRequests();
   await updateRequestsNotification();
 
-  alert('✅ تم حذف التقرير واسترجاع كميات المواد الكيميائية.');
+  alert('✅ تم حذف التقرير.');
 }
+
 
 function printSavedDaily(id){
   openDailyReport(id);
