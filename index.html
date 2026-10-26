@@ -2528,7 +2528,7 @@ async function addDailyChemical(){
 
   qtyInput.value = '';
   renderDailyChemicalPreview();
-
+await loadChemicalsFromSupabase();
   alert('تمت إضافة المادة وخصم الكمية بنجاح.');
 }
 
