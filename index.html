@@ -4250,24 +4250,40 @@ async function executeRequest(id){
 }
 
 
+
 async function deleteRequest(id) {
+  console.log('حذف الطلب، المعرّف:', id);
+
   if (!confirm('هل تريد حذف هذا الطلب نهائيًا؟')) return;
 
-  const { error } = await supabaseClient
-    .from('requests')
-    .delete()
-    .eq('id', id);
+  try {
+    const { data, error, status } = await supabaseClient
+      .from('requests')
+      .delete()
+      .eq('id', id)
+      .select('id');
 
-  if (error) {
-    console.error(error);
-    alert('❌ فشل حذف الطلب:\n' + error.message);
-    return;
+    console.log('نتيجة الحذف:', { data, error, status });
+
+    if (error) {
+      console.error(error);
+      alert('❌ فشل حذف الطلب:\n' + error.message);
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      alert('لم يُحذف أي طلب. تحقق من معرّف الطلب وصلاحيات DELETE في Supabase.');
+      return;
+    }
+
+    await renderRequests();
+    await updateRequestsNotification();
+
+    alert('✅ تم حذف الطلب بنجاح.');
+  } catch (e) {
+    console.error(e);
+    alert('❌ حدث خطأ غير متوقع:\n' + (e.message || e));
   }
-
-  await renderRequests();
-  await updateRequestsNotification();
-
-  alert('✅ تم حذف الطلب بنجاح.');
 }
 
 async function renderRequests(){
