@@ -1854,7 +1854,17 @@ function renderChem() {
                     <td>${esc(className)}</td>
                     <td>${esc(experiment)}</td>
                     <td>${esc(quantity)} ${esc(u.unit || c.unit || '')}</td>
-                    <td>${esc(balance)} ${esc(u.unit || c.unit || '')}</td>
+                  <td>${esc(balance)} ${esc(u.unit || c.unit || '')}</td>
+<td>
+  <button type="button"
+    onclick="editChemUse('${c.id}', ${index})">
+    ✏️ تعديل
+  </button>
+  <button type="button" class="danger"
+    onclick="deleteChemUse('${c.id}', ${index})">
+    🗑️ حذف
+  </button>
+</td>
                     <td>
                       <button onclick="editChemUse('${c.id}', ${index})">✏️ تعديل</button>
                       <button class="danger" onclick="deleteChemUse('${c.id}', ${index})">🗑️ حذف</button>
