@@ -1780,6 +1780,7 @@ async function delInv(id){
 
 
 
+
 function renderChem() {
   const box = document.getElementById('chemCards');
   if (!box) return;
@@ -1790,22 +1791,15 @@ function renderChem() {
 
     const remaining = Number.isFinite(Number(c.remaining_quantity))
       ? Number(c.remaining_quantity)
-      : Math.max(
-          0,
-          total - uses.reduce(
-            (sum, item) => sum + Number(item.qty ?? item.quantity ?? 0),
-            0
-          )
-        );
+      : Math.max(0, total - uses.reduce(
+          (sum, item) => sum + Number(item.qty ?? item.quantity ?? 0), 0
+        ));
 
     const used = Math.max(0, total - remaining);
 
     let state = 'متوفرة';
-    if (remaining <= 0) {
-      state = 'منتهية';
-    } else if (remaining <= total * 0.2) {
-      state = 'قليلة';
-    }
+    if (remaining <= 0) state = 'منتهية';
+    else if (remaining <= total * 0.2) state = 'قليلة';
 
     return `
       <div class="card">
@@ -1818,30 +1812,14 @@ function renderChem() {
         </div>
 
         <div class="stats">
-          <div class="statbox">
-            إجمالي الداخل
-            <b>${total}</b>
-            ${esc(c.unit || '')}
-          </div>
-          <div class="statbox">
-            المستعمل
-            <b>${used}</b>
-            ${esc(c.unit || '')}
-          </div>
-          <div class="statbox">
-            المتبقي
-            <b>${remaining}</b>
-            ${esc(c.unit || '')}
-          </div>
+          <div class="statbox">إجمالي الداخل <b>${total}</b> ${esc(c.unit || '')}</div>
+          <div class="statbox">المستعمل <b>${used}</b> ${esc(c.unit || '')}</div>
+          <div class="statbox">المتبقي <b>${remaining}</b> ${esc(c.unit || '')}</div>
         </div>
 
         <div class="actions">
-          <button class="primary" onclick="useChem('${c.id}')">
-            تسجيل استعمال
-          </button>
-          <button onclick="addChemStock('${c.id}')">
-            إضافة كمية
-          </button>
+          <button class="primary" onclick="useChem('${c.id}')">تسجيل استعمال</button>
+          <button onclick="addChemStock('${c.id}')">إضافة كمية</button>
         </div>
 
         <div class="tablewrap">
@@ -1855,24 +1833,18 @@ function renderChem() {
                 <th>التجربة</th>
                 <th>الكمية المستعملة</th>
                 <th>المتبقي</th>
+                <th>إجراء</th>
               </tr>
             </thead>
             <tbody>
-              ${uses.map(u => {
-                const teacher =
-                  u.teacher ?? u.used_by ?? u.teacher_name ?? '';
-                const className =
-                  u.class_name ?? u.className ?? u.class ?? '';
-                const experiment =
-                  u.experiment ?? u.experiment_name ?? '';
-                const quantity =
-                  u.qty ?? u.quantity ?? u.used_quantity ?? '';
-                const date =
-                  u.date ?? u.chemical_date ?? u.report_date ?? '';
-                const time =
-                  u.time ?? u.report_time ?? '';
-                const balance =
-                  u.remaining ?? u.remaining_quantity ?? '';
+              ${uses.map((u, index) => {
+                const teacher = u.teacher ?? u.used_by ?? u.teacher_name ?? '';
+                const className = u.class_name ?? u.className ?? u.class ?? '';
+                const experiment = u.experiment ?? u.experiment_name ?? '';
+                const quantity = u.qty ?? u.quantity ?? u.used_quantity ?? '';
+                const date = u.date ?? u.chemical_date ?? u.report_date ?? '';
+                const time = u.time ?? u.report_time ?? '';
+                const balance = u.remaining ?? u.remaining_quantity ?? '';
 
                 return `
                   <tr>
@@ -1883,6 +1855,10 @@ function renderChem() {
                     <td>${esc(experiment)}</td>
                     <td>${esc(quantity)} ${esc(u.unit || c.unit || '')}</td>
                     <td>${esc(balance)} ${esc(u.unit || c.unit || '')}</td>
+                    <td>
+                      <button onclick="editChemUse('${c.id}', ${index})">✏️ تعديل</button>
+                      <button class="danger" onclick="deleteChemUse('${c.id}', ${index})">🗑️ حذف</button>
+                    </td>
                   </tr>
                 `;
               }).join('')}
@@ -1893,7 +1869,6 @@ function renderChem() {
     `;
   }).join('');
 }
-
 
 async function addChem(){
 
@@ -2152,6 +2127,211 @@ async function useChem(cid){
 
   alert('تم تسجيل الاستعمال في قاعدة البيانات. المتبقي: ' +
     Number(saved.remaining_quantity || 0) + ' ' + (c.unit || ''));
+}
+
+async function editChemUse(cid, index) {
+  const c = (db.chemicals || []).find(
+    x => String(x.id) === String(cid)
+  );
+  if (!c || !Array.isArray(c.uses) || !c.uses[index]) return;
+
+  const { data: remote, error: readError } = await supabaseClient
+    .from('chemicals')
+    .select('*')
+    .eq('id', cid)
+    .single();
+
+  if (readError || !remote) {
+    alert('تعذر تحميل سجل المحلول.');
+    return;
+  }
+
+  const uses = Array.isArray(remote.uses) ? [...remote.uses] : [];
+  const old = uses[index];
+  if (!old) {
+    alert('لم يتم العثور على سجل الاستعمال.');
+    return;
+  }
+
+  const oldQty = Number(old.qty ?? old.quantity ?? 0);
+
+  const teacher = prompt(
+    'اسم الأستاذ:',
+    old.teacher ?? old.used_by ?? old.teacher_name ?? ''
+  );
+  if (teacher === null) return;
+
+  const className = prompt(
+    'القسم:',
+    old.class_name ?? old.className ?? old.class ?? ''
+  );
+  if (className === null) return;
+
+  const experiment = prompt(
+    'التجربة:',
+    old.experiment ?? old.experiment_name ?? ''
+  );
+  if (experiment === null) return;
+
+  const qtyText = prompt('الكمية المستعملة:', String(oldQty));
+  if (qtyText === null) return;
+
+  const qty = Number(qtyText);
+  if (!Number.isFinite(qty) || qty <= 0) {
+    alert('أدخل كمية صحيحة أكبر من صفر.');
+    return;
+  }
+
+  const date = prompt(
+    'التاريخ (YYYY-MM-DD):',
+    old.date ?? old.report_date ?? today()
+  );
+  if (date === null) return;
+
+  const time = prompt(
+    'الوقت (HH:MM):',
+    old.time ?? old.report_time ?? nowTime()
+  );
+  if (time === null) return;
+
+  const total = Number(remote.total_quantity || 0);
+  const oldUsed = uses.reduce(
+    (sum, u) => sum + Number(u.qty ?? u.quantity ?? 0), 0
+  );
+  const newUsed = oldUsed - oldQty + qty;
+
+  if (newUsed > total) {
+    alert('الكمية الجديدة تتجاوز إجمالي المخزون.');
+    return;
+  }
+
+  if (old.usage_key) {
+    alert(
+      'هذا السجل مرتبط بعملية خصم مسجلة. أوقفنا التعديل لحماية سجل المعاملات والأرصدة. يجب معالجة هذه العملية المرتبطة بطريقة خاصة.'
+    );
+    return;
+  }
+
+  uses[index] = {
+    ...old,
+    teacher,
+    class_name: className,
+    experiment,
+    qty,
+    date,
+    time,
+    remaining: null
+  };
+
+  let balance = total;
+  uses.forEach(u => {
+    balance -= Number(u.qty ?? u.quantity ?? 0);
+    u.remaining = balance;
+  });
+
+  const { data: saved, error } = await supabaseClient
+    .from('chemicals')
+    .update({
+      uses,
+      used_quantity: newUsed,
+      remaining_quantity: Math.max(0, total - newUsed),
+      used_by: teacher
+    })
+    .eq('id', cid)
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error(error);
+    alert('فشل تعديل الاستعمال: ' + error.message);
+    return;
+  }
+
+  c.uses = Array.isArray(saved.uses) ? saved.uses : uses;
+  c.total = Number(saved.total_quantity || 0);
+  c.remaining_quantity = Number(saved.remaining_quantity || 0);
+  c.unit = saved.unit || c.unit;
+
+  save();
+  renderChem();
+  alert('تم تعديل سجل الاستعمال وتحديث الرصيد.');
+}
+
+
+async function deleteChemUse(cid, index) {
+  const c = (db.chemicals || []).find(
+    x => String(x.id) === String(cid)
+  );
+  if (!c) return;
+
+  const { data: remote, error: readError } = await supabaseClient
+    .from('chemicals')
+    .select('*')
+    .eq('id', cid)
+    .single();
+
+  if (readError || !remote) {
+    alert('تعذر تحميل بيانات المحلول.');
+    return;
+  }
+
+  const uses = Array.isArray(remote.uses) ? [...remote.uses] : [];
+  const old = uses[index];
+
+  if (!old) {
+    alert('لم يتم العثور على سجل الاستعمال.');
+    return;
+  }
+
+  if (!confirm(
+    'هل تريد حذف سجل الاستعمال؟ ستُسترجع كميته إلى رصيد المحلول.'
+  )) return;
+
+  if (old.usage_key) {
+    alert(
+      'هذا السجل مرتبط بعملية خصم مسجلة. لم يُحذف لحماية سجل المعاملات والأرصدة.'
+    );
+    return;
+  }
+
+  uses.splice(index, 1);
+
+  const total = Number(remote.total_quantity || 0);
+  const used = uses.reduce(
+    (sum, u) => sum + Number(u.qty ?? u.quantity ?? 0), 0
+  );
+
+  let balance = total;
+  uses.forEach(u => {
+    balance -= Number(u.qty ?? u.quantity ?? 0);
+    u.remaining = balance;
+  });
+
+  const { data: saved, error } = await supabaseClient
+    .from('chemicals')
+    .update({
+      uses,
+      used_quantity: used,
+      remaining_quantity: Math.max(0, total - used)
+    })
+    .eq('id', cid)
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error(error);
+    alert('فشل حذف الاستعمال: ' + error.message);
+    return;
+  }
+
+  c.uses = Array.isArray(saved.uses) ? saved.uses : uses;
+  c.total = Number(saved.total_quantity || 0);
+  c.remaining_quantity = Number(saved.remaining_quantity || 0);
+  c.unit = saved.unit || c.unit;
+
+  save();
+  renderChem();
+  alert('تم حذف سجل الاستعمال واسترجاع الكمية إلى الرصيد.');
 }
 
 
