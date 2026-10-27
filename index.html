@@ -4299,10 +4299,17 @@ async function renderRequests(){
       <td>${esc(x.tools || '')}</td>
       <td>${esc(visibleDailyNote(x.notes || ''))}</td>
       <td class="no-print">
-        <button type="button"
-          onclick="executeRequest('${String(x.id).replace(/'/g, '&#39;')}')">
-          ✅ تنفيذ
-        </button>
+        
+<button type="button"
+  onclick="executeRequest('${String(x.id).replace(/'/g, '&#39;')}')">
+  ✅ تنفيذ
+</button>
+
+<button type="button" class="danger"
+  onclick="deleteRequest('${String(x.id).replace(/'/g, '&#39;')}')">
+  🗑️ حذف
+</button>
+
         <button type="button"
           onclick="addRequestToDaily('${String(x.id).replace(/'/g, '&#39;')}')">
           ➕ إلى التقرير
