@@ -1779,29 +1779,31 @@ async function delInv(id){
 ========================= */
 
 
-function renderChem(){
 
+function renderChem() {
   const box = document.getElementById('chemCards');
-  if(!box) return;
+  if (!box) return;
 
   box.innerHTML = (db.chemicals || []).map(c => {
-
     const total = Number(c.total || 0);
+    const uses = Array.isArray(c.uses) ? c.uses : [];
 
-    // استعمال الرصيد المحفوظ في Supabase إن كان متاحًا
     const remaining = Number.isFinite(Number(c.remaining_quantity))
       ? Number(c.remaining_quantity)
-      : Math.max(0, total - (c.uses || []).reduce(
-          (sum, item) => sum + Number(item.qty || 0), 0
-        ));
+      : Math.max(
+          0,
+          total - uses.reduce(
+            (sum, item) => sum + Number(item.qty ?? item.quantity ?? 0),
+            0
+          )
+        );
 
     const used = Math.max(0, total - remaining);
 
     let state = 'متوفرة';
-
-    if(remaining <= 0){
+    if (remaining <= 0) {
       state = 'منتهية';
-    }else if(remaining <= total * 0.2){
+    } else if (remaining <= total * 0.2) {
       state = 'قليلة';
     }
 
@@ -1821,13 +1823,11 @@ function renderChem(){
             <b>${total}</b>
             ${esc(c.unit || '')}
           </div>
-
           <div class="statbox">
             المستعمل
             <b>${used}</b>
             ${esc(c.unit || '')}
           </div>
-
           <div class="statbox">
             المتبقي
             <b>${remaining}</b>
@@ -1839,7 +1839,6 @@ function renderChem(){
           <button class="primary" onclick="useChem('${c.id}')">
             تسجيل استعمال
           </button>
-
           <button onclick="addChemStock('${c.id}')">
             إضافة كمية
           </button>
@@ -1852,30 +1851,49 @@ function renderChem(){
                 <th>التاريخ</th>
                 <th>الوقت</th>
                 <th>الأستاذ</th>
+                <th>القسم</th>
                 <th>التجربة</th>
                 <th>الكمية المستعملة</th>
                 <th>المتبقي</th>
               </tr>
             </thead>
             <tbody>
-              ${(c.uses || []).map(u => `
-                <tr>
-                  <td>${esc(u.date || '')}</td>
-                  <td>${esc(u.time || '')}</td>
-                  <td>${esc(u.teacher || '')}</td>
-                  <td>${esc(u.experiment || '')}</td>
-                  <td>${esc(u.qty)} ${esc(c.unit || '')}</td>
-                  <td>${esc(u.remaining ?? '')} ${esc(c.unit || '')}</td>
-                </tr>
-              `).join('')}
+              ${uses.map(u => {
+                const teacher =
+                  u.teacher ?? u.used_by ?? u.teacher_name ?? '';
+                const className =
+                  u.class_name ?? u.className ?? u.class ?? '';
+                const experiment =
+                  u.experiment ?? u.experiment_name ?? '';
+                const quantity =
+                  u.qty ?? u.quantity ?? u.used_quantity ?? '';
+                const date =
+                  u.date ?? u.chemical_date ?? u.report_date ?? '';
+                const time =
+                  u.time ?? u.report_time ?? '';
+                const balance =
+                  u.remaining ?? u.remaining_quantity ?? '';
+
+                return `
+                  <tr>
+                    <td>${esc(date)}</td>
+                    <td>${esc(time)}</td>
+                    <td>${esc(teacher)}</td>
+                    <td>${esc(className)}</td>
+                    <td>${esc(experiment)}</td>
+                    <td>${esc(quantity)} ${esc(u.unit || c.unit || '')}</td>
+                    <td>${esc(balance)} ${esc(u.unit || c.unit || '')}</td>
+                  </tr>
+                `;
+              }).join('')}
             </tbody>
           </table>
         </div>
       </div>
     `;
-
   }).join('');
 }
+
 
 async function addChem(){
 
