@@ -4249,20 +4249,25 @@ async function executeRequest(id){
   await updateRequestsNotification();
 }
 
-async function deleteReq(id){
-  if(!confirm('هل تريد حذف هذا الطلب نهائيًا؟'))return;
 
-  const {error}=await supabaseClient.from('requests').delete().eq('id',id);
+async function deleteRequest(id) {
+  if (!confirm('هل تريد حذف هذا الطلب نهائيًا؟')) return;
 
-  if(error){
+  const { error } = await supabaseClient
+    .from('requests')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
     console.error(error);
-    alert('❌ لم يتم حذف الطلب\n\n'+error.message);
+    alert('❌ فشل حذف الطلب:\n' + error.message);
     return;
   }
 
   await renderRequests();
   await updateRequestsNotification();
-  alert('✅ تم حذف الطلب بنجاح');
+
+  alert('✅ تم حذف الطلب بنجاح.');
 }
 
 async function renderRequests(){
