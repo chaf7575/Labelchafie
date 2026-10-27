@@ -3213,7 +3213,9 @@ async function loadDailyFromSupabase(){
     if(!groups.has(key)){
       const parsedNumber=parseInt(number,10);
       groups.set(key,{
-        id:id(),
+        id:row.report_id
+  ? String(row.report_id)
+  : 'legacy_' + String(number) + '_' + String(date),
         report_id:row.report_id || null,
         report_number:Number.isFinite(parsedNumber)?parsedNumber:0,
         number:Number.isFinite(parsedNumber)?parsedNumber:0,
