@@ -3372,8 +3372,11 @@ function editDaily(id){
   alert('✏️ تم تحميل التقرير للتعديل. تحقق من ظهور جميع الصفوف قبل تغيير أي شيء.');
 }
 
+
 async function deleteDaily(id) {
-  const report = db.daily.find(x => x.id === id);
+  const report = db.daily.find(
+    x => String(x.id) === String(id)
+  );
 
   if (!report) {
     alert('❌ لم يتم العثور على التقرير');
@@ -3382,69 +3385,105 @@ async function deleteDaily(id) {
 
   if (!confirm(
     'هل أنت متأكد من حذف التقرير رقم ' +
-    (report.report_number || report.number || '') + '؟'
+    (report.report_number || report.number || '') +
+    '؟\nسيتم إلغاء استهلاك المواد الكيميائية المرتبط به أيضًا.'
   )) return;
 
   const reportId = report.report_id;
 
   if (!reportId) {
-    alert('❌ لا يوجد معرّف للتقرير.');
+    alert('❌ لا يوجد معرّف للتقرير؛ لم يُحذف شيء.');
     return;
   }
 
-  // قراءة جميع صفوف التقرير قبل الحذف
-  const { data: reportRows, error: readError } = await supabaseClient
-    .from('daily_reports')
-    .select('chemicals_used')
-    .eq('report_id', String(reportId));
+  // قراءة صفوف التقرير قبل الحذف
+  const { data: reportRows, error: readError } =
+    await supabaseClient
+      .from('daily_reports')
+      .select('id, chemicals_used')
+      .eq('report_id', String(reportId));
 
   if (readError) {
     console.error(readError);
-    alert('❌ تعذرت قراءة مواد التقرير؛ لم يُحذف شيء.\n' + readError.message);
-    return;
-  }
-
-  const hasChemicals = (reportRows || []).some(row =>
-    Array.isArray(row.chemicals_used) && row.chemicals_used.length > 0
-  );
-
-  if (hasChemicals) {
     alert(
-      '⛔ لم يُحذف التقرير لأنّه يحتوي على مواد كيميائية.\n' +
-      'يجب أولًا ربط عمليات الخصم بمعرّف التقرير واسترجاعها بطريقة مضمونة، ' +
-      'حتى لا تتغير الأرصدة بصورة خاطئة.'
+      '❌ تعذرت قراءة التقرير؛ لم يُحذف شيء.\n' +
+      readError.message
     );
     return;
   }
 
-  const { error } = await supabaseClient
-    .from('daily_reports')
-    .delete()
-    .eq('report_id', String(reportId));
-
-  if (error) {
-    console.error(error);
-    alert('❌ تعذر حذف التقرير.\n' + error.message);
+  if (!reportRows || reportRows.length === 0) {
+    alert(
+      '❌ لم يتم العثور على صفوف التقرير في قاعدة البيانات؛ ' +
+      'لم يُحذف شيء.'
+    );
     return;
   }
 
-  db.daily = db.daily.filter(x => x.id !== id);
+  // إلغاء حركات استهلاك المواد المرتبطة بالتقرير
+  const { error: syncError } = await supabaseClient.rpc(
+    'sync_report_chemical_usage',
+    {
+      p_report_id: String(reportId),
+      p_usages: []
+    }
+  );
 
-  if (editingDailyId === id) {
+  if (syncError) {
+    console.error('تعذر إلغاء استهلاك المواد:', syncError);
+    alert(
+      '❌ تعذر إلغاء استهلاك المواد الكيميائية.\n' +
+      syncError.message +
+      '\nلم يُحذف التقرير.'
+    );
+    return;
+  }
+
+  // حذف التقرير من قاعدة البيانات
+  const { data: deletedRows, error: deleteError } =
+    await supabaseClient
+      .from('daily_reports')
+      .delete()
+      .eq('report_id', String(reportId))
+      .select('id');
+
+  if (deleteError || !deletedRows || deletedRows.length === 0) {
+    console.error('خطأ حذف التقرير:', deleteError);
+
+    alert(
+      '⚠️ تعذر تأكيد حذف التقرير.\n' +
+      (deleteError?.message || 'لم تُحذف أي صفوف.') +
+      '\nتحقق من التقرير وأرصدة المواد قبل إعادة المحاولة.'
+    );
+
+    await loadChemicalsFromSupabase();
+    return;
+  }
+
+  // تحديث قائمة التقارير محليًا
+  db.daily = db.daily.filter(
+    x => String(x.id) !== String(id)
+  );
+
+  if (String(editingDailyId) === String(id)) {
     editingDailyId = null;
     dailyRows = [];
     clearDailyForm();
     renderDailyRows();
+    updateDailyOfficial();
   }
 
   save();
   renderSavedDaily();
+  renderStats();
+
+  // تحديث أرصدة المواد والطلبات
+  await loadChemicalsFromSupabase();
   await renderRequests();
   await updateRequestsNotification();
 
-  alert('✅ تم حذف التقرير.');
+  alert('✅ تم حذف التقرير وإلغاء استهلاك مواده بنجاح.');
 }
-
 
 function printSavedDaily(id){
   openDailyReport(id);
