@@ -3233,11 +3233,17 @@ async function loadDailyFromSupabase(){
     if(!report.date && date)report.date=date;
   });
 
-  const remoteReports=[...groups.values()];
-  if(remoteReports.length){
-    db.daily=remoteReports;
-    localStorage.setItem(KEY,JSON.stringify(db));
-  }
+ const remoteReports = [...groups.values()];
+
+if (remoteReports.length) {
+  db.daily = remoteReports;
+  localStorage.setItem(KEY, JSON.stringify(db));
+} else {
+  console.warn(
+    'لم يتم استبدال التقارير المحلية لأن قاعدة البيانات لم تُرجع تقارير.',
+    data
+  );
+}
 
   renderSavedDaily();
   renderStats();
