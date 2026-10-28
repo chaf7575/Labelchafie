@@ -3334,20 +3334,37 @@ function openDailyReport(id){
   show('daily');
 }
 
-function editDaily(id){
-  const report=db.daily.find(x=>x.id===id);
-  if(!report){alert('❌ لم يتم العثور على التقرير');return;}
 
-  editingDailyId=id;
-  dailyRows=JSON.parse(JSON.stringify(report.rows||[]));
+function editDaily(id){
+  const report = db.daily.find(x => String(x.id) === String(id));
+
+  if(!report){
+    alert('❌ لم يتم العثور على التقرير');
+    return;
+  }
+
+  console.log('التقرير المحدد للتعديل:', report);
+  console.log('صفوف التقرير:', report.rows);
+
+  if(!Array.isArray(report.rows) || report.rows.length === 0){
+    alert(
+      '⚠️ التقرير موجود، لكن صفوفه فارغة في البيانات المحمّلة.\n' +
+      'لن نبدأ التعديل حتى لا نفقد المحتوى.\n' +
+      'افتح Console وأرسل لي نتيجة: التقرير المحدد للتعديل.'
+    );
+    return;
+  }
+
+  editingDailyId = id;
+  dailyRows = JSON.parse(JSON.stringify(report.rows));
+
   fillDailyForm(report);
   renderDailyRows();
   updateDailyOfficial();
   show('daily');
-  alert('✏️ تم تحميل التقرير للتعديل. يمكنك تغيير رقم التقرير ثم الضغط على حفظ.');
+
+  alert('✏️ تم تحميل التقرير للتعديل. تحقق من ظهور جميع الصفوف قبل تغيير أي شيء.');
 }
-
-
 
 async function deleteDaily(id) {
   const report = db.daily.find(x => x.id === id);
