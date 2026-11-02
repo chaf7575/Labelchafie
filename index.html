@@ -2086,13 +2086,11 @@ async function addChemStock(cid){
   alert('تم حفظ الكمية الجديدة بنجاح');
 }
 
+
 async function useChem(cid){
 
   const c = db.chemicals.find(x => String(x.id) === String(cid));
   if(!c) return;
-
-  const q = Number(prompt('كمية المادة المستعملة:'));
-  if(!q || q <= 0) return;
 
   const { data: remote, error: loadError } = await supabaseClient
     .from("chemicals")
@@ -2111,9 +2109,25 @@ async function useChem(cid){
     return;
   }
 
-  const uses = Array.isArray(remote.uses) ? remote.uses : [];
+  const q = Number(prompt('كمية المادة المستعملة:'));
+
+  if(!Number.isFinite(q) || q <= 0){
+    alert('أدخل كمية صحيحة أكبر من صفر.');
+    return;
+  }
+
+  const uses = Array.isArray(remote.uses) ? [...remote.uses] : [];
   const total = Number(remote.total_quantity || 0);
-  const used = uses.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+
+  // حساب الاستهلاك فقط، مع استثناء عمليات الإضافة
+  const used = uses.reduce(
+    (sum, item) => sum + (
+      item.type === 'add'
+        ? 0
+        : Number(item.qty ?? item.quantity ?? 0)
+    ), 0
+  );
+
   const remaining = Math.max(0, total - used);
 
   if(q > remaining){
@@ -2122,24 +2136,29 @@ async function useChem(cid){
   }
 
   const teacher = prompt('اسم الأستاذ:') || '';
+  const className = prompt('القسم:') || '';
   const experiment = prompt('اسم التجربة أو النشاط:') || '';
   const time = prompt('وقت التجربة (مثال 10:30):', nowTime()) || nowTime();
   const date = prompt('تاريخ التجربة (YYYY-MM-DD):', today()) || today();
 
+  const newRemaining = remaining - q;
+
   uses.push({
+    type: 'use',
     date: date,
     time: time,
     teacher: teacher,
+    class_name: className,
     experiment: experiment,
     qty: q,
-    remaining: remaining - q
+    remaining: newRemaining
   });
 
   const { data: saved, error } = await supabaseClient
     .from("chemicals")
     .update({
       used_quantity: used + q,
-      remaining_quantity: total - used - q,
+      remaining_quantity: newRemaining,
       used_by: teacher,
       uses: uses
     })
@@ -2154,18 +2173,19 @@ async function useChem(cid){
   }
 
   c.total = Number(saved.total_quantity || 0);
+  c.remaining_quantity = Number(saved.remaining_quantity || 0);
   c.unit = saved.unit || c.unit;
   c.date = saved.chemical_date || c.date;
   c.notes = saved.notes || c.notes;
   c.uses = Array.isArray(saved.uses) ? saved.uses : uses;
-  c.state = Number(saved.remaining_quantity || 0) > 0 ? "متوفرة" : "منتهية";
+  c.state = c.remaining_quantity > 0 ? "متوفرة" : "منتهية";
 
   save();
+  renderChem();
 
   alert('تم تسجيل الاستعمال في قاعدة البيانات. المتبقي: ' +
     Number(saved.remaining_quantity || 0) + ' ' + (c.unit || ''));
 }
-
 
 async function editChemUse(cid, index) {
   const c = (db.chemicals || []).find(
