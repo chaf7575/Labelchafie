@@ -2166,11 +2166,12 @@ async function useChem(cid){
     Number(saved.remaining_quantity || 0) + ' ' + (c.unit || ''));
 }
 
+
 async function editChemUse(cid, index) {
   const c = (db.chemicals || []).find(
     x => String(x.id) === String(cid)
   );
-  if (!c || !Array.isArray(c.uses) || !c.uses[index]) return;
+  if (!c) return;
 
   const { data: remote, error: readError } = await supabaseClient
     .from('chemicals')
@@ -2185,32 +2186,47 @@ async function editChemUse(cid, index) {
 
   const uses = Array.isArray(remote.uses) ? [...remote.uses] : [];
   const old = uses[index];
+
   if (!old) {
-    alert('لم يتم العثور على سجل الاستعمال.');
+    alert('لم يتم العثور على سجل العملية.');
     return;
   }
 
+  const isAddition = old.type === 'add';
   const oldQty = Number(old.qty ?? old.quantity ?? 0);
 
-  const teacher = prompt(
-    'اسم الأستاذ:',
-    old.teacher ?? old.used_by ?? old.teacher_name ?? ''
-  );
-  if (teacher === null) return;
+  let teacher = old.teacher ?? old.used_by ?? old.teacher_name ?? '';
+  let className = old.class_name ?? old.className ?? old.class ?? '';
+  let experiment = old.experiment ?? old.experiment_name ?? '';
+  let source = old.source || '';
 
-  const className = prompt(
-    'القسم:',
-    old.class_name ?? old.className ?? old.class ?? ''
-  );
-  if (className === null) return;
+  if (isAddition) {
+    source = prompt('مصدر المادة:', source);
+    if (source === null) return;
+    if (!source.trim()) {
+      alert('يجب إدخال مصدر المادة.');
+      return;
+    }
+  } else {
+    if (old.usage_key) {
+      alert('هذا السجل مرتبط بعملية خصم مسجلة. أوقفنا التعديل لحماية سجل المعاملات والأرصدة.');
+      return;
+    }
 
-  const experiment = prompt(
-    'التجربة:',
-    old.experiment ?? old.experiment_name ?? ''
-  );
-  if (experiment === null) return;
+    teacher = prompt('اسم الأستاذ:', teacher);
+    if (teacher === null) return;
 
-  const qtyText = prompt('الكمية المستعملة:', String(oldQty));
+    className = prompt('القسم:', className);
+    if (className === null) return;
+
+    experiment = prompt('التجربة:', experiment);
+    if (experiment === null) return;
+  }
+
+  const qtyText = prompt(
+    isAddition ? 'كمية الإضافة:' : 'الكمية المستعملة:',
+    String(oldQty)
+  );
   if (qtyText === null) return;
 
   const qty = Number(qtyText);
@@ -2232,37 +2248,54 @@ async function editChemUse(cid, index) {
   if (time === null) return;
 
   const total = Number(remote.total_quantity || 0);
-  const oldUsed = uses.reduce(
-    (sum, u) => sum + Number(u.qty ?? u.quantity ?? 0), 0
-  );
-  const newUsed = oldUsed - oldQty + qty;
-
-  if (newUsed > total) {
-    alert('الكمية الجديدة تتجاوز إجمالي المخزون.');
-    return;
-  }
-
-  if (old.usage_key) {
-    alert(
-      'هذا السجل مرتبط بعملية خصم مسجلة. أوقفنا التعديل لحماية سجل المعاملات والأرصدة. يجب معالجة هذه العملية المرتبطة بطريقة خاصة.'
-    );
-    return;
-  }
 
   uses[index] = {
     ...old,
-    teacher,
-    class_name: className,
-    experiment,
+    ...(isAddition
+      ? { source: source.trim() }
+      : {
+          teacher,
+          class_name: className,
+          experiment
+        }),
     qty,
     date,
-    time,
-    remaining: null
+    time
   };
 
-  let balance = total;
+  const added = uses.reduce(
+    (sum, u) => sum + (
+      u.type === 'add'
+        ? Number(u.qty ?? u.quantity ?? 0)
+        : 0
+    ), 0
+  );
+
+  const used = uses.reduce(
+    (sum, u) => sum + (
+      u.type === 'add'
+        ? 0
+        : Number(u.qty ?? u.quantity ?? 0)
+    ), 0
+  );
+
+  if (used > total) {
+    alert('الكمية المستهلكة تتجاوز إجمالي المخزون.');
+    return;
+  }
+
+  // إعادة حساب الرصيد المرحلي حسب ترتيب العمليات
+  let balance = Math.max(0, total - added);
+
   uses.forEach(u => {
-    balance -= Number(u.qty ?? u.quantity ?? 0);
+    const operationQty = Number(u.qty ?? u.quantity ?? 0);
+
+    if (u.type === 'add') {
+      balance += operationQty;
+    } else {
+      balance -= operationQty;
+    }
+
     u.remaining = balance;
   });
 
@@ -2270,9 +2303,11 @@ async function editChemUse(cid, index) {
     .from('chemicals')
     .update({
       uses,
-      used_quantity: newUsed,
-      remaining_quantity: Math.max(0, total - newUsed),
-      used_by: teacher
+      used_quantity: used,
+      remaining_quantity: Math.max(0, total - used),
+      used_by: isAddition
+        ? (remote.used_by || '')
+        : teacher
     })
     .eq('id', cid)
     .select('*')
@@ -2280,7 +2315,7 @@ async function editChemUse(cid, index) {
 
   if (error) {
     console.error(error);
-    alert('فشل تعديل الاستعمال: ' + error.message);
+    alert('فشل تعديل العملية: ' + error.message);
     return;
   }
 
@@ -2291,11 +2326,9 @@ async function editChemUse(cid, index) {
 
   save();
   renderChem();
-  alert('تم تعديل سجل الاستعمال وتحديث الرصيد.');
+
+  alert('تم تعديل العملية وتحديث الرصيد.');
 }
-
-
-
 
 async function deleteChemUse(cid, index) {
   const c = (db.chemicals || []).find(
