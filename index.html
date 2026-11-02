@@ -2296,6 +2296,7 @@ async function editChemUse(cid, index) {
 
 
 
+
 async function deleteChemUse(cid, index) {
   const c = (db.chemicals || []).find(
     x => String(x.id) === String(cid)
@@ -2317,23 +2318,28 @@ async function deleteChemUse(cid, index) {
   const old = uses[index];
 
   if (!old) {
-    alert('لم يتم العثور على سجل الاستعمال.');
+    alert('لم يتم العثور على سجل العملية.');
     return;
   }
 
-  if (!confirm('هل تريد حذف سجل الاستعمال؟ ستُسترجع كميته إذا كانت مرتبطة بعملية خصم.')) {
+  const isAddition = old.type === 'add';
+
+  if (!confirm(
+    isAddition
+      ? 'هل تريد حذف عملية إضافة هذه الكمية؟ سيتم إنقاصها من الرصيد الإجمالي.'
+      : 'هل تريد حذف سجل الاستعمال؟ ستُسترجع كميته إلى الرصيد.'
+  )) {
     return;
   }
 
-  // السجلات المرتبطة بعملية خصم تُحذف عبر الدالة الآمنة في قاعدة البيانات
-  if (old.usage_key) {
+  // حذف استهلاك مرتبط بالتقرير اليومي عبر الدالة الآمنة
+  if (!isAddition && old.usage_key) {
     const { data, error } = await supabaseClient.rpc(
       'delete_chemical_usage',
       { p_usage_key: old.usage_key }
     );
 
     if (error) {
-      console.error(error);
       alert('فشل حذف سجل الاستعمال: ' + error.message);
       return;
     }
@@ -2358,31 +2364,58 @@ async function deleteChemUse(cid, index) {
     c.total = Number(refreshed.total_quantity || 0);
     c.remaining_quantity = Number(refreshed.remaining_quantity || 0);
     c.unit = refreshed.unit || c.unit;
+
     save();
     renderChem();
     alert('تم حذف سجل الاستعمال وتحديث الرصيد.');
     return;
   }
 
-  // السجلات غير المرتبطة بمعاملة خصم
+  // حذف عملية إضافة أو سجل استهلاك عادي
   const updatedUses = uses.filter((_, i) => i !== index);
-  const total = Number(remote.total_quantity || 0);
-  const used = updatedUses.reduce(
-    (sum, u) => sum + Number(u.qty ?? u.quantity ?? 0), 0
+
+  const oldTotal = Number(remote.total_quantity || 0);
+
+  const total = isAddition
+    ? Math.max(0, oldTotal - Number(old.qty || 0))
+    : oldTotal;
+
+  const added = updatedUses.reduce(
+    (sum, u) => sum + (
+      u.type === 'add' ? Number(u.qty ?? u.quantity ?? 0) : 0
+    ), 0
   );
 
-  let balance = total;
+  const used = updatedUses.reduce(
+    (sum, u) => sum + (
+      u.type === 'add' ? 0 : Number(u.qty ?? u.quantity ?? 0)
+    ), 0
+  );
+
+  // إعادة حساب الرصيد بعد كل عملية حسب ترتيب السجل
+  let balance = Math.max(0, total - added);
+
   updatedUses.forEach(u => {
-    balance -= Number(u.qty ?? u.quantity ?? 0);
-    u.remaining = balance;
+    const qty = Number(u.qty ?? u.quantity ?? 0);
+
+    if (u.type === 'add') {
+      balance += qty;
+    } else {
+      balance -= qty;
+    }
+
+    u.remaining = Math.max(0, balance);
   });
+
+  const remaining = Math.max(0, total - used);
 
   const { data: saved, error } = await supabaseClient
     .from('chemicals')
     .update({
+      total_quantity: total,
       uses: updatedUses,
       used_quantity: used,
-      remaining_quantity: Math.max(0, total - used)
+      remaining_quantity: remaining
     })
     .eq('id', cid)
     .select('*')
@@ -2390,7 +2423,7 @@ async function deleteChemUse(cid, index) {
 
   if (error) {
     console.error(error);
-    alert('فشل حذف الاستعمال: ' + error.message);
+    alert('فشل حذف العملية: ' + error.message);
     return;
   }
 
@@ -2401,7 +2434,8 @@ async function deleteChemUse(cid, index) {
 
   save();
   renderChem();
-  alert('تم حذف سجل الاستعمال وتحديث الرصيد.');
+
+  alert('تم حذف العملية وتحديث الرصيد بنجاح.');
 }
 
 async function delChem(cid){
