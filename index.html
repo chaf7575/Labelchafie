@@ -3586,23 +3586,24 @@ function resetReportColumnWidths() {
 document.addEventListener('DOMContentLoaded', applyReportColumnWidths);
 
 function mailDaily(){
-  alert('تم الضغط على زر البريد، والدالة تعمل.');
-
   const number = document.getElementById('rno')?.textContent?.trim() || '';
   const date = document.getElementById('rdate')?.textContent?.trim() || '';
 
-  const subject = encodeURIComponent('التقرير اليومي للمخبر رقم ' + number);
+  const subject = 'التقرير اليومي للمخبر رقم ' + number;
 
-  const body = encodeURIComponent(
+  const body =
     'تقرير يومي للمخبر - متوسطة قايد أحمد – غليزان\n' +
     'رقم التقرير: ' + number + '\n' +
     'التاريخ: ' + date + '\n\n' +
-    'يمكن إرفاق النسخة المطبوعة أو PDF من جهازك.'
-  );
+    'يمكن إرفاق النسخة المطبوعة أو PDF من جهازك.';
 
-  window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+  const gmailUrl =
+    'https://mail.google.com/mail/?view=cm&fs=1' +
+    '&su=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(body);
+
+  window.open(gmailUrl, '_blank');
 }
-
 /* =========================
    التدرج السنوي
 ========================= */
