@@ -580,10 +580,16 @@ const supabaseClient = window.supabase.createClient(
 
 <label>
 التاريخ
-<input id="cdate" type="date">
+<label>
+  التاريخ
+  <input id="cdate" type="date">
 </label>
 
 <label>
+  مصدر المادة (من أين جاءت)
+  <input id="csource" type="text"
+    placeholder="مثلاً: مديرية التربية، شراء، تبرع...">
+</label>
 الحالة
 <select id="cstate">
 <option>متوفرة</option>
@@ -1463,9 +1469,9 @@ async function loadChemicalsFromSupabase(){
     const rows = db.chemicals.map(c => {
       const uses = Array.isArray(c.uses) ? c.uses : [];
       const total = Number(c.total || 0);
-      const used = uses.reduce(
-        (sum, u) => sum + Number(u.qty || 0), 0
-      );
+     const used = uses.reduce(
+  (sum, u) => sum + (u.type === 'add' ? 0 : Number(u.qty || 0)), 0
+);
 
       return {
         name: c.name || "",
@@ -1824,18 +1830,19 @@ function renderChem() {
 
         <div class="tablewrap">
           <table>
-            <thead>
-              <tr>
-                <th>التاريخ</th>
-                <th>الوقت</th>
-                <th>الأستاذ</th>
-                <th>القسم</th>
-                <th>التجربة</th>
-                <th>الكمية المستعملة</th>
-                <th>المتبقي</th>
-                <th>إجراء</th>
-              </tr>
-            </thead>
+         <thead>
+  <tr>
+    <th>نوع العملية</th>
+    <th>التاريخ</th>
+    <th>الوقت</th>
+    <th>الأستاذ / مصدر المادة</th>
+    <th>القسم</th>
+    <th>التجربة</th>
+    <th>الكمية</th>
+    <th>المتبقي</th>
+    <th>إجراء</th>
+  </tr>
+</thead>
             <tbody>
               ${uses.map((u, index) => {
                 const teacher = u.teacher ?? u.used_by ?? u.teacher_name ?? '';
@@ -1846,28 +1853,30 @@ function renderChem() {
                 const time = u.time ?? u.report_time ?? '';
                 const balance = u.remaining ?? u.remaining_quantity ?? '';
 
-                return `
-                  <tr>
-                    <td>${esc(date)}</td>
-                    <td>${esc(time)}</td>
-                    <td>${esc(teacher)}</td>
-                    <td>${esc(className)}</td>
-                    <td>${esc(experiment)}</td>
-                    <td>${esc(quantity)} ${esc(u.unit || c.unit || '')}</td>
-                  <td>${esc(balance)} ${esc(u.unit || c.unit || '')}</td>
-<td>
-  <button type="button"
-    onclick="editChemUse('${c.id}', ${index})">
-    ✏️ تعديل
-  </button>
-  <button type="button" class="danger"
-    onclick="deleteChemUse('${c.id}', ${index})">
-    🗑️ حذف
-  </button>
-</td>
-                   
-                  </tr>
-                `;
+         const isAddition = u.type === 'add';
+
+return `
+  <tr>
+    <td>${isAddition ? '🟢 إضافة' : '🔵 استهلاك'}</td>
+    <td>${esc(date)}</td>
+    <td>${esc(time)}</td>
+    <td>${esc(isAddition ? (u.source || '') : teacher)}</td>
+    <td>${esc(className)}</td>
+    <td>${esc(experiment)}</td>
+    <td>${esc(quantity)} ${esc(u.unit || c.unit || '')}</td>
+    <td>${esc(balance)} ${esc(u.unit || c.unit || '')}</td>
+    <td>
+      <button type="button"
+        onclick="editChemUse('${c.id}', ${index})">
+        ✏️ تعديل
+      </button>
+      <button type="button" class="danger"
+        onclick="deleteChemUse('${c.id}', ${index})">
+        🗑️ حذف
+      </button>
+    </td>
+  </tr>
+`;
               }).join('')}
             </tbody>
           </table>
@@ -1877,13 +1886,14 @@ function renderChem() {
   }).join('');
 }
 
+
 async function addChem(){
 
   const name = document.getElementById('cname').value.trim();
   const qty = Number(document.getElementById('cqty').value || 0);
   const unit = document.getElementById('cunit').value.trim();
   const date = document.getElementById('cdate').value || today();
-  const state = document.getElementById('cstate').value;
+  const source = document.getElementById('csource').value.trim();
   const notes = document.getElementById('cnote').value.trim();
 
   if(!name){
@@ -1893,6 +1903,11 @@ async function addChem(){
 
   if(qty <= 0){
     alert('أدخل كمية صحيحة');
+    return;
+  }
+
+  if(!source){
+    alert('اكتب مصدر المادة');
     return;
   }
 
@@ -1907,7 +1922,6 @@ async function addChem(){
 
   if(findError){
     alert("تعذر التحقق من المادة: " + findError.message);
-    console.error(findError);
     return;
   }
 
@@ -1915,25 +1929,40 @@ async function addChem(){
     x => x.name.trim().toLowerCase() === name.toLowerCase()
   );
 
+  const uses = Array.isArray(remote?.uses)
+    ? [...remote.uses]
+    : (Array.isArray(local?.uses) ? [...local.uses] : []);
+
   const previousTotal = Number(
     remote?.total_quantity ?? local?.total ?? 0
   );
 
-  const uses = Array.isArray(remote?.uses)
-    ? remote.uses
-    : (local?.uses || []);
-
   const used = uses.reduce(
-    (sum, item) => sum + Number(item.qty || 0), 0
+    (sum, item) => sum + (
+      item.type === 'add'
+        ? 0
+        : Number(item.qty ?? item.quantity ?? 0)
+    ), 0
   );
 
   const newTotal = previousTotal + qty;
+  const remaining = Math.max(0, newTotal - used);
+
+  uses.push({
+    type: 'add',
+    qty: qty,
+    unit: unit || remote?.unit || local?.unit || '',
+    source: source,
+    date: date,
+    time: nowTime(),
+    remaining: remaining
+  });
 
   const record = {
     name: name,
     total_quantity: newTotal,
     used_quantity: used,
-    remaining_quantity: Math.max(0, newTotal - used),
+    remaining_quantity: remaining,
     unit: unit || remote?.unit || local?.unit || "",
     used_by: remote?.used_by || "",
     chemical_date: date,
@@ -1959,7 +1988,7 @@ async function addChem(){
   }
 
   if(result.error){
-    alert("فشل حفظ المحلول: " + result.error.message);
+    alert("فشل حفظ الإضافة: " + result.error.message);
     console.error(result.error);
     return;
   }
@@ -1970,6 +1999,7 @@ async function addChem(){
     id: saved.id,
     name: saved.name,
     total: Number(saved.total_quantity || 0),
+    remaining_quantity: Number(saved.remaining_quantity || 0),
     unit: saved.unit || "",
     date: saved.chemical_date || "",
     state: saved.remaining_quantity > 0 ? "متوفرة" : "منتهية",
@@ -1988,16 +2018,16 @@ async function addChem(){
   }
 
   save();
+  renderAll();
 
   document.getElementById('cname').value = '';
   document.getElementById('cqty').value = '';
   document.getElementById('cunit').value = '';
+  document.getElementById('csource').value = '';
   document.getElementById('cnote').value = '';
 
-  alert('تم حفظ المحلول في قاعدة البيانات بنجاح');
+  alert('تم تسجيل إضافة المادة ومصدرها وتاريخها بنجاح');
 }
-
-
 
 async function addChemStock(cid){
 
