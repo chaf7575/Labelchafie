@@ -4405,8 +4405,8 @@ function removeInvoiceItem(index) {
 </script> 
  <script>
    
+
 async function saveInvoice() {
-   alert('تم تشغيل دالة حفظ الفاتورة');
   const number = document.getElementById('invoiceNumber').value.trim();
   const date = document.getElementById('invoiceDate').value;
   const supplier = document.getElementById('invoiceSupplier').value.trim();
@@ -4423,17 +4423,17 @@ async function saveInvoice() {
     return;
   }
 
-  if (!imageFile) {
+  if (!editingInvoiceId && !imageFile) {
     alert('يرجى اختيار صورة الفاتورة.');
     return;
   }
 
-  if (!imageFile.type.startsWith('image/')) {
+  if (imageFile && !imageFile.type.startsWith('image/')) {
     alert('الملف المختار ليس صورة.');
     return;
   }
 
-  if (imageFile.size > 5 * 1024 * 1024) {
+  if (imageFile && imageFile.size > 5 * 1024 * 1024) {
     alert('حجم الصورة يجب ألا يتجاوز 5 ميغابايت.');
     return;
   }
@@ -4447,49 +4447,10 @@ async function saveInvoice() {
   }
 
   const userId = authData.user.id;
-  const totalAmount = invoicePurchaseItems.reduce(
-    (sum, item) => sum + Number(item.total || 0), 0
-  );
 
-  const fileExt = imageFile.name.split('.').pop().toLowerCase();
-  const filePath =
-    userId + '/' + crypto.randomUUID() + '.' + fileExt;
+  let oldImagePath = null;
 
-  let uploadedPath = null;
-
-  const { data: uploadData, error: uploadError } =
-    await supabaseClient.storage
-      .from('invoices')
-      .upload(filePath, imageFile, {
-        contentType: imageFile.type,
-        upsert: false
-      });
-
-  if (uploadError) {
-    console.error(uploadError);
-    alert('فشل رفع صورة الفاتورة: ' + uploadError.message);
-    return;
-  }
-
-  uploadedPath = uploadData.path;
-
-  const invoiceRecord = {
-    user_id: userId,
-    invoice_number: number,
-    invoice_date: date,
-    supplier: supplier,
-    notes: notes,
-    image_path: uploadedPath,
-    items: invoicePurchaseItems,
-    total_amount: totalAmount,
-    status: 'مسجلة'
-  };
-
- 
-  let finalImagePath = uploadedPath;
-
-  // عند تعديل فاتورة دون اختيار صورة جديدة، نحتفظ بالصورة القديمة
-  if (editingInvoiceId && !imageFile) {
+  if (editingInvoiceId) {
     const { data: oldInvoice, error: oldError } = await supabaseClient
       .from('invoices')
       .select('image_path')
@@ -4497,14 +4458,55 @@ async function saveInvoice() {
       .single();
 
     if (oldError || !oldInvoice) {
-      alert('تعذر قراءة صورة الفاتورة القديمة.');
+      alert('تعذر تحميل الفاتورة القديمة.');
+      console.error(oldError);
       return;
     }
 
-    finalImagePath = oldInvoice.image_path;
+    oldImagePath = oldInvoice.image_path;
   }
 
+  let finalImagePath = oldImagePath;
+  let uploadedPath = null;
 
+  if (imageFile) {
+    const fileExt = imageFile.name.split('.').pop().toLowerCase();
+    const filePath =
+      userId + '/' + crypto.randomUUID() + '.' + fileExt;
+
+    const { data: uploadData, error: uploadError } =
+      await supabaseClient.storage
+        .from('invoices')
+        .upload(filePath, imageFile, {
+          contentType: imageFile.type,
+          upsert: false
+        });
+
+    if (uploadError) {
+      console.error(uploadError);
+      alert('فشل رفع صورة الفاتورة: ' + uploadError.message);
+      return;
+    }
+
+    uploadedPath = uploadData.path;
+    finalImagePath = uploadedPath;
+  }
+
+  const totalAmount = invoicePurchaseItems.reduce(
+    (sum, item) => sum + Number(item.total || 0), 0
+  );
+
+  const invoiceRecord = {
+    user_id: userId,
+    invoice_number: number,
+    invoice_date: date,
+    supplier: supplier,
+    notes: notes,
+    image_path: finalImagePath,
+    items: invoicePurchaseItems,
+    total_amount: totalAmount,
+    status: 'مسجلة'
+  };
 
   let savedInvoice;
   let saveError;
@@ -4534,15 +4536,21 @@ async function saveInvoice() {
     console.error(saveError);
 
     if (uploadedPath) {
-      const { error: cleanupError } = await supabaseClient.storage
+      await supabaseClient.storage
         .from('invoices')
         .remove([uploadedPath]);
-
-      if (cleanupError) console.error(cleanupError);
     }
 
     alert('فشل حفظ الفاتورة: ' + saveError.message);
     return;
+  }
+
+  if (uploadedPath && oldImagePath) {
+    const { error: removeError } = await supabaseClient.storage
+      .from('invoices')
+      .remove([oldImagePath]);
+
+    if (removeError) console.error('تعذر حذف الصورة القديمة:', removeError);
   }
 
   editingInvoiceId = null;
@@ -4558,6 +4566,8 @@ async function saveInvoice() {
   alert('تم حفظ الفاتورة بنجاح: ' + savedInvoice.invoice_number);
 
   await loadInvoices();
+}
+
 
 async function loadInvoices() {
   const list = document.getElementById('invoiceList');
