@@ -4504,17 +4504,7 @@ async function saveInvoice() {
     finalImagePath = oldInvoice.image_path;
   }
 
-  const invoiceRecord = {
-    user_id: userId,
-    invoice_number: number,
-    invoice_date: date,
-    supplier: supplier,
-    notes: notes,
-    image_path: finalImagePath,
-    items: invoicePurchaseItems,
-    total_amount: totalAmount,
-    status: 'مسجلة'
-  };
+
 
   let savedInvoice;
   let saveError;
@@ -4602,6 +4592,9 @@ async function loadInvoices() {
   const cards = await Promise.all(data.map(async invoice => {
     let imageUrl = '';
 
+    
+    
+    
     if (invoice.image_path) {
       const { data: imageData, error: imageError } =
         await supabaseClient.storage
