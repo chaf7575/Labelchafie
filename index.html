@@ -322,19 +322,22 @@ const supabaseClient = window.supabase.createClient(
 <h1>🔬 منصة المخبري</h1>
 <div>متوسطة قايد أحمد – غليزان</div>
 
+
 <nav id="mainNav">
-<button onclick="show('home')">🏠 الرئيسية</button>
-<button onclick="show('inventory')">📦 الجرد</button>
-<button onclick="show('chemicals')">⚗️ المحاليل</button>
-<button onclick="show('daily')">📝 التقارير</button>
-<button onclick="show('progress')">📅 التدرج</button>
- <button onclick="show('labSchedule')">🗓️ استعمال زمن المخبر</button> 
-<button onclick="show('requests')">📨 الطلبات</button>
-<button onclick="show('safety')">🦺 السلامة</button>
-<button onclick="show('various')">🧪 منوعات</button>
-<button onclick="show('other')">🎧 الصوتيات والسمعيات</button>
-<button onclick="show('settings')">⚙️ الإعدادات</button>
+  <button onclick="show('home')">🏠 الرئيسية</button>
+  <button onclick="show('inventory')">📦 الجرد</button>
+  <button onclick="show('invoices')">🧾 الفواتير</button>
+  <button onclick="show('chemicals')">⚗️ المحاليل</button>
+  <button onclick="show('daily')">📝 التقارير</button>
+  <button onclick="show('progress')">📅 التدرج</button>
+  <button onclick="show('labSchedule')">🗓️ استعمال زمن المخبر</button>
+  <button onclick="show('requests')">📨 الطلبات</button>
+  <button onclick="show('safety')">🦺 السلامة</button>
+  <button onclick="show('various')">🧪 منوعات</button>
+  <button onclick="show('other')">🎧 الصوتيات والسمعيات</button>
+  <button onclick="show('settings')">⚙️ الإعدادات</button>
 </nav>
+
 </header>
 
 <div class="container">
@@ -1369,6 +1372,76 @@ onchange="restore(event)"
   </div>
 
 </section>
+  
+<!-- قسم الفواتير -->
+<section id="invoices" class="section">
+
+  <h2>🧾 إدارة الفواتير</h2>
+
+  <div class="card">
+    <h3>إضافة فاتورة جديدة</h3>
+
+    <label>رقم الفاتورة</label>
+    <input id="invoiceNumber" type="text" placeholder="رقم الفاتورة">
+
+    <label>تاريخ الفاتورة</label>
+    <input id="invoiceDate" type="date">
+
+    <label>اسم المورد</label>
+    <input id="invoiceSupplier" type="text" placeholder="اسم المورد">
+
+    <label>صورة الفاتورة</label>
+    <input id="invoiceImage" type="file" accept="image/*">
+
+<h3>📦 تفاصيل المشتريات</h3>
+
+<label>نوع المشتريات</label>
+<select id="invoiceTarget">
+  <option value="inventory">معدات وتجهيزات المخبر</option>
+  <option value="chemicals">مواد ومحاليل كيميائية</option>
+</select>
+
+<label>نوع العملية</label>
+<select id="invoicePurchaseType">
+  <option value="existing">شراء مادة موجودة</option>
+  <option value="new">شراء مادة جديدة</option>
+</select>
+
+<label>اسم المادة أو التجهيز</label>
+<input id="invoiceItemName" type="text"
+  placeholder="اسم المادة أو التجهيز">
+
+<label>الكمية المشتراة</label>
+<input id="invoiceQty" type="number" min="0" step="any">
+
+<label>الوحدة</label>
+<input id="invoiceUnit" type="text"
+  placeholder="قطعة، غ، مل، لتر...">
+
+<label>سعر الوحدة</label>
+<input id="invoiceUnitPrice" type="number" min="0" step="any">
+
+<button type="button" class="primary" onclick="addInvoiceItem()">
+  ➕ إضافة إلى قائمة المشتريات
+</button>
+
+<div id="invoiceItemsPreview"></div>
+
+    <label>ملاحظات</label>
+    <textarea id="invoiceNotes" placeholder="ملاحظات إضافية"></textarea>
+
+    <button class="primary" type="button" onclick="saveInvoice()">
+      💾 حفظ الفاتورة
+    </button>
+  </div>
+
+  <div class="card">
+    <h3>📚 سجل الفواتير</h3>
+    <div id="invoiceList">لا توجد فواتير مسجلة بعد.</div>
+  </div>
+
+</section>
+
 <footer>
 منصة المخبري — متوسطة قايد أحمد – غليزان
 </footer>
@@ -1395,7 +1468,7 @@ const EMPTY={
 };
 
 let db=load();
-
+let invoicePurchaseItems = [];
 function load(){
   try{
     const x=JSON.parse(localStorage.getItem(KEY)||'null');
@@ -4222,6 +4295,106 @@ const dates=[
     renderStats();
   }
 );
+ 
+function addInvoiceItem() {
+  const target = document.getElementById('invoiceTarget').value;
+  const purchaseType = document.getElementById('invoicePurchaseType').value;
+  const name = document.getElementById('invoiceItemName').value.trim();
+  const qty = Number(document.getElementById('invoiceQty').value);
+  const unit = document.getElementById('invoiceUnit').value.trim();
+  const unitPrice = Number(document.getElementById('invoiceUnitPrice').value);
+
+  if (!name) {
+    alert('أدخل اسم المادة أو التجهيز.');
+    return;
+  }
+
+  if (!Number.isFinite(qty) || qty <= 0) {
+    alert('أدخل كمية صحيحة.');
+    return;
+  }
+
+  if (!Number.isFinite(unitPrice) || unitPrice < 0) {
+    alert('أدخل سعرًا صحيحًا.');
+    return;
+  }
+
+  invoicePurchaseItems.push({
+    target,
+    purchaseType,
+    name,
+    qty,
+    unit,
+    unitPrice,
+    total: qty * unitPrice
+  });
+
+  renderInvoiceItems();
+
+  document.getElementById('invoiceItemName').value = '';
+  document.getElementById('invoiceQty').value = '';
+  document.getElementById('invoiceUnit').value = '';
+  document.getElementById('invoiceUnitPrice').value = '';
+}
+
+function renderInvoiceItems() {
+  const preview = document.getElementById('invoiceItemsPreview');
+  if (!preview) return;
+
+  const safe = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[ch]);
+
+  if (!invoicePurchaseItems.length) {
+    preview.innerHTML = 'لم تتم إضافة مشتريات بعد.';
+    return;
+  }
+
+  let grandTotal = 0;
+
+  preview.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;margin-top:12px">
+      <thead>
+        <tr>
+          <th>المادة</th>
+          <th>الكمية</th>
+          <th>سعر الوحدة</th>
+          <th>المجموع</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${invoicePurchaseItems.map((item, index) => {
+          grandTotal += item.total;
+          return `
+            <tr>
+              <td>${safe(item.name)}</td>
+              <td>${safe(item.qty)} ${safe(item.unit)}</td>
+              <td>${safe(item.unitPrice)}</td>
+              <td>${safe(item.total)}</td>
+              <td>
+                <button type="button" class="danger"
+                  onclick="removeInvoiceItem(${index})">حذف</button>
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+    <h3>المبلغ الإجمالي: ${grandTotal.toLocaleString('ar-DZ')}</h3>
+  `;
+}
+
+function removeInvoiceItem(index) {
+  if (!confirm('هل تريد حذف هذا العنصر من قائمة المشتريات؟')) return;
+  invoicePurchaseItems.splice(index, 1);
+  renderInvoiceItems();
+}
+ 
 </script> 
  <script>
 async function activatePlatform(){
