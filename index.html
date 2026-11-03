@@ -1638,6 +1638,7 @@ function nowTime(){
   return new Date().toTimeString().slice(0,5);
 }
 
+
 function show(id){
   document.querySelectorAll('.section').forEach(x=>{
     x.classList.remove('active','printing');
@@ -1651,7 +1652,12 @@ function show(id){
 
   window.scrollTo(0,0);
   renderAll();
+
+  if(id === 'invoices'){
+    loadInvoices();
+  }
 }
+
 
 function toggle(id){
   const e=document.getElementById(id);
@@ -4397,6 +4403,200 @@ function removeInvoiceItem(index) {
  
 </script> 
  <script>
+   
+async function saveInvoice() {
+  const number = document.getElementById('invoiceNumber').value.trim();
+  const date = document.getElementById('invoiceDate').value;
+  const supplier = document.getElementById('invoiceSupplier').value.trim();
+  const notes = document.getElementById('invoiceNotes').value.trim();
+  const imageFile = document.getElementById('invoiceImage').files[0];
+
+  if (!number || !date || !supplier) {
+    alert('يرجى إدخال رقم الفاتورة والتاريخ واسم المورد.');
+    return;
+  }
+
+  if (!invoicePurchaseItems.length) {
+    alert('أضف مادة واحدة على الأقل إلى قائمة المشتريات.');
+    return;
+  }
+
+  if (!imageFile) {
+    alert('يرجى اختيار صورة الفاتورة.');
+    return;
+  }
+
+  if (!imageFile.type.startsWith('image/')) {
+    alert('الملف المختار ليس صورة.');
+    return;
+  }
+
+  if (imageFile.size > 5 * 1024 * 1024) {
+    alert('حجم الصورة يجب ألا يتجاوز 5 ميغابايت.');
+    return;
+  }
+
+  const { data: authData, error: authError } =
+    await supabaseClient.auth.getUser();
+
+  if (authError || !authData.user) {
+    alert('يجب تسجيل الدخول قبل حفظ الفاتورة.');
+    return;
+  }
+
+  const userId = authData.user.id;
+  const totalAmount = invoicePurchaseItems.reduce(
+    (sum, item) => sum + Number(item.total || 0), 0
+  );
+
+  const fileExt = imageFile.name.split('.').pop().toLowerCase();
+  const filePath =
+    userId + '/' + crypto.randomUUID() + '.' + fileExt;
+
+  let uploadedPath = null;
+
+  const { data: uploadData, error: uploadError } =
+    await supabaseClient.storage
+      .from('invoices')
+      .upload(filePath, imageFile, {
+        contentType: imageFile.type,
+        upsert: false
+      });
+
+  if (uploadError) {
+    console.error(uploadError);
+    alert('فشل رفع صورة الفاتورة: ' + uploadError.message);
+    return;
+  }
+
+  uploadedPath = uploadData.path;
+
+  const invoiceRecord = {
+    user_id: userId,
+    invoice_number: number,
+    invoice_date: date,
+    supplier: supplier,
+    notes: notes,
+    image_path: uploadedPath,
+    items: invoicePurchaseItems,
+    total_amount: totalAmount,
+    status: 'مسجلة'
+  };
+
+  const { data: savedInvoice, error: saveError } =
+    await supabaseClient
+      .from('invoices')
+      .insert(invoiceRecord)
+      .select()
+      .single();
+
+  if (saveError) {
+    console.error(saveError);
+
+    const { error: cleanupError } = await supabaseClient.storage
+      .from('invoices')
+      .remove([uploadedPath]);
+
+    if (cleanupError) {
+      console.error('تعذر حذف الصورة بعد فشل حفظ الفاتورة:', cleanupError);
+    }
+
+    alert('فشل حفظ بيانات الفاتورة: ' + saveError.message);
+    return;
+  }
+
+  invoicePurchaseItems = [];
+  renderInvoiceItems();
+
+  document.getElementById('invoiceNumber').value = '';
+  document.getElementById('invoiceDate').value = '';
+  document.getElementById('invoiceSupplier').value = '';
+  document.getElementById('invoiceNotes').value = '';
+  document.getElementById('invoiceImage').value = '';
+
+  alert('تم حفظ الفاتورة وصورتها بنجاح. رقم السجل: ' + savedInvoice.invoice_number);
+
+  await loadInvoices();
+}
+
+async function loadInvoices() {
+  const list = document.getElementById('invoiceList');
+  if (!list) return;
+
+  list.textContent = 'جارٍ تحميل الفواتير...';
+
+  const { data, error } = await supabaseClient
+    .from('invoices')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    list.textContent = 'تعذر تحميل الفواتير: ' + error.message;
+    return;
+  }
+
+  if (!data || !data.length) {
+    list.textContent = 'لا توجد فواتير مسجلة بعد.';
+    return;
+  }
+
+  const safe = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[ch]);
+
+  const cards = await Promise.all(data.map(async invoice => {
+    let imageUrl = '';
+
+    if (invoice.image_path) {
+      const { data: imageData, error: imageError } =
+        await supabaseClient.storage
+          .from('invoices')
+          .createSignedUrl(invoice.image_path, 3600);
+
+      if (!imageError && imageData) {
+        imageUrl = imageData.signedUrl;
+      }
+    }
+
+    const items = Array.isArray(invoice.items) ? invoice.items : [];
+
+    return `
+      <div class="card" style="margin:12px 0;padding:15px">
+        <h3>🧾 فاتورة رقم: ${safe(invoice.invoice_number)}</h3>
+        <p>التاريخ: ${safe(invoice.invoice_date)}</p>
+        <p>المورد: ${safe(invoice.supplier)}</p>
+        <p>عدد المشتريات: ${items.length}</p>
+        <p>المبلغ الإجمالي: ${safe(invoice.total_amount)}</p>
+        <p>الحالة: ${safe(invoice.status)}</p>
+
+        ${imageUrl
+          ? `<a href="${safe(imageUrl)}" target="_blank" rel="noopener">🖼️ عرض صورة الفاتورة</a>`
+          : '<p>تعذر إنشاء رابط الصورة.</p>'}
+
+        <details>
+          <summary>تفاصيل المشتريات</summary>
+          <ul>
+            ${items.map(item => `
+              <li>
+                ${safe(item.name)} —
+                ${safe(item.qty)} ${safe(item.unit)} —
+                ${safe(item.total)}
+              </li>
+            `).join('')}
+          </ul>
+        </details>
+      </div>
+    `;
+  }));
+
+  list.innerHTML = cards.join('');
+}
+
 async function activatePlatform(){
 
   const code = document.getElementById("activationCode").value.trim();
