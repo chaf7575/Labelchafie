@@ -1469,6 +1469,7 @@ const EMPTY={
 
 let db=load();
 let invoicePurchaseItems = [];
+ let editingInvoiceId = null; 
 function load(){
   try{
     const x=JSON.parse(localStorage.getItem(KEY)||'null');
@@ -4484,28 +4485,77 @@ async function saveInvoice() {
     status: 'مسجلة'
   };
 
-  const { data: savedInvoice, error: saveError } =
-    await supabaseClient
+ 
+  let finalImagePath = uploadedPath;
+
+  // عند تعديل فاتورة دون اختيار صورة جديدة، نحتفظ بالصورة القديمة
+  if (editingInvoiceId && !imageFile) {
+    const { data: oldInvoice, error: oldError } = await supabaseClient
+      .from('invoices')
+      .select('image_path')
+      .eq('id', editingInvoiceId)
+      .single();
+
+    if (oldError || !oldInvoice) {
+      alert('تعذر قراءة صورة الفاتورة القديمة.');
+      return;
+    }
+
+    finalImagePath = oldInvoice.image_path;
+  }
+
+  const invoiceRecord = {
+    user_id: userId,
+    invoice_number: number,
+    invoice_date: date,
+    supplier: supplier,
+    notes: notes,
+    image_path: finalImagePath,
+    items: invoicePurchaseItems,
+    total_amount: totalAmount,
+    status: 'مسجلة'
+  };
+
+  let savedInvoice;
+  let saveError;
+
+  if (editingInvoiceId) {
+    const result = await supabaseClient
+      .from('invoices')
+      .update(invoiceRecord)
+      .eq('id', editingInvoiceId)
+      .select()
+      .single();
+
+    savedInvoice = result.data;
+    saveError = result.error;
+  } else {
+    const result = await supabaseClient
       .from('invoices')
       .insert(invoiceRecord)
       .select()
       .single();
 
+    savedInvoice = result.data;
+    saveError = result.error;
+  }
+
   if (saveError) {
     console.error(saveError);
 
-    const { error: cleanupError } = await supabaseClient.storage
-      .from('invoices')
-      .remove([uploadedPath]);
+    if (uploadedPath) {
+      const { error: cleanupError } = await supabaseClient.storage
+        .from('invoices')
+        .remove([uploadedPath]);
 
-    if (cleanupError) {
-      console.error('تعذر حذف الصورة بعد فشل حفظ الفاتورة:', cleanupError);
+      if (cleanupError) console.error(cleanupError);
     }
 
-    alert('فشل حفظ بيانات الفاتورة: ' + saveError.message);
+    alert('فشل حفظ الفاتورة: ' + saveError.message);
     return;
   }
 
+  editingInvoiceId = null;
   invoicePurchaseItems = [];
   renderInvoiceItems();
 
@@ -4515,10 +4565,9 @@ async function saveInvoice() {
   document.getElementById('invoiceNotes').value = '';
   document.getElementById('invoiceImage').value = '';
 
-  alert('تم حفظ الفاتورة وصورتها بنجاح. رقم السجل: ' + savedInvoice.invoice_number);
+  alert('تم حفظ الفاتورة بنجاح: ' + savedInvoice.invoice_number);
 
   await loadInvoices();
-}
 
 async function loadInvoices() {
   const list = document.getElementById('invoiceList');
@@ -4568,7 +4617,18 @@ async function loadInvoices() {
 
     return `
       <div class="card" style="margin:12px 0;padding:15px">
-        <h3>🧾 فاتورة رقم: ${safe(invoice.invoice_number)}</h3>
+       <h3>🧾 فاتورة رقم: ${safe(invoice.invoice_number)}</h3>
+
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+  <button type="button" onclick="editInvoice('${invoice.id}')">
+    ✏️ تعديل الفاتورة
+  </button>
+
+  <button type="button" class="danger"
+    onclick="deleteInvoice('${invoice.id}')">
+    🗑️ حذف الفاتورة
+  </button>
+</div>
         <p>التاريخ: ${safe(invoice.invoice_date)}</p>
         <p>المورد: ${safe(invoice.supplier)}</p>
         <p>عدد المشتريات: ${items.length}</p>
@@ -4596,6 +4656,86 @@ async function loadInvoices() {
   }));
 
   list.innerHTML = cards.join('');
+}
+
+async function editInvoice(id) {
+  const { data: invoice, error } = await supabaseClient
+    .from('invoices')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !invoice) {
+    alert('تعذر تحميل الفاتورة للتعديل.');
+    console.error(error);
+    return;
+  }
+
+  editingInvoiceId = id;
+
+  document.getElementById('invoiceNumber').value = invoice.invoice_number || '';
+  document.getElementById('invoiceDate').value = invoice.invoice_date || '';
+  document.getElementById('invoiceSupplier').value = invoice.supplier || '';
+  document.getElementById('invoiceNotes').value = invoice.notes || '';
+  document.getElementById('invoiceImage').value = '';
+
+  invoicePurchaseItems = Array.isArray(invoice.items)
+    ? JSON.parse(JSON.stringify(invoice.items))
+    : [];
+
+  renderInvoiceItems();
+
+  document.getElementById('invoices').scrollIntoView({
+    behavior: 'smooth'
+  });
+
+  alert('تم تحميل الفاتورة. عدّل البيانات ثم اضغط حفظ الفاتورة.');
+}
+
+async function deleteInvoice(id) {
+  if (!confirm('هل أنت متأكد من حذف هذه الفاتورة وصورتها نهائيًا؟')) {
+    return;
+  }
+
+  const { data: invoice, error: readError } = await supabaseClient
+    .from('invoices')
+    .select('image_path')
+    .eq('id', id)
+    .single();
+
+  if (readError || !invoice) {
+    alert('تعذر العثور على الفاتورة.');
+    console.error(readError);
+    return;
+  }
+
+  const { error: deleteError } = await supabaseClient
+    .from('invoices')
+    .delete()
+    .eq('id', id);
+
+  if (deleteError) {
+    alert('فشل حذف الفاتورة: ' + deleteError.message);
+    console.error(deleteError);
+    return;
+  }
+
+  if (invoice.image_path) {
+    const { error: imageError } = await supabaseClient.storage
+      .from('invoices')
+      .remove([invoice.image_path]);
+
+    if (imageError) {
+      console.error('تعذر حذف صورة الفاتورة:', imageError);
+      alert('حُذفت بيانات الفاتورة، لكن تعذر حذف صورتها.');
+    } else {
+      alert('تم حذف الفاتورة وصورتها بنجاح.');
+    }
+  } else {
+    alert('تم حذف الفاتورة بنجاح.');
+  }
+
+  await loadInvoices();
 }
 
 async function activatePlatform(){
