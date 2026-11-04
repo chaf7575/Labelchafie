@@ -1906,6 +1906,9 @@ function renderChem() {
         <div class="actions">
           <button class="primary" onclick="useChem('${c.id}')">تسجيل استعمال</button>
           <button onclick="addChemStock('${c.id}')">إضافة كمية</button>
+         <button class="danger" onclick="expireChemStock('${c.id}')">
+  تسجيل نهاية الصلاحية
+</button> 
         </div>
 
         <div class="tablewrap">
@@ -1933,14 +1936,26 @@ function renderChem() {
                 const time = u.time ?? u.report_time ?? '';
                 const balance = u.remaining ?? u.remaining_quantity ?? '';
 
-         const isAddition = u.type === 'add';
+        const operationType = u.type || 'use';
+
+const operationLabel = {
+  use: '🔵 استهلاك',
+  add: '🟢 إضافة',
+  purchase: '🟢 شراء',
+  expiry: '🟠 نهاية الصلاحية'
+};
+
+const operationText = operationLabel[operationType] || '🔵 استهلاك';
+const operationSource = operationType === 'purchase' || operationType === 'add'
+  ? (u.source || '')
+  : (operationType === 'expiry' ? 'انتهاء الصلاحية' : teacher);
 
 return `
   <tr>
-    <td>${isAddition ? '🟢 إضافة' : '🔵 استهلاك'}</td>
+   <td>${operationText}</td>
     <td>${esc(date)}</td>
     <td>${esc(time)}</td>
-    <td>${esc(isAddition ? (u.source || '') : teacher)}</td>
+  <td>${esc(operationSource)}</td>
     <td>${esc(className)}</td>
     <td>${esc(experiment)}</td>
     <td>${esc(quantity)} ${esc(u.unit || c.unit || '')}</td>
@@ -2109,13 +2124,21 @@ async function addChem(){
   alert('تم تسجيل إضافة المادة ومصدرها وتاريخها بنجاح');
 }
 
-async function addChemStock(cid){
-
+async function addChemStock(cid) {
   const c = db.chemicals.find(x => String(x.id) === String(cid));
-  if(!c) return;
+  if (!c) return;
 
-  const q = Number(prompt('أدخل الكمية الجديدة:'));
-  if(!q || q <= 0) return;
+  const q = Number(prompt('أدخل الكمية المشتراة:'));
+  if (!Number.isFinite(q) || q <= 0) return;
+
+  const invoiceNumber = prompt('أدخل رقم الفاتورة:') || '';
+  const supplier = prompt('أدخل اسم المورد:') || '';
+  const invoiceDate = prompt(
+    'أدخل تاريخ الفاتورة (YYYY-MM-DD):',
+    new Date().toISOString().slice(0, 10)
+  );
+
+  if (!invoiceDate) return;
 
   const { data: remote, error: loadError } = await supabaseClient
     .from("chemicals")
@@ -2123,50 +2146,138 @@ async function addChemStock(cid){
     .eq("id", cid)
     .maybeSingle();
 
-  if(loadError){
-    alert("تعذر تحميل بيانات المادة: " + loadError.message);
+  if (loadError || !remote) {
+    alert("تعذر تحميل المادة من قاعدة البيانات.");
     console.error(loadError);
     return;
   }
 
-  if(!remote){
-    alert("لم يُعثر على المادة في قاعدة البيانات.");
-    return;
-  }
-
   const total = Number(remote.total_quantity || 0) + q;
-  const used = Number(remote.used_quantity || 0);
-  const remaining = total - used;
+  const remaining = Number(remote.remaining_quantity || 0) + q;
+
+  const uses = Array.isArray(remote.uses) ? remote.uses : [];
+
+  uses.push({
+    type: "purchase",
+    qty: q,
+    unit: remote.unit || c.unit || '',
+    date: invoiceDate,
+    time: new Date().toLocaleTimeString('en-GB'),
+    source: supplier,
+    invoice_number: invoiceNumber,
+    teacher: supplier,
+    remaining: remaining
+  });
 
   const { data: saved, error } = await supabaseClient
     .from("chemicals")
     .update({
       total_quantity: total,
-      remaining_quantity: remaining
+      remaining_quantity: remaining,
+      uses: uses
     })
     .eq("id", cid)
     .select()
     .single();
 
-  if(error){
-    alert("فشل حفظ الكمية الجديدة: " + error.message);
+  if (error) {
+    alert("فشل حفظ عملية الشراء: " + error.message);
     console.error(error);
     return;
   }
 
   c.total = Number(saved.total_quantity || 0);
+  c.remaining_quantity = Number(saved.remaining_quantity || 0);
   c.unit = saved.unit || c.unit;
-  c.date = saved.chemical_date || c.date;
-  c.notes = saved.notes || c.notes;
-  c.uses = Array.isArray(saved.uses) ? saved.uses : (c.uses || []);
-  c.state = Number(saved.remaining_quantity || 0) > 0 ? "متوفرة" : "منتهية";
+  c.uses = Array.isArray(saved.uses) ? saved.uses : uses;
+  c.state = c.remaining_quantity > 0 ? "متوفرة" : "منتهية";
 
   save();
+  renderChem();
 
-  alert('تم حفظ الكمية الجديدة بنجاح');
+  alert("تم تسجيل الشراء وتحديث رصيد المادة بنجاح.");
 }
+  async function expireChemStock(cid) {
+  const c = db.chemicals.find(x => String(x.id) === String(cid));
+  if (!c) return;
 
+  const { data: remote, error: loadError } = await supabaseClient
+    .from("chemicals")
+    .select("*")
+    .eq("id", cid)
+    .maybeSingle();
 
+  if (loadError || !remote) {
+    alert("تعذر تحميل بيانات المادة.");
+    console.error(loadError);
+    return;
+  }
+
+  const remainingNow = Number(remote.remaining_quantity || 0);
+
+  if (remainingNow <= 0) {
+    alert("لا توجد كمية متبقية لتسجيلها كنهاية صلاحية.");
+    return;
+  }
+
+  const q = Number(prompt(
+    `الكمية المتبقية: ${remainingNow} ${remote.unit || ''}\nأدخل الكمية المنتهية:`
+  ));
+
+  if (!Number.isFinite(q) || q <= 0) return;
+
+  if (q > remainingNow) {
+    alert("الكمية المنتهية أكبر من الكمية المتبقية.");
+    return;
+  }
+
+  const expiryDate = prompt(
+    "أدخل تاريخ انتهاء الصلاحية (YYYY-MM-DD):"
+  );
+
+  if (!expiryDate) return;
+
+  const newRemaining = remainingNow - q;
+  const uses = Array.isArray(remote.uses) ? [...remote.uses] : [];
+
+  uses.push({
+    type: "expiry",
+    qty: q,
+    unit: remote.unit || c.unit || "",
+    date: new Date().toISOString().slice(0, 10),
+    expiry_date: expiryDate,
+    time: new Date().toLocaleTimeString("en-GB"),
+    source: "انتهاء الصلاحية",
+    remaining: newRemaining
+  });
+
+  const { data: saved, error } = await supabaseClient
+    .from("chemicals")
+    .update({
+      remaining_quantity: newRemaining,
+      uses: uses
+    })
+    .eq("id", cid)
+    .select()
+    .single();
+
+  if (error) {
+    alert("فشل تسجيل نهاية الصلاحية: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  c.total = Number(saved.total_quantity || 0);
+  c.remaining_quantity = Number(saved.remaining_quantity || 0);
+  c.uses = Array.isArray(saved.uses) ? saved.uses : uses;
+  c.unit = saved.unit || c.unit;
+  c.state = c.remaining_quantity > 0 ? "متوفرة" : "منتهية";
+
+  save();
+  renderChem();
+
+  alert("تم تسجيل نهاية الصلاحية وخصم الكمية بنجاح.");
+}
 async function useChem(cid){
 
   const c = db.chemicals.find(x => String(x.id) === String(cid));
