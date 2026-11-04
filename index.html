@@ -1867,6 +1867,7 @@ async function delInv(id){
 
 
 
+
 function renderChem() {
   const box = document.getElementById('chemCards');
   if (!box) return;
@@ -1875,17 +1876,122 @@ function renderChem() {
     const total = Number(c.total || 0);
     const uses = Array.isArray(c.uses) ? c.uses : [];
 
+    // تحويل كمية العبوات إلى الكمية الفعلية
+    const getOperationQty = u => {
+      let qty = Number(u.qty ?? u.quantity ?? u.used_quantity ?? 0);
+
+      if (u.type === 'purchase') {
+        const match = String(u.unit || '').match(/\/\s*(\d+(?:\.\d+)?)/);
+        if (match) qty *= Number(match[1]);
+      }
+
+      return qty;
+    };
+
+    // مجموع الشراء والإضافات
+    const added = uses.reduce((sum, u) => {
+      const type = u.type || 'use';
+      return sum + (
+        type === 'purchase' || type === 'add'
+          ? getOperationQty(u)
+          : 0
+      );
+    }, 0);
+
+    // المستعمل هو الاستهلاك فقط
+    const used = uses.reduce((sum, u) => {
+      return sum + (
+        (u.type || 'use') === 'use'
+          ? getOperationQty(u)
+          : 0
+      );
+    }, 0);
+
+    // الرصيد الحالي من قاعدة البيانات
     const remaining = Number.isFinite(Number(c.remaining_quantity))
       ? Number(c.remaining_quantity)
-      : Math.max(0, total - uses.reduce(
-          (sum, item) => sum + Number(item.qty ?? item.quantity ?? 0), 0
-        ));
-
-    const used = Math.max(0, total - remaining);
+      : Math.max(0, total - used);
 
     let state = 'متوفرة';
     if (remaining <= 0) state = 'منتهية';
     else if (remaining <= total * 0.2) state = 'قليلة';
+
+    // ترتيب العمليات مع الاحتفاظ بالفهرس الأصلي
+    const sortedUses = uses.map((u, index) => ({ u, index }));
+
+    sortedUses.sort((a, b) => {
+      const dateA = `${a.u.date || a.u.chemical_date || a.u.report_date || ''} ${a.u.time || a.u.report_time || ''}`;
+      const dateB = `${b.u.date || b.u.chemical_date || b.u.report_date || ''} ${b.u.time || b.u.report_time || ''}`;
+      return dateA.localeCompare(dateB);
+    });
+
+    // حساب الرصيد المرحلي
+    const totalAdded = added;
+    let runningBalance = Math.max(0, total - totalAdded);
+
+    const operationLabel = {
+      use: '🔵 استهلاك',
+      add: '🟢 إضافة',
+      purchase: '🟢 شراء',
+      expiry: '🟠 نهاية الصلاحية'
+    };
+
+    const rows = sortedUses.map(({ u, index }) => {
+      const teacher = u.teacher ?? u.used_by ?? u.teacher_name ?? '';
+      const className = u.class_name ?? u.className ?? u.class ?? '';
+      const experiment = u.experiment ?? u.experiment_name ?? '';
+      const date = u.date ?? u.chemical_date ?? u.report_date ?? '';
+      const time = u.time ?? u.report_time ?? '';
+
+      const type = u.type || 'use';
+      const quantity = getOperationQty(u);
+
+      if (type === 'purchase' || type === 'add') {
+        runningBalance += quantity;
+      } else if (type === 'use' || type === 'expiry') {
+        runningBalance -= quantity;
+      }
+
+      const balance = Math.max(0, runningBalance);
+
+      const unit = type === 'purchase'
+        ? (
+            String(u.unit || '').includes('ملل') ? 'ملل' :
+            String(u.unit || '').includes('غ') ? 'غرام' :
+            (c.unit || '')
+          )
+        : (c.unit || u.unit || '');
+
+      const source =
+        type === 'purchase' || type === 'add'
+          ? (u.source || '')
+          : type === 'expiry'
+            ? 'انتهاء الصلاحية'
+            : teacher;
+
+      return `
+        <tr>
+          <td>${operationLabel[type] || '🔵 استهلاك'}</td>
+          <td>${esc(date)}</td>
+          <td>${esc(time)}</td>
+          <td>${esc(source)}</td>
+          <td>${esc(className)}</td>
+          <td>${esc(experiment)}</td>
+          <td>${quantity} ${esc(unit)}</td>
+          <td>${balance} ${esc(c.unit || unit)}</td>
+          <td>
+            <button type="button"
+              onclick="editChemUse('${c.id}', ${index})">
+              ✏️ تعديل
+            </button>
+            <button type="button" class="danger"
+              onclick="deleteChemUse('${c.id}', ${index})">
+              🗑️ حذف
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
 
     return `
       <div class="card">
@@ -1898,144 +2004,53 @@ function renderChem() {
         </div>
 
         <div class="stats">
-          <div class="statbox">إجمالي الداخل <b>${total}</b> ${esc(c.unit || '')}</div>
-          <div class="statbox">المستعمل <b>${used}</b> ${esc(c.unit || '')}</div>
-          <div class="statbox">المتبقي <b>${remaining}</b> ${esc(c.unit || '')}</div>
+          <div class="statbox">
+            إجمالي الداخل <b>${total}</b> ${esc(c.unit || '')}
+          </div>
+          <div class="statbox">
+            المستعمل <b>${used}</b> ${esc(c.unit || '')}
+          </div>
+          <div class="statbox">
+            المتبقي <b>${remaining}</b> ${esc(c.unit || '')}
+          </div>
         </div>
 
         <div class="actions">
-          <button class="primary" onclick="useChem('${c.id}')">تسجيل استعمال</button>
-          <button onclick="addChemStock('${c.id}')">إضافة كمية</button>
-         <button class="danger" onclick="expireChemStock('${c.id}')">
-  تسجيل نهاية الصلاحية
-</button> 
+          <button class="primary" onclick="useChem('${c.id}')">
+            تسجيل استعمال
+          </button>
+          <button onclick="addChemStock('${c.id}')">
+            إضافة كمية
+          </button>
+          <button class="danger" onclick="expireChemStock('${c.id}')">
+            تسجيل نهاية الصلاحية
+          </button>
         </div>
 
         <div class="tablewrap">
           <table>
-         <thead>
-  <tr>
-    <th>نوع العملية</th>
-    <th>التاريخ</th>
-    <th>الوقت</th>
-    <th>الأستاذ / مصدر المادة</th>
-    <th>القسم</th>
-    <th>التجربة</th>
-    <th>الكمية</th>
-    <th>المتبقي</th>
-    <th>إجراء</th>
-  </tr>
-</thead>
+            <thead>
+              <tr>
+                <th>نوع العملية</th>
+                <th>التاريخ</th>
+                <th>الوقت</th>
+                <th>الأستاذ / مصدر المادة</th>
+                <th>القسم</th>
+                <th>التجربة</th>
+                <th>الكمية</th>
+                <th>المتبقي</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
             <tbody>
-             ${(() => {
-  // نسخة مرتبة للعرض مع الاحتفاظ بالفهرس الأصلي
-  const sortedUses = uses.map((u, index) => ({ u, index }));
-
-  sortedUses.sort((a, b) => {
-    const dateA = `${a.u.date || a.u.chemical_date || a.u.report_date || ''} ${a.u.time || a.u.report_time || ''}`;
-    const dateB = `${b.u.date || b.u.chemical_date || b.u.report_date || ''} ${b.u.time || b.u.report_time || ''}`;
-    return dateA.localeCompare(dateB);
-  });
-
-  // تحويل عدد العبوات إلى الكمية الفعلية
-  const getDisplayQty = u => {
-    let qty = Number(u.qty ?? u.quantity ?? u.used_quantity ?? 0);
-
-    if (u.type === 'purchase') {
-      const unit = String(u.unit || '');
-      const match = unit.match(/\/\s*(\d+(?:\.\d+)?)/);
-
-      if (match) {
-        qty *= Number(match[1]);
-      }
-    }
-
-    return qty;
-  };
-
-  // حساب مجموع المشتريات والإضافات
-  const totalAdded = uses.reduce((sum, u) => {
-    const type = u.type || 'use';
-
-    return sum + (
-      type === 'purchase' || type === 'add'
-        ? getDisplayQty(u)
-        : 0
-    );
-  }, 0);
-
-  // الرصيد قبل أول عملية
-  let runningBalance = Math.max(
-    0,
-    Number(c.total || 0) - totalAdded
-  );
-
-  const operationLabel = {
-    use: '🔵 استهلاك',
-    add: '🟢 إضافة',
-    purchase: '🟢 شراء',
-    expiry: '🟠 نهاية الصلاحية'
-  };
-
-  return sortedUses.map(({ u, index }) => {
-    const teacher = u.teacher ?? u.used_by ?? u.teacher_name ?? '';
-    const className = u.class_name ?? u.className ?? u.class ?? '';
-    const experiment = u.experiment ?? u.experiment_name ?? '';
-    const date = u.date ?? u.chemical_date ?? u.report_date ?? '';
-    const time = u.time ?? u.report_time ?? '';
-
-    const operationType = u.type || 'use';
-    const quantity = getDisplayQty(u);
-
-    // تحديث الرصيد حسب نوع العملية
-    if (operationType === 'purchase' || operationType === 'add') {
-      runningBalance += quantity;
-    } else if (operationType === 'use' || operationType === 'expiry') {
-      runningBalance -= quantity;
-    }
-
-    const balance = Math.max(0, runningBalance);
-
-    const unit = operationType === 'purchase'
-      ? (
-          String(u.unit || '').includes('ملل') ? 'ملل' :
-          String(u.unit || '').includes('غ') ? 'غرام' :
-          (c.unit || '')
-        )
-      : (c.unit || u.unit || '');
-
-    const operationSource =
-      operationType === 'purchase' || operationType === 'add'
-        ? (u.source || '')
-        : operationType === 'expiry'
-          ? 'انتهاء الصلاحية'
-          : teacher;
-
-    return `
-      <tr>
-        <td>${operationLabel[operationType] || '🔵 استهلاك'}</td>
-        <td>${esc(date)}</td>
-        <td>${esc(time)}</td>
-        <td>${esc(operationSource)}</td>
-        <td>${esc(className)}</td>
-        <td>${esc(experiment)}</td>
-        <td>${quantity} ${esc(unit)}</td>
-        <td>${balance} ${esc(c.unit || unit)}</td>
-        <td>
-          <button type="button"
-            onclick="editChemUse('${c.id}', ${index})">
-            ✏️ تعديل
-          </button>
-          <button type="button" class="danger"
-            onclick="deleteChemUse('${c.id}', ${index})">
-            🗑️ حذف
-          </button>
-        </td>
-      </tr>
+              ${rows}
+            </tbody>
+          </table>
+        </div>
+      </div>
     `;
   }).join('');
-})()}
-
+}
 
 async function addChem(){
 
