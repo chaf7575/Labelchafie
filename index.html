@@ -2378,32 +2378,41 @@ async function useChem(cid){
     Number(saved.remaining_quantity || 0) + ' ' + (c.unit || ''));
 }
 
-async function editChemUse(cid, index) {
-  const c = (db.chemicals || []).find(
-    x => String(x.id) === String(cid)
-  );
-  if (!c) return;
 
-  const { data: remote, error: readError } = await supabaseClient
+async function editChemUse(cid, index) {
+  const c = db.chemicals.find(x => String(x.id) === String(cid));
+
+  if (!c) {
+    alert('المادة غير موجودة.');
+    return;
+  }
+
+  const { data: remote, error: fetchError } = await supabaseClient
     .from('chemicals')
     .select('*')
     .eq('id', cid)
     .single();
 
-  if (readError || !remote) {
-    alert('تعذر تحميل سجل المحلول.');
+  if (fetchError || !remote) {
+    console.error(fetchError);
+    alert('تعذر تحميل بيانات المادة.');
     return;
   }
 
   const uses = Array.isArray(remote.uses) ? [...remote.uses] : [];
-  const old = uses[index];
 
-  if (!old) {
-    alert('لم يتم العثور على سجل العملية.');
+  if (!uses[index]) {
+    alert('عملية الاستعمال غير موجودة.');
     return;
   }
 
-  const isAddition = old.type === 'add';
+  const old = { ...uses[index] };
+  const type = old.type || 'use';
+
+  // تحديد نوع العملية
+  const isAddition = type === 'add' || type === 'purchase';
+  const isExpiry = type === 'expiry';
+
   const oldQty = Number(old.qty ?? old.quantity ?? 0);
 
   let teacher = old.teacher ?? old.used_by ?? old.teacher_name ?? '';
@@ -2411,19 +2420,21 @@ async function editChemUse(cid, index) {
   let experiment = old.experiment ?? old.experiment_name ?? '';
   let source = old.source || '';
 
+  // حماية العمليات المرتبطة بالتقارير
+  if (old.usage_key) {
+    alert('هذا السجل مرتبط بعملية خصم مسجلة. أوقفنا التعديل لحماية سجل المعاملات والأرصدة.');
+    return;
+  }
+
   if (isAddition) {
     source = prompt('مصدر المادة:', source);
     if (source === null) return;
+
     if (!source.trim()) {
       alert('يجب إدخال مصدر المادة.');
       return;
     }
-  } else {
-    if (old.usage_key) {
-      alert('هذا السجل مرتبط بعملية خصم مسجلة. أوقفنا التعديل لحماية سجل المعاملات والأرصدة.');
-      return;
-    }
-
+  } else if (!isExpiry) {
     teacher = prompt('اسم الأستاذ:', teacher);
     if (teacher === null) return;
 
@@ -2435,12 +2446,18 @@ async function editChemUse(cid, index) {
   }
 
   const qtyText = prompt(
-    isAddition ? 'كمية الإضافة:' : 'الكمية المستعملة:',
+    isAddition
+      ? 'الكمية الجديدة للعملية:'
+      : isExpiry
+        ? 'كمية نهاية الصلاحية:'
+        : 'الكمية المستعملة:',
     String(oldQty)
   );
+
   if (qtyText === null) return;
 
   const qty = Number(qtyText);
+
   if (!Number.isFinite(qty) || qty <= 0) {
     alert('أدخل كمية صحيحة أكبر من صفر.');
     return;
@@ -2450,79 +2467,113 @@ async function editChemUse(cid, index) {
     'التاريخ (YYYY-MM-DD):',
     old.date ?? old.report_date ?? today()
   );
+
   if (date === null) return;
 
   const time = prompt(
     'الوقت (HH:MM):',
     old.time ?? old.report_time ?? nowTime()
   );
+
   if (time === null) return;
+
+  // تحديث العملية مع المحافظة على نوعها ووحدتها
+  uses[index] = {
+    ...old,
+    qty,
+    date,
+    time,
+    ...(isAddition ? { source: source.trim() } : {}),
+    ...(!isAddition && !isExpiry
+      ? { teacher, class_name: className, experiment }
+      : {})
+  };
 
   const total = Number(remote.total_quantity || 0);
 
-  uses[index] = {
-    ...old,
-    ...(isAddition
-      ? { source: source.trim() }
-      : {
-          teacher,
-          class_name: className,
-          experiment
-        }),
-    qty,
-    date,
-    time
+  // تحويل كمية العبوات إلى الكمية الفعلية عند الحساب
+  const getOperationQty = u => {
+    let value = Number(u.qty ?? u.quantity ?? 0);
+
+    if (u.type === 'purchase') {
+      const unit = String(u.unit || '');
+      const match = unit.match(/\/\s*(\d+(?:\.\d+)?)/);
+
+      if (match) {
+        value *= Number(match[1]);
+      }
+    }
+
+    return value;
   };
 
-  const added = uses.reduce(
-    (sum, u) => sum + (
-      u.type === 'add'
-        ? Number(u.qty ?? u.quantity ?? 0)
+  // مجموع المشتريات والإضافات
+  const added = uses.reduce((sum, u) => {
+    const t = u.type || 'use';
+
+    return sum + (
+      t === 'purchase' || t === 'add'
+        ? getOperationQty(u)
         : 0
-    ), 0
-  );
+    );
+  }, 0);
 
-  const used = uses.reduce(
-    (sum, u) => sum + (
-      u.type === 'add'
-        ? 0
-        : Number(u.qty ?? u.quantity ?? 0)
-    ), 0
-  );
+  // مجموع الاستهلاك فقط
+  const used = uses.reduce((sum, u) => {
+    const t = u.type || 'use';
 
-  if (used > total) {
-    alert('الكمية المستهلكة تتجاوز إجمالي المخزون.');
+    return sum + (
+      t === 'use'
+        ? getOperationQty(u)
+        : 0
+    );
+  }, 0);
+
+  // مجموع نهاية الصلاحية
+  const expired = uses.reduce((sum, u) => {
+    return sum + (
+      u.type === 'expiry'
+        ? getOperationQty(u)
+        : 0
+    );
+  }, 0);
+
+  if (used + expired > total + added) {
+    alert('العمليات تتجاوز الكمية المتوفرة في المخزون.');
     return;
   }
 
- // إعادة حساب الرصيد المرحلي حسب ترتيب العمليات
-let balance = Math.max(0, total - added);
+  // ترتيب العمليات زمنيًا
+  uses.sort((a, b) => {
+    const dateA = `${a.date || ''} ${a.time || ''}`;
+    const dateB = `${b.date || ''} ${b.time || ''}`;
 
-// ترتيب العمليات زمنيًا من الأقدم إلى الأحدث
-uses.sort((a, b) => {
-  const dateA = `${a.date || ''} ${a.time || ''}`;
-  const dateB = `${b.date || ''} ${b.time || ''}`;
-  return dateA.localeCompare(dateB);
-});
+    return dateA.localeCompare(dateB);
+  });
 
-uses.forEach(u => {
-  const operationQty = Number(u.qty ?? u.quantity ?? 0);
-  const type = u.type || 'use';
+  // حساب الرصيد المرحلي
+  let balance = total - added;
 
-  if (type === 'purchase' || type === 'add') {
-    balance += operationQty;
-  } else if (type === 'use' || type === 'expiry') {
-    balance -= operationQty;
-  }
+  uses.forEach(u => {
+    const operationQty = getOperationQty(u);
+    const t = u.type || 'use';
 
-  u.remaining = Math.max(0, balance);
-});
+    if (t === 'purchase' || t === 'add') {
+      balance += operationQty;
+    } else if (t === 'use' || t === 'expiry') {
+      balance -= operationQty;
+    }
+
+    u.remaining = Math.max(0, balance);
+  });
+
+  // حفظ الرصيد وسجل العمليات
   const { data: saved, error } = await supabaseClient
     .from('chemicals')
     .update({
       uses,
       used_quantity: used,
-      remaining_quantity: Math.max(0, total - used),
+      remaining_quantity: Math.max(0, balance),
       used_by: isAddition
         ? (remote.used_by || '')
         : teacher
@@ -2537,6 +2588,7 @@ uses.forEach(u => {
     return;
   }
 
+  // تحديث البيانات المحلية
   c.uses = Array.isArray(saved.uses) ? saved.uses : uses;
   c.total = Number(saved.total_quantity || 0);
   c.remaining_quantity = Number(saved.remaining_quantity || 0);
@@ -2545,7 +2597,7 @@ uses.forEach(u => {
   save();
   renderChem();
 
-  alert('تم تعديل العملية وتحديث الرصيد.');
+  alert('تم تعديل العملية وتحديث الرصيد بنجاح.');
 }
 
 async function deleteChemUse(cid, index) {
