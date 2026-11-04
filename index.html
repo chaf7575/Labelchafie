@@ -2495,21 +2495,28 @@ async function editChemUse(cid, index) {
     return;
   }
 
-  // إعادة حساب الرصيد المرحلي حسب ترتيب العمليات
-  let balance = Math.max(0, total - added);
+ // إعادة حساب الرصيد المرحلي حسب ترتيب العمليات
+let balance = Math.max(0, total - added);
 
-  uses.forEach(u => {
-    const operationQty = Number(u.qty ?? u.quantity ?? 0);
+// ترتيب العمليات زمنيًا من الأقدم إلى الأحدث
+uses.sort((a, b) => {
+  const dateA = `${a.date || ''} ${a.time || ''}`;
+  const dateB = `${b.date || ''} ${b.time || ''}`;
+  return dateA.localeCompare(dateB);
+});
 
-    if (u.type === 'add') {
-      balance += operationQty;
-    } else {
-      balance -= operationQty;
-    }
+uses.forEach(u => {
+  const operationQty = Number(u.qty ?? u.quantity ?? 0);
+  const type = u.type || 'use';
 
-    u.remaining = balance;
-  });
+  if (type === 'purchase' || type === 'add') {
+    balance += operationQty;
+  } else if (type === 'use' || type === 'expiry') {
+    balance -= operationQty;
+  }
 
+  u.remaining = Math.max(0, balance);
+});
   const { data: saved, error } = await supabaseClient
     .from('chemicals')
     .update({
