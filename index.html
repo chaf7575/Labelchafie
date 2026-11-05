@@ -4762,9 +4762,25 @@ async function saveInvoice() {
     finalImagePath = uploadedPath;
   }
 
-  const totalAmount = invoicePurchaseItems.reduce(
-    (sum, item) => sum + Number(item.total || 0), 0
-  );
+
+// التأكد من وجود فئة لكل تجهيز قبل حفظ الفاتورة
+for (const item of invoicePurchaseItems) {
+  if (item.target === 'inventory' && !item.category) {
+    alert('التجهيز "' + item.name + '" لا يحتوي على فئة. احذف البند وأعد إضافته بعد اختيار الفئة.');
+    return;
+  }
+}
+
+const totalAmount = invoicePurchaseItems.reduce(
+  (sum, item) => sum + Number(item.total || 0), 0
+);
+
+// تجهيز نسخة من المشتريات للحفظ
+const itemsToSave = invoicePurchaseItems.map(item => ({
+  ...item,
+  category: item.target === 'inventory' ? item.category : ''
+}));
+
 
   const invoiceRecord = {
     user_id: userId,
@@ -4773,7 +4789,7 @@ async function saveInvoice() {
     supplier: supplier,
     notes: notes,
     image_path: finalImagePath,
-    items: invoicePurchaseItems,
+   items: itemsToSave,
     total_amount: totalAmount,
     status: 'مسجلة'
   };
