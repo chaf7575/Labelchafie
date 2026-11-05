@@ -4893,6 +4893,7 @@ async function loadInvoices() {
        <h3>🧾 فاتورة رقم: ${safe(invoice.invoice_number)}</h3>
 
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+
   <button type="button" onclick="editInvoice('${invoice.id}')">
     ✏️ تعديل الفاتورة
   </button>
@@ -4901,6 +4902,16 @@ async function loadInvoices() {
     onclick="deleteInvoice('${invoice.id}')">
     🗑️ حذف الفاتورة
   </button>
+  ${items.some(item => item.target === 'inventory') && !invoice.inventory_applied ? `
+  <button type="button"
+    onclick="applyInvoiceInventory('${invoice.id}')">
+    📦 إضافة المعدات إلى المخزون
+  </button>
+` : invoice.inventory_applied ? `
+  <span style="color:green;font-weight:bold">
+    ✔ تمت إضافة المعدات إلى المخزون
+  </span>
+` : ''}
 </div>
         <p>التاريخ: ${safe(invoice.invoice_date)}</p>
         <p>المورد: ${safe(invoice.supplier)}</p>
@@ -4929,6 +4940,33 @@ async function loadInvoices() {
   }));
 
   list.innerHTML = cards.join('');
+}
+
+async function applyInvoiceInventory(invoiceId) {
+  if (!confirm('هل تريد إضافة معدات هذه الفاتورة إلى المخزون؟')) {
+    return;
+  }
+
+  const { data, error } = await supabaseClient.rpc(
+    'apply_invoice_inventory',
+    { p_invoice_id: invoiceId }
+  );
+
+  if (error) {
+    console.error('خطأ إضافة المعدات:', error);
+    alert('تعذرت إضافة المعدات: ' + error.message);
+    return;
+  }
+
+  alert(data);
+
+  await loadInvoices();
+
+  if (typeof loadInventoryFromSupabase === 'function') {
+    await loadInventoryFromSupabase();
+  } else if (typeof renderAll === 'function') {
+    renderAll();
+  }
 }
 
 async function editInvoice(id) {
