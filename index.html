@@ -1400,7 +1400,17 @@ onchange="restore(event)"
   <option value="inventory">معدات وتجهيزات المخبر</option>
   <option value="chemicals">مواد ومحاليل كيميائية</option>
 </select>
-
+<div id="invoiceCategoryBox" style="display:none;margin-top:10px">
+  <label>فئة التجهيز:</label>
+  <select id="invoiceCategory">
+    <option value="معدات الفيزياء">معدات الفيزياء</option>
+    <option value="معدات العلوم">معدات العلوم</option>
+    <option value="معدات الإعلام الآلي">معدات الإعلام الآلي</option>
+    <option value="معدات الصوتيات">معدات الصوتيات</option>
+    <option value="الأجهزة السمعية البصرية">الأجهزة السمعية البصرية</option>
+    <option value="الأدوات والتجهيزات العامة">الأدوات والتجهيزات العامة</option>
+  </select>
+</div>
 <label>نوع العملية</label>
 <select id="invoicePurchaseType">
   <option value="existing">شراء مادة موجودة</option>
@@ -4020,8 +4030,18 @@ function resetReportColumnWidths() {
   applyReportColumnWidths();
 }
 
-document.addEventListener('DOMContentLoaded', applyReportColumnWidths);
+document.getElementById('invoiceTarget').addEventListener('change', function () {
+  document.getElementById('invoiceCategoryBox').style.display =
+    this.value === 'inventory' ? 'block' : 'none';
+});
 
+// ضبط ظهور فئة التجهيز عند تحميل الصفحة
+document.getElementById('invoiceCategoryBox').style.display =
+  document.getElementById('invoiceTarget').value === 'inventory'
+    ? 'block'
+    : 'none';
+
+document.addEventListener('DOMContentLoaded', applyReportColumnWidths);
 function mailDaily(){
   const number = document.getElementById('rno')?.textContent?.trim() || '';
   const date = document.getElementById('rdate')?.textContent?.trim() || '';
