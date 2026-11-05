@@ -4030,19 +4030,28 @@ function resetReportColumnWidths() {
   applyReportColumnWidths();
 }
 
-document.getElementById('invoiceTarget').addEventListener('change', function () {
-  document.getElementById('invoiceCategoryBox').style.display =
-    this.value === 'inventory' ? 'block' : 'none';
+// إظهار أو إخفاء فئة التجهيز
+document.addEventListener('DOMContentLoaded', function () {
+  const target = document.getElementById('invoiceTarget');
+  const categoryBox = document.getElementById('invoiceCategoryBox');
+
+  if (!target || !categoryBox) {
+    console.error('لم يتم العثور على invoiceTarget أو invoiceCategoryBox');
+    return;
+  }
+
+  function updateInvoiceCategory() {
+    categoryBox.style.display =
+      target.value === 'inventory' ? 'block' : 'none';
+  }
+
+  target.addEventListener('change', updateInvoiceCategory);
+  updateInvoiceCategory();
 });
 
-// ضبط ظهور فئة التجهيز عند تحميل الصفحة
-document.getElementById('invoiceCategoryBox').style.display =
-  document.getElementById('invoiceTarget').value === 'inventory'
-    ? 'block'
-    : 'none';
-
 document.addEventListener('DOMContentLoaded', applyReportColumnWidths);
-function mailDaily(){
+
+function mailDaily() {
   const number = document.getElementById('rno')?.textContent?.trim() || '';
   const date = document.getElementById('rdate')?.textContent?.trim() || '';
 
@@ -4059,8 +4068,9 @@ function mailDaily(){
     '&su=' + encodeURIComponent(subject) +
     '&body=' + encodeURIComponent(body);
 
- window.location.href = gmailUrl;
+  window.location.href = gmailUrl;
 }
+
 /* =========================
    التدرج السنوي
 ========================= */
