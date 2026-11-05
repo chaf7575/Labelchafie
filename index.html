@@ -4573,6 +4573,7 @@ const dates=[
   }
 );
  
+
 function addInvoiceItem() {
   const target = document.getElementById('invoiceTarget').value;
   const purchaseType = document.getElementById('invoicePurchaseType').value;
@@ -4580,6 +4581,10 @@ function addInvoiceItem() {
   const qty = Number(document.getElementById('invoiceQty').value);
   const unit = document.getElementById('invoiceUnit').value.trim();
   const unitPrice = Number(document.getElementById('invoiceUnitPrice').value);
+
+  const category = target === 'inventory'
+    ? document.getElementById('invoiceCategory')?.value || ''
+    : '';
 
   if (!name) {
     alert('أدخل اسم المادة أو التجهيز.');
@@ -4596,10 +4601,16 @@ function addInvoiceItem() {
     return;
   }
 
+  if (target === 'inventory' && !category) {
+    alert('اختر فئة التجهيز.');
+    return;
+  }
+
   invoicePurchaseItems.push({
     target,
     purchaseType,
     name,
+    category,
     qty,
     unit,
     unitPrice,
