@@ -274,6 +274,162 @@ footer{
 
 }
 
+/* =================================
+   تصميم منصة المخبري الاحترافي
+   أزرق داكن + سماوي
+================================= */
+
+:root {
+  --main-blue: #102b50;
+  --deep-blue: #071a32;
+  --cyan: #27c7e8;
+  --light-cyan: #a5efff;
+  --soft-bg: #eef5fc;
+  --card-bg: rgba(255,255,255,.92);
+  --main-text: #18324e;
+  --soft-shadow: 0 8px 28px rgba(12, 43, 78, .12);
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% 5%, #d8f5ff 0, transparent 28%),
+    linear-gradient(135deg, #eef5fc, #e4effb);
+  color: var(--main-text);
+  font-family: "Cairo", "Tahoma", sans-serif;
+}
+
+header, .header, .topbar {
+  background: linear-gradient(120deg, #071a32, #123d68);
+  color: white;
+  border-bottom: 2px solid var(--cyan);
+  box-shadow: 0 5px 25px rgba(0, 25, 55, .2);
+}
+
+h1, h2, h3 {
+  color: var(--main-blue);
+  font-weight: 800;
+}
+
+button, .btn {
+  background: linear-gradient(135deg, #1266a5, #20b9d8);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 700;
+  transition: transform .2s ease, box-shadow .2s ease;
+  box-shadow: 0 4px 12px rgba(18, 102, 165, .18);
+}
+
+button:hover, .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 18px rgba(18, 102, 165, .28);
+}
+
+.card, .stat-card, .panel, .section-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(39, 199, 232, .18);
+  border-radius: 18px;
+  box-shadow: var(--soft-shadow);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.card:hover, .stat-card:hover, .section-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 13px 32px rgba(12, 43, 78, .16);
+}
+
+input, select, textarea {
+  border: 1px solid #c8d9e9;
+  border-radius: 10px;
+  padding: 10px;
+  background: #fff;
+  color: var(--main-text);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(39, 199, 232, .15);
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 4px 15px rgba(12, 43, 78, .07);
+}
+
+thead {
+  background: linear-gradient(120deg, #102b50, #17618d);
+  color: white;
+}
+
+th, td {
+  padding: 11px;
+  border-bottom: 1px solid #e5edf5;
+}
+
+tbody tr:hover {
+  background: #effaff;
+}
+
+nav button, .nav button {
+  border-radius: 10px;
+}
+
+@keyframes softGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(39, 199, 232, .12); }
+  50% { box-shadow: 0 0 22px rgba(39, 199, 232, .3); }
+}
+
+header {
+  animation: softGlow 5s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  .card, .stat-card, .panel, .section-card {
+    border-radius: 14px;
+    margin-bottom: 12px;
+  }
+
+  button, .btn {
+    padding: 9px 13px;
+  }
+
+  table {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media print {
+  body {
+    background: white !important;
+  }
+
+  header {
+    animation: none !important;
+    box-shadow: none !important;
+  }
+
+  button, .btn {
+    box-shadow: none !important;
+  }
+}
+
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
