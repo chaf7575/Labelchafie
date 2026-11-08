@@ -6179,6 +6179,282 @@ function resetReportColumnWidths(){
 
 window.addEventListener('load', applyReportColumnWidths);
 </script>
+<script>
+let purchaseListPrintHTML = '';
 
+async function loadPurchaseList() {
+  const year = document.getElementById('purchaseSchoolYear').value;
+  const type = document.getElementById('purchaseListType').value;
+  const result = document.getElementById('purchaseListResult');
+
+  result.innerHTML = '⏳ جارٍ تحميل المشتريات...';
+
+  const startYear = Number(year.split('/')[0]);
+  const startDate = startYear + '-09-01';
+  const endDate = (startYear + 1) + '-08-31';
+
+  const { data, error } = await supabaseClient
+    .from('invoices')
+    .select('*')
+    .order('invoice_date', { ascending: true });
+
+  if (error) {
+    console.error(error);
+    result.innerHTML = 'تعذر تحميل الفواتير: ' + error.message;
+    return;
+  }
+
+  const invoices = (data || []).filter(invoice =>
+    invoice.invoice_date >= startDate &&
+    invoice.invoice_date <= endDate
+  );
+
+  const rows = [];
+  let grandTotal = 0;
+
+  invoices.forEach(invoice => {
+    const items = Array.isArray(invoice.items) ? invoice.items : [];
+
+    items.forEach(item => {
+      if (item.target !== type) return;
+
+      const qty = Number(item.qty || 0);
+      const unitPrice = Number(item.unitPrice || 0);
+      const total = Number(item.total ?? qty * unitPrice);
+
+      grandTotal += total;
+
+      rows.push({
+        date: invoice.invoice_date || '',
+        number: invoice.invoice_number || '',
+        supplier: invoice.supplier || '',
+        name: item.name || '',
+        qty,
+        unit: item.unit || '',
+        unitPrice,
+        total
+      });
+    });
+  });
+
+  const title = type === 'inventory'
+    ? 'قائمة مشتريات العتاد والتجهيزات'
+    : 'قائمة مشتريات المحاليل الكيميائية';
+
+  const money = value => Number(value).toLocaleString('fr-FR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
+  const safe = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[ch]);
+
+  let tableRows = '';
+
+  rows.forEach((item, index) => {
+    tableRows += `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${safe(item.date)}</td>
+        <td>${safe(item.number)}</td>
+        <td>${safe(item.supplier)}</td>
+        <td>${safe(item.name)}</td>
+        <td>${safe(item.qty)}</td>
+        <td>${safe(item.unit)}</td>
+        <td>${money(item.unitPrice)}</td>
+        <td>${money(item.total)}</td>
+      </tr>
+    `;
+  });
+
+  if (!rows.length) {
+    tableRows = `
+      <tr>
+        <td colspan="9">لا توجد مشتريات في هذه السنة الدراسية.</td>
+      </tr>
+    `;
+  }
+
+  purchaseListPrintHTML = `
+    <!DOCTYPE html>
+    <html lang="ar" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>${title}</title>
+      <style>
+        @page {
+          size: A4 landscape;
+          margin: 12mm;
+        }
+
+        body {
+          font-family: Arial, sans-serif;
+          direction: rtl;
+          color: #111;
+          padding: 10px;
+        }
+
+        .header {
+          text-align: center;
+          line-height: 1.8;
+          margin-bottom: 20px;
+        }
+
+        h2 {
+          text-align: center;
+          margin: 15px 0;
+        }
+
+        .year {
+          text-align: center;
+          margin-bottom: 20px;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 12px;
+        }
+
+        th, td {
+          border: 1px solid #333;
+          padding: 8px 5px;
+          text-align: center;
+        }
+
+        th {
+          background: #e8edf3;
+        }
+
+        .total {
+          margin-top: 18px;
+          font-size: 17px;
+          font-weight: bold;
+          text-align: left;
+        }
+
+        .signatures {
+          display: flex;
+          justify-content: space-around;
+          margin-top: 45px;
+          font-weight: bold;
+        }
+
+        @media screen {
+          body { max-width: 1100px; margin: auto; }
+        }
+      </style>
+    </head>
+
+    <body>
+      <div class="header">
+        الجمهورية الجزائرية الديمقراطية الشعبية<br>
+        وزارة التربية الوطنية<br>
+        متوسطة قايد أحمد – غليزان
+      </div>
+
+      <h2>${title}</h2>
+
+      <div class="year">
+        السنة الدراسية: ${safe(year)}
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ر.م</th>
+            <th>التاريخ</th>
+            <th>رقم الفاتورة</th>
+            <th>المورد</th>
+            <th>المادة أو التجهيز</th>
+            <th>الكمية</th>
+            <th>الوحدة</th>
+            <th>سعر الوحدة</th>
+            <th>الإجمالي</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+
+      <div class="total">
+        مجموع المشتريات: ${money(grandTotal)} دج
+      </div>
+
+      <div class="signatures">
+        <span>مسؤول المخبر</span>
+        <span>المستشار</span>
+        <span>المدير</span>
+      </div>
+    </body>
+    </html>
+  `;
+
+  result.innerHTML = `
+    <h3>${title} — ${safe(year)}</h3>
+    <p>عدد المشتريات: ${rows.length}</p>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr>
+            <th>التاريخ</th>
+            <th>رقم الفاتورة</th>
+            <th>المورد</th>
+            <th>المادة</th>
+            <th>الكمية</th>
+            <th>الوحدة</th>
+            <th>سعر الوحدة</th>
+            <th>الإجمالي</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(item => `
+            <tr>
+              <td>${safe(item.date)}</td>
+              <td>${safe(item.number)}</td>
+              <td>${safe(item.supplier)}</td>
+              <td>${safe(item.name)}</td>
+              <td>${safe(item.qty)}</td>
+              <td>${safe(item.unit)}</td>
+              <td>${money(item.unitPrice)}</td>
+              <td>${money(item.total)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <h3>مجموع المشتريات: ${money(grandTotal)} دج</h3>
+  `;
+}
+
+function printPurchaseList() {
+  if (!purchaseListPrintHTML) {
+    alert('اعرض القائمة أولاً قبل الطباعة.');
+    return;
+  }
+
+  const win = window.open('', '_blank');
+
+  if (!win) {
+    alert('يرجى السماح بفتح النوافذ المنبثقة للطباعة.');
+    return;
+  }
+
+  win.document.open();
+  win.document.write(purchaseListPrintHTML);
+  win.document.close();
+
+  win.onload = function() {
+    win.focus();
+    win.print();
+  };
+}
+</script>
 </body>
 </html> 
