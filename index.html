@@ -1605,7 +1605,26 @@ onchange="restore(event)"
     <h3>📚 سجل الفواتير</h3>
     <div id="invoiceList">لا توجد فواتير مسجلة بعد.</div>
   </div>
+<div class="card no-print">
+  <h3>📋 قوائم المشتريات السنوية</h3>
 
+  <label>السنة الدراسية</label>
+  <select id="purchaseSchoolYear">
+    <option value="2025/2026">2025/2026</option>
+    <option value="2026/2027" selected>2026/2027</option>
+  </select>
+
+  <label>نوع القائمة</label>
+  <select id="purchaseListType">
+    <option value="inventory">قائمة العتاد والتجهيزات</option>
+    <option value="chemicals">قائمة المحاليل الكيميائية</option>
+  </select>
+
+  <button onclick="loadPurchaseList()">عرض القائمة</button>
+  <button onclick="printPurchaseList()">طباعة القائمة</button>
+
+  <div id="purchaseListResult"></div>
+</div>
 </section>
 
 <footer>
