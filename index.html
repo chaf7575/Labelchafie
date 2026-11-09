@@ -519,6 +519,38 @@ header {
     text-align: center;
   }
 } 
+ /* عنوان لوحة التحكم */
+#home .head {
+  background: linear-gradient(120deg, #ffffff, #edf7fc);
+  border-right: 5px solid #087eaa;
+  border-radius: 15px;
+  padding: 18px 22px;
+  margin: 20px 0;
+  box-shadow: 0 4px 15px rgba(18,59,101,.07);
+}
+
+#home .head h2 {
+  color: #123b65;
+  font-size: 24px;
+  font-weight: 900;
+  margin: 0 0 7px;
+}
+
+#home .head .small {
+  color: #718399;
+  font-size: 14px;
+  margin: 0;
+}
+
+@media(max-width:768px) {
+  #home .head {
+    padding: 15px;
+  }
+
+  #home .head h2 {
+    font-size: 20px;
+  }
+} 
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
