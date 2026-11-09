@@ -448,14 +448,27 @@ header {
     margin: 12px auto;
   }
 
+ 
+/* القائمة على الكمبيوتر */
+#mainNav {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* القائمة على الهاتف */
+@media (max-width: 768px) {
   #mainNav {
     display: none !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   #mainNav.mobile-open {
     display: grid !important;
   }
 }
+
  /* شريط الترحيب */
 .lab-welcome {
   display: flex;
