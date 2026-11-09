@@ -580,7 +580,15 @@ header {
 .lab-dashboard-stats .statbox:hover {
   transform: translateY(-6px);
   box-shadow: 0 12px 25px rgba(18,59,101,.15);
-} 
+}
+  /* تمييز القسم النشط */
+#mainNav button.nav-active {
+  background: linear-gradient(135deg, #16b8c9, #087eaa);
+  color: #ffffff;
+  border-color: rgba(255,255,255,.5);
+  box-shadow: 0 4px 12px rgba(22,184,201,.3);
+  transform: translateY(-2px);
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
@@ -2249,6 +2257,21 @@ function show(id){
     s.classList.add('active');
   }
 
+  // تمييز القسم المفتوح في القائمة
+  document.querySelectorAll('#mainNav button').forEach(btn=>{
+    btn.classList.remove('nav-active');
+
+    if(btn.getAttribute('onclick') === `show('${id}')`){
+      btn.classList.add('nav-active');
+    }
+  });
+
+  // إغلاق قائمة الهاتف بعد اختيار القسم
+  const menu = document.getElementById('mainNav');
+  if(menu){
+    menu.classList.remove('mobile-open');
+  }
+
   window.scrollTo(0,0);
   renderAll();
 
@@ -2256,8 +2279,6 @@ function show(id){
     loadInvoices();
   }
 }
-
-
 function toggle(id){
   const e=document.getElementById(id);
   if(e)e.classList.toggle('hidden');
