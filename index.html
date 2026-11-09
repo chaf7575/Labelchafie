@@ -589,6 +589,46 @@ header {
   box-shadow: 0 4px 12px rgba(22,184,201,.3);
   transform: translateY(-2px);
 }
+ /* رأس منصة المخبري ثلاثي الأبعاد */
+header {
+  position: relative;
+  background-image: url('lab-header-3d.png');
+  background-size: 100% 330px;
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-color: #07356f;
+  padding-top: 330px;
+  overflow: hidden;
+}
+
+/* العنوان واسم المؤسسة موجودان داخل الصورة */
+header > h1,
+header > div {
+  display: none !important;
+}
+
+/* القائمة الحقيقية */
+#mainNav {
+  position: relative;
+  margin: 0;
+  border-radius: 0 0 16px 16px;
+  background: linear-gradient(135deg, #07356f, #075b9b);
+}
+
+/* زر القائمة الحقيقي فوق الصورة */
+#menuToggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000000;
+}
+
+@media(max-width:768px) {
+  header {
+    padding-top: 200px;
+    background-size: auto 200px;
+  }
+} 
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
