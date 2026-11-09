@@ -567,6 +567,66 @@ td {
     display: none !important;
   }
 }
+  
+/* بطاقات الإحصائيات الاحترافية */
+.lab-dashboard-stats {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin: 25px 0;
+}
+
+.lab-dashboard-stats .statbox {
+  background: linear-gradient(145deg, #ffffff, #eaf5fc);
+  border: 1px solid #d9e9f5;
+  border-top: 4px solid #087eaa;
+  border-radius: 17px;
+  padding: 20px 12px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(18,59,101,.09);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: .25s ease;
+}
+
+.lab-dashboard-stats .statbox:hover {
+  transform: translateY(-5px);
+}
+
+.lab-dashboard-stats .statbox span {
+  font-size: 16px;
+  font-weight: 800;
+  color: #16466d;
+}
+
+.lab-dashboard-stats .statbox b {
+  font-size: 34px;
+  color: #087eaa;
+  font-weight: 900;
+}
+
+.lab-dashboard-stats .statbox small {
+  color: #718399;
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .lab-dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .lab-dashboard-stats .statbox {
+    padding: 15px 8px;
+  }
+
+  .lab-dashboard-stats .statbox b {
+    font-size: 28px;
+  }
+}
+
 </style>
 
 </head>
@@ -676,32 +736,41 @@ td {
 
 <div class="stats">
 
-<div class="statbox">
-الجرد
-<b id="sInv">0</b>
+
+<div class="stats lab-dashboard-stats">
+
+  <div class="statbox">
+    <span>📦 الجرد</span>
+    <b id="sInv">0</b>
+    <small>المعدات والتجهيزات</small>
+  </div>
+
+  <div class="statbox">
+    <span>🧪 المحاليل</span>
+    <b id="sChem">0</b>
+    <small>المواد الكيميائية</small>
+  </div>
+
+  <div class="statbox">
+    <span>📋 التقارير</span>
+    <b id="sDaily">0</b>
+    <small>النشاط اليومي</small>
+  </div>
+
+  <div class="statbox">
+    <span>📨 الطلبات</span>
+    <b id="sReq">0</b>
+    <small>طلبات الأساتذة</small>
+  </div>
+
+  <div class="statbox">
+    <span>📊 المشاريع</span>
+    <b id="sProj">0</b>
+    <small>متابعة المشاريع</small>
+  </div>
+
 </div>
 
-<div class="statbox">
-المحاليل
-<b id="sChem">0</b>
-</div>
-
-<div class="statbox">
-التقارير
-<b id="sDaily">0</b>
-</div>
-
-<div class="statbox">
-الطلبات
-<b id="sReq">0</b>
-</div>
-
-<div class="statbox">
-المشاريع
-<b id="sProj">0</b>
-</div>
-
-</div>
 </section>
 
 
