@@ -456,6 +456,69 @@ header {
     display: grid !important;
   }
 }
+ /* شريط الترحيب */
+.lab-welcome {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  margin: 20px 0;
+  border-radius: 20px;
+  color: white;
+  background: linear-gradient(120deg, #123b65, #087eaa, #16b8c9);
+  box-shadow: 0 8px 24px rgba(18,59,101,.16);
+}
+
+.lab-welcome-icon {
+  font-size: 42px;
+  background: rgba(255,255,255,.16);
+  padding: 12px;
+  border-radius: 16px;
+}
+
+.lab-welcome h2 {
+  color: white;
+  margin: 0 0 7px;
+  font-size: 21px;
+}
+
+.lab-welcome p {
+  color: #e4f7ff;
+  margin: 0;
+  font-size: 14px;
+}
+
+.lab-welcome-badge {
+  margin-right: auto;
+  padding: 9px 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.16);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+@media(max-width:768px) {
+  .lab-welcome {
+    flex-wrap: wrap;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .lab-welcome-icon {
+    font-size: 30px;
+    padding: 9px;
+  }
+
+  .lab-welcome h2 {
+    font-size: 17px;
+  }
+
+  .lab-welcome-badge {
+    margin-right: 0;
+    width: 100%;
+    text-align: center;
+  }
+} 
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
@@ -766,7 +829,14 @@ td {
 </nav>
 
 </header>
-
+<div class="lab-welcome">
+  <div class="lab-welcome-icon">🔬</div>
+  <div>
+    <h2>مرحباً بك في منصة المخبري</h2>
+    <p>فضاؤك الرقمي لتسيير وتنظيم أعمال المخبر بكل سهولة.</p>
+  </div>
+  <div class="lab-welcome-badge">✨ إدارة ذكية للمخبر</div>
+</div>
 <div class="container">
 
 <section id="home" class="section active">
