@@ -629,6 +629,75 @@ header > div {
     background-size: auto 200px;
   }
 } 
+  
+/* القائمة الاحترافية ثلاثية الأبعاد */
+#mainNav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px;
+  background: linear-gradient(135deg, #062b52, #07558a, #06345f);
+  border-top: 1px solid rgba(255,255,255,.25);
+  box-shadow: 0 8px 22px rgba(0,20,50,.3);
+}
+
+/* أزرار القائمة */
+#mainNav button {
+  color: #fff;
+  background: linear-gradient(145deg, #1675a8, #08436f);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 13px;
+  padding: 12px 17px;
+  font-weight: bold;
+  box-shadow:
+    0 5px 0 #032b4c,
+    0 8px 14px rgba(0,0,0,.25);
+  transition: all .25s ease;
+  cursor: pointer;
+}
+
+/* تأثير الحركة */
+#mainNav button:hover {
+  transform: translateY(-4px);
+  background: linear-gradient(145deg, #19a6c4, #08769b);
+  box-shadow:
+    0 8px 0 #03445c,
+    0 12px 20px rgba(0,0,0,.3);
+}
+
+/* القسم المفتوح */
+#mainNav button.nav-active {
+  background: linear-gradient(145deg, #20d4c2, #078b9e);
+  color: #032e45;
+  border-color: #a5fff4;
+  box-shadow:
+    0 4px 0 #056475,
+    0 0 16px rgba(32,212,194,.5);
+  transform: translateY(-2px);
+}
+
+/* توافق الهاتف */
+@media(max-width:768px) {
+  #mainNav {
+    display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 14px;
+  }
+
+  #mainNav.mobile-open {
+    display: grid;
+  }
+
+  #mainNav button {
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 6px;
+    font-size: 13px;
+  }
+}
+
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
