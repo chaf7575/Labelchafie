@@ -627,6 +627,57 @@ td {
   }
 }
 
+/* القائمة الرئيسية الاحترافية */
+#mainNav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+  padding: 14px;
+  margin: 15px 0 22px;
+  background: linear-gradient(135deg, #102f50, #075b83);
+  border-radius: 17px;
+  box-shadow: 0 7px 22px rgba(15, 48, 78, .16);
+}
+
+#mainNav button {
+  flex: 1 1 auto;
+  min-width: 125px;
+  padding: 12px 14px;
+  color: #fff;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: .2s ease;
+}
+
+#mainNav button:hover {
+  background: #16a8c5;
+  transform: translateY(-2px);
+}
+
+#mainNav button:active {
+  background: #16a8c5;
+}
+
+@media(max-width:768px) {
+  #mainNav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px;
+  }
+
+  #mainNav button {
+    min-width: 0;
+    width: 100%;
+    padding: 12px 5px;
+    font-size: 13px;
+  }
+}
+
 </style>
 
 </head>
