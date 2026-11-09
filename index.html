@@ -441,6 +441,134 @@ const supabaseClient = window.supabase.createClient(
 );
 </script>
   <script src="https://cdn.jsdelivr.net/npm/mammoth@1.9.0/mammoth.browser.min.js"></script>
+  
+<style>
+/* الهوية البصرية لمنصة المخبري */
+:root {
+  --lab-primary: #123b65;
+  --lab-secondary: #087eaa;
+  --lab-accent: #16b8c9;
+  --lab-bg: #f2f6fb;
+  --lab-card: #ffffff;
+  --lab-text: #18324b;
+  --lab-radius: 16px;
+}
+
+body {
+  background: var(--lab-bg) !important;
+  color: var(--lab-text);
+  font-family: "Cairo", "Tahoma", sans-serif;
+  line-height: 1.7;
+}
+
+/* العناوين */
+h1, h2, h3 {
+  color: var(--lab-primary);
+  font-weight: 800;
+}
+
+/* البطاقات */
+.card {
+  background: var(--lab-card);
+  border: 1px solid #e4edf5;
+  border-radius: var(--lab-radius);
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 5px 18px rgba(20, 57, 90, .07);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 9px 25px rgba(20, 57, 90, .12);
+}
+
+/* الأزرار */
+button {
+  background: linear-gradient(135deg, var(--lab-primary), var(--lab-secondary));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 19px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+button:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+/* حقول الإدخال */
+input, select, textarea {
+  max-width: 100%;
+  border: 1px solid #d5e1ed;
+  border-radius: 10px;
+  padding: 11px;
+  background: #fff;
+  color: var(--lab-text);
+  box-sizing: border-box;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid #16b8c955;
+  border-color: var(--lab-accent);
+}
+
+/* الجداول */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th {
+  background: var(--lab-primary);
+  color: white;
+  padding: 12px;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #e8eef5;
+}
+
+/* تحسين الهاتف */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  .card {
+    padding: 14px;
+    border-radius: 13px;
+    overflow-x: auto;
+  }
+
+  button {
+    max-width: 100%;
+    margin: 3px;
+  }
+
+  table {
+    min-width: 600px;
+  }
+}
+
+/* احترام إعدادات الطباعة */
+@media print {
+  .card {
+    box-shadow: none !important;
+  }
+
+  button {
+    display: none !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <script>
