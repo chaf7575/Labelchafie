@@ -430,6 +430,33 @@ header {
   }
 }
 
+/* زر القائمة للهاتف */
+#menuToggle {
+  display: none;
+  background: linear-gradient(135deg, #087eaa, #16b8c9);
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  font-size: 25px;
+  padding: 7px 15px;
+  cursor: pointer;
+}
+
+@media(max-width:768px) {
+  #menuToggle {
+    display: block;
+    margin: 12px auto;
+  }
+
+  #mainNav {
+    display: none;
+  }
+
+  #mainNav.mobile-open {
+    display: grid;
+  }
+}
+
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
@@ -718,7 +745,13 @@ td {
 <div>متوسطة قايد أحمد – غليزان</div>
 
 
+
+<button id="menuToggle" onclick="toggleMainMenu()" aria-label="فتح القائمة">
+  ☰
+</button>
+
 <nav id="mainNav">
+
   <button onclick="show('home')">🏠 الرئيسية</button>
   <button onclick="show('inventory')">📦 الجرد</button>
   <button onclick="show('invoices')">🧾 الفواتير</button>
@@ -6704,5 +6737,14 @@ function printPurchaseList() {
   };
 }
 </script>
+  
+<script>
+function toggleMainMenu() {
+  const menu = document.getElementById('mainNav');
+  if (!menu) return;
+  menu.classList.toggle('mobile-open');
+}
+</script>
+
 </body>
 </html> 
