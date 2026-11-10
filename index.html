@@ -943,7 +943,54 @@ table tbody tr:last-child td {
   table tbody td {
     padding: 9px 7px;
   }
-} 
+}
+  /* =================================
+   الأزرار - تصميم احترافي
+================================= */
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all .25s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 5px 14px rgba(7, 91, 155, .18);
+}
+
+button:active {
+  transform: scale(.97);
+}
+
+/* الأزرار الرئيسية */
+button[type="submit"],
+.btn-primary {
+  background: linear-gradient(135deg, #075b9b, #087eaa);
+  color: white;
+}
+
+/* تحسين حقول الإدخال */
+input,
+select,
+textarea {
+  border: 1px solid #d4e3ef;
+  border-radius: 10px;
+  padding: 10px;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #0787b5;
+  box-shadow: 0 0 0 3px rgba(8, 126, 170, .12);
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
