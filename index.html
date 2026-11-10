@@ -890,6 +890,60 @@ header > button.primary {
     padding: 6px;
   }
 }
+ /* =================================
+   الجداول - تصميم احترافي
+================================= */
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 5px 18px rgba(20, 70, 110, .08);
+}
+
+table thead th {
+  background: linear-gradient(135deg, #075b9b, #087eaa);
+  color: #ffffff;
+  padding: 14px 10px;
+  font-weight: 900;
+  border: none;
+  white-space: nowrap;
+}
+
+table tbody td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #e6eef5;
+  color: #29445c;
+  text-align: center;
+}
+
+table tbody tr:nth-child(even) {
+  background: #f3f8fc;
+}
+
+table tbody tr:hover {
+  background: #e5f4fa;
+  transition: background .2s ease;
+}
+
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* تحسين العرض على الهاتف */
+@media(max-width:768px) {
+  table {
+    font-size: 13px;
+  }
+
+  table thead th,
+  table tbody td {
+    padding: 9px 7px;
+  }
+} 
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
