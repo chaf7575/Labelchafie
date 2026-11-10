@@ -1198,6 +1198,61 @@ tbody tr:hover {
     max-width: 100%;
   }
 } 
+  /* بطاقات الإحصائيات الاحترافية */
+
+.stats,
+.stats-container,
+.dashboard-stats {
+  gap: 18px;
+}
+
+.stat-card,
+.stats .card,
+.dashboard-stats .card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px !important;
+  background: linear-gradient(145deg, #ffffff, #eaf4fc) !important;
+  border: 1px solid #dceaf5 !important;
+  box-shadow: 0 9px 20px rgba(20,75,115,.12),
+              inset 0 2px 4px #ffffff;
+  transition: all .3s ease;
+}
+
+.stat-card::after,
+.stats .card::after,
+.dashboard-stats .card::after {
+  content: "";
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: rgba(22,184,176,.08);
+  left: -35px;
+  bottom: -45px;
+  pointer-events: none;
+}
+
+.stat-card:hover,
+.stats .card:hover,
+.dashboard-stats .card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 30px rgba(20,75,115,.18);
+}
+
+/* أرقام الإحصائيات */
+.stat-card strong,
+.stat-card .number {
+  color: #1261a0;
+  font-size: 27px;
+  font-weight: 900;
+}
+
+/* تأثير لطيف عند المرور */
+@keyframes labGlow {
+  0%, 100% { box-shadow: 0 8px 20px rgba(20,75,115,.10); }
+  50% { box-shadow: 0 12px 25px rgba(22,184,176,.20); }
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
