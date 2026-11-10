@@ -854,7 +854,42 @@ header > button.primary {
     font-size: 14px;
   }
 }
+/* تنسيق أيقونات الإحصائيات */
+.lab-dashboard-stats .statbox span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-size: 17px;
+  font-weight: 900;
+}
 
+.lab-dashboard-stats .statbox span svg {
+  width: 38px;
+  height: 38px;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(22, 184, 201, .12);
+  color: #087eaa;
+  flex-shrink: 0;
+  transition: transform .3s ease;
+}
+
+.lab-dashboard-stats .statbox:hover span svg {
+  transform: rotate(-8deg) scale(1.12);
+}
+
+@media(max-width:768px) {
+  .lab-dashboard-stats .statbox span {
+    font-size: 14px;
+  }
+
+  .lab-dashboard-stats .statbox span svg {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+  }
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
