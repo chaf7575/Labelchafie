@@ -1320,6 +1320,99 @@ nav a {
     transform: translateY(0);
   }
 } 
+  /* =================================
+   لمسات مخبرية للواجهة الرئيسية
+================================= */
+
+#home {
+  position: relative;
+  isolation: isolate;
+}
+
+/* خلفية زخرفية ناعمة */
+#home::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 12px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(22,184,176,.12),
+    transparent 70%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+#home::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: 20px;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(18,97,160,.09),
+    transparent 70%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* بطاقات الواجهة */
+#home .card {
+  backdrop-filter: blur(8px);
+  border-top: 3px solid #19aaa9 !important;
+}
+
+/* عناوين الواجهة */
+#home h2,
+#home h3 {
+  letter-spacing: .2px;
+}
+
+/* تأثير زجاجي */
+#home .card {
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,.98),
+    rgba(235,247,252,.94)
+  ) !important;
+}
+
+/* تحسين الروابط */
+a {
+  transition: color .2s ease;
+}
+
+a:hover {
+  color: #079b9b;
+}
+
+/* شريط تمرير أنيق */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #edf3f8;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#1688ad, #19b8ae);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1261a0;
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
