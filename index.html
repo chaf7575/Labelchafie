@@ -1253,6 +1253,73 @@ tbody tr:hover {
   0%, 100% { box-shadow: 0 8px 20px rgba(20,75,115,.10); }
   50% { box-shadow: 0 12px 25px rgba(22,184,176,.20); }
 }
+ /* =================================
+   قائمة التنقل الاحترافية
+================================= */
+
+nav {
+  background: linear-gradient(135deg, #123b5b, #126b91) !important;
+  border-radius: 16px;
+  padding: 10px !important;
+  box-shadow: 0 8px 22px rgba(15,55,85,.2);
+}
+
+nav button,
+nav a {
+  border-radius: 11px !important;
+  transition: all .25s ease;
+}
+
+nav button:hover,
+nav a:hover {
+  background: rgba(255,255,255,.16) !important;
+  transform: translateY(-2px);
+}
+
+/* الزر النشط */
+nav button.active,
+nav a.active {
+  background: linear-gradient(135deg, #18b9b0, #1689a5) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+
+/* تحسين الأيقونات */
+nav svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 2;
+  vertical-align: middle;
+  transition: transform .25s ease;
+}
+
+nav button:hover svg,
+nav a:hover svg {
+  transform: scale(1.15);
+}
+
+/* تحسين الشريط العلوي */
+header {
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 5px 18px rgba(15,55,85,.13);
+}
+
+/* حركة ناعمة */
+nav button,
+nav a {
+  animation: navFade .4s ease both;
+}
+
+@keyframes navFade {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
