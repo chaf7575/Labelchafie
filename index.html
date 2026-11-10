@@ -991,6 +991,50 @@ textarea:focus {
   border-color: #0787b5;
   box-shadow: 0 0 0 3px rgba(8, 126, 170, .12);
 }
+  /* =================================
+   عناوين الأقسام
+================================= */
+
+h2 {
+  position: relative;
+  color: #075b9b;
+  font-weight: 900;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border-right: 5px solid #16b8c9;
+  border-radius: 8px;
+  background: linear-gradient(to left, #eaf6fc, #ffffff);
+}
+
+h3 {
+  color: #087eaa;
+  font-weight: 900;
+  padding-bottom: 9px;
+  border-bottom: 2px solid #dceef6;
+}
+
+/* حركة خفيفة للعناوين */
+h2, h3 {
+  transition: color .25s ease;
+}
+
+h2:hover, h3:hover {
+  color: #16a6b7;
+}
+
+/* تحسين الحاويات */
+.card,
+.panel {
+  border-radius: 16px;
+  border: 1px solid #e1edf5;
+  box-shadow: 0 5px 18px rgba(20, 70, 110, .07);
+  transition: box-shadow .25s ease;
+}
+
+.card:hover,
+.panel:hover {
+  box-shadow: 0 9px 24px rgba(20, 70, 110, .12);
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
