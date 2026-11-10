@@ -5862,6 +5862,230 @@ function removeInvoiceItem(index) {
   renderInvoiceItems();
 }
  
+// ========================================
+// قوائم المشتريات السنوية
+// ========================================
+
+async function loadPurchaseList() {
+  const year = document.getElementById('purchaseSchoolYear').value;
+  const type = document.getElementById('purchaseListType').value;
+  const result = document.getElementById('purchaseListResult');
+
+  if (!result) return;
+
+  result.innerHTML = '⏳ جارٍ تحميل قائمة المشتريات...';
+
+  try {
+    const years = year.split('/');
+    const startDate = years[0] + '-09-01';
+    const endDate = years[1] + '-08-31';
+
+    const { data, error } = await supabaseClient
+      .from('invoices')
+      .select('invoice_date, invoice_number, supplier, items')
+      .gte('invoice_date', startDate)
+      .lte('invoice_date', endDate)
+      .order('invoice_date', { ascending: true });
+
+    if (error) throw error;
+
+    const purchases = [];
+
+    (data || []).forEach(invoice => {
+      const items = Array.isArray(invoice.items)
+        ? invoice.items
+        : [];
+
+      items.forEach(item => {
+        if (item.target !== type) return;
+
+        purchases.push({
+          date: invoice.invoice_date || '',
+          number: invoice.invoice_number || '',
+          supplier: invoice.supplier || '',
+          name: item.name || '',
+          qty: Number(item.qty || 0),
+          unit: item.unit || '',
+          price: Number(item.unitPrice || 0),
+          total: Number(item.total || 0)
+        });
+      });
+    });
+
+    const title = type === 'inventory'
+      ? 'قائمة مشتريات العتاد والتجهيزات'
+      : 'قائمة مشتريات المحاليل والمواد الكيميائية';
+
+    if (purchases.length === 0) {
+      result.innerHTML = `
+        <p style="text-align:center;padding:20px;color:#b45309">
+          لا توجد مشتريات مسجلة ضمن هذه السنة الدراسية.
+        </p>`;
+      return;
+    }
+
+    let html = `
+      <div class="purchase-print-area">
+        <h3 style="text-align:center;color:#075b9b">
+          ${title}
+        </h3>
+        <h4 style="text-align:center">
+          السنة الدراسية: ${year}
+        </h4>
+
+        <p style="text-align:center">
+          عدد المشتريات: ${purchases.length}
+        </p>
+
+        <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse"
+          border="1">
+          <thead>
+            <tr>
+              <th>الرقم</th>
+              <th>التاريخ</th>
+              <th>رقم الفاتورة</th>
+              <th>المورد</th>
+              <th>اسم المادة أو التجهيز</th>
+              <th>الكمية</th>
+              <th>الوحدة</th>
+              <th>سعر الوحدة</th>
+              <th>المبلغ الإجمالي</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+    purchases.forEach((p, index) => {
+      html += `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${p.date}</td>
+          <td>${p.number}</td>
+          <td>${p.supplier}</td>
+          <td>${p.name}</td>
+          <td>${p.qty}</td>
+          <td>${p.unit}</td>
+          <td>${p.price.toFixed(2)}</td>
+          <td>${p.total.toFixed(2)}</td>
+        </tr>`;
+    });
+
+    html += `
+          </tbody>
+        </table>
+        </div>
+        <p style="text-align:left;font-weight:bold">
+          المجموع الكلي:
+          ${purchases.reduce((sum, p) => sum + p.total, 0).toFixed(2)}
+          دج
+        </p>
+      </div>`;
+
+    result.innerHTML = html;
+
+    // السماح بتعديل الجدول قبل الطباعة
+    result.querySelector('table').setAttribute(
+      'contenteditable', 'true'
+    );
+
+  } catch (error) {
+    console.error('خطأ تحميل المشتريات:', error);
+
+    result.innerHTML = `
+      <p style="color:red">
+        حدث خطأ أثناء تحميل قائمة المشتريات.
+        ${error.message || ''}
+      </p>`;
+  }
+}
+
+
+// ========================================
+// طباعة قائمة المشتريات
+// ========================================
+
+function printPurchaseList() {
+  const result = document.getElementById('purchaseListResult');
+
+  if (!result || !result.querySelector('table')) {
+    alert('اعرضي قائمة المشتريات أولاً.');
+    return;
+  }
+
+  const year = document.getElementById('purchaseSchoolYear').value;
+
+  const printWindow = window.open('', '_blank');
+
+  if (!printWindow) {
+    alert('يرجى السماح بفتح النوافذ المنبثقة للطباعة.');
+    return;
+  }
+
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <title>قائمة المشتريات</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          padding: 20px;
+          color: #111;
+        }
+
+        h3, h4, p {
+          text-align: center;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+
+        th, td {
+          border: 1px solid #333;
+          padding: 8px;
+          text-align: center;
+        }
+
+        th {
+          background: #e5eef5;
+        }
+
+        td {
+          min-width: 35px;
+        }
+
+        @page {
+          size: A4 landscape;
+          margin: 12mm;
+        }
+
+        @media print {
+          body { padding: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <h3>الجمهورية الجزائرية الديمقراطية الشعبية</h3>
+      <h3>متوسطة قايد أحمد – غليزان</h3>
+      <h4>السنة الدراسية: ${year}</h4>
+      ${result.innerHTML}
+      <script>
+        window.onload = function() {
+          window.focus();
+          window.print();
+        };
+      <\/script>
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+}
+
 </script> 
  <script>
    
