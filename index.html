@@ -754,6 +754,23 @@ header > button.primary {
   letter-spacing: .2px;
 }
 
+#mainNav button svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: #65e5f1;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+  margin-left: 7px;
+}
+
+#mainNav button:hover svg,
+#mainNav button.nav-active svg {
+  stroke: #ffffff;
+}
+
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
@@ -1047,20 +1064,69 @@ td {
   ☰
 </button>
 
+
 <nav id="mainNav">
 
-  <button onclick="show('home')">🏠 الرئيسية</button>
-  <button onclick="show('inventory')">📦 الجرد</button>
-  <button onclick="show('invoices')">🧾 الفواتير</button>
-  <button onclick="show('chemicals')">⚗️ المحاليل</button>
-  <button onclick="show('daily')">📝 التقارير</button>
-  <button onclick="show('progress')">📅 التدرج</button>
-  <button onclick="show('labSchedule')">🗓️ استعمال زمن المخبر</button>
-  <button onclick="show('requests')">📨 الطلبات</button>
-  <button onclick="show('safety')">🦺 السلامة</button>
-  <button onclick="show('various')">🧪 منوعات</button>
-  <button onclick="show('other')">🎧 الصوتيات والسمعيات</button>
-  <button onclick="show('settings')">⚙️ الإعدادات</button>
+  <button onclick="show('home')">
+    <svg viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5V21h-6v-6H9v6H3z"/></svg>
+    الرئيسية
+  </button>
+
+  <button onclick="show('inventory')">
+    <svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z M3 7l9 4 9-4 M12 11v10 M8 5l9 4"/></svg>
+    الجرد
+  </button>
+
+  <button onclick="show('invoices')">
+    <svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7"/></svg>
+    الفواتير
+  </button>
+
+  <button onclick="show('chemicals')">
+    <svg viewBox="0 0 24 24"><path d="M9 3h6 M10 3v7l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3 M7 16h10"/></svg>
+    المحاليل
+  </button>
+
+  <button onclick="show('daily')">
+    <svg viewBox="0 0 24 24"><path d="M5 3h14v18H5z M8 8h8 M8 12h8 M8 16h5"/></svg>
+    التقارير
+  </button>
+
+  <button onclick="show('progress')">
+    <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z M4 9h16 M9 4v16 M13 13l2 2 4-4"/></svg>
+    التدرج
+  </button>
+
+  <button onclick="show('labSchedule')">
+    <svg viewBox="0 0 24 24"><path d="M4 5h16v16H4z M8 3v4 M16 3v4 M4 10h16 M8 14h3 M8 17h3"/></svg>
+    استعمال زمن المخبر
+  </button>
+
+  <button onclick="show('requests')">
+    <svg viewBox="0 0 24 24"><path d="M3 5h18v14H3z M3 6l9 7 9-7"/></svg>
+    الطلبات
+  </button>
+
+  <button onclick="show('safety')">
+    <svg viewBox="0 0 24 24"><path d="M12 2l9 4v6c0 5-4 8-9 10-5-2-9-5-9-10V6z M8 12l3 3 5-6"/></svg>
+    السلامة
+  </button>
+
+  <button onclick="show('various')">
+    <svg viewBox="0 0 24 24"><path d="M9 3h6 M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3 M7 15h10"/></svg>
+    منوعات
+  </button>
+
+  <button onclick="show('other')">
+    <svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4z M17 9a5 5 0 010 6 M19 6a9 9 0 010 12"/></svg>
+    الصوتيات والسمعيات
+  </button>
+
+  <button onclick="show('settings')">
+    <svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 100 8 4 4 0 000-8z M12 2v3 M12 19v3 M2 12h3 M19 12h3 M5 5l2 2 M17 17l2 2 M19 5l-2 2 M7 17l-2 2"/></svg>
+    الإعدادات
+  </button>
+
 </nav>
 
 </header>
