@@ -771,6 +771,90 @@ header > button.primary {
   stroke: #ffffff;
 }
 
+/* بطاقات الإحصائيات - تصميم ثلاثي الأبعاد */
+.lab-dashboard-stats .statbox {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: 145px;
+  border-radius: 20px;
+  border: 1px solid #d6e8f5;
+  border-top-width: 5px;
+  padding: 22px 12px;
+  box-shadow:
+    0 7px 0 rgba(8, 58, 95, .10),
+    0 12px 25px rgba(18, 59, 101, .12);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+/* زخرفة ضوئية */
+.lab-dashboard-stats .statbox::before {
+  content: "";
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  top: -38px;
+  right: -30px;
+  background: rgba(22, 184, 201, .10);
+  z-index: -1;
+}
+
+.lab-dashboard-stats .statbox::after {
+  content: "";
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  bottom: -35px;
+  left: -20px;
+  background: rgba(8, 126, 170, .08);
+  z-index: -1;
+}
+
+/* إبراز الأرقام */
+.lab-dashboard-stats .statbox b {
+  font-size: 38px;
+  font-weight: 900;
+  text-shadow: 0 3px 8px rgba(8, 126, 170, .15);
+}
+
+/* عناوين البطاقات */
+.lab-dashboard-stats .statbox span {
+  font-size: 17px;
+  font-weight: 900;
+}
+
+/* الحركة ثلاثية الأبعاد */
+.lab-dashboard-stats .statbox:hover {
+  transform: translateY(-7px) scale(1.02);
+  box-shadow:
+    0 5px 0 rgba(8, 58, 95, .12),
+    0 18px 30px rgba(18, 59, 101, .18);
+}
+
+/* الهاتف */
+@media(max-width:768px) {
+  .lab-dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .lab-dashboard-stats .statbox {
+    min-height: 125px;
+    padding: 16px 8px;
+    border-radius: 16px;
+  }
+
+  .lab-dashboard-stats .statbox b {
+    font-size: 30px;
+  }
+
+  .lab-dashboard-stats .statbox span {
+    font-size: 14px;
+  }
+}
+
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
