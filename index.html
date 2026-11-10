@@ -1035,6 +1035,51 @@ h2:hover, h3:hover {
 .panel:hover {
   box-shadow: 0 9px 24px rgba(20, 70, 110, .12);
 }
+  /* =================================
+   القائمة الرئيسية الاحترافية
+================================= */
+
+#mainNav button {
+  position: relative;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  padding: 11px 15px;
+  margin: 3px;
+  color: #fff;
+  background: rgba(255,255,255,.07);
+  transition: all .25s ease;
+}
+
+#mainNav button:hover {
+  background: rgba(255,255,255,.18);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0,0,0,.15);
+}
+
+#mainNav button.active,
+#mainNav button[aria-current="page"] {
+  background: linear-gradient(135deg,#16b8c9,#087eaa);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,.18);
+}
+
+#mainNav button svg {
+  vertical-align: middle;
+  transition: transform .25s ease;
+}
+
+#mainNav button:hover svg {
+  transform: scale(1.15);
+}
+
+/* الهاتف */
+@media(max-width:768px) {
+  #mainNav button {
+    width: 100%;
+    margin: 4px 0;
+    text-align: right;
+  }
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
