@@ -2158,6 +2158,323 @@ button[onclick*="Remove"] {
   border-radius: 20px;
   box-shadow: 0 10px 28px rgba(15,60,100,.18);
 }
+ 
+/* ===== الهوية البصرية البنفسجية والذهبية ===== */
+
+#home {
+  --lab-purple: #6036a8;
+  --lab-deep: #39205f;
+  --lab-gold: #d9ad45;
+  --lab-light: #f8f5ff;
+  --lab-text: #382650;
+  color: var(--lab-text);
+  padding-bottom: 25px;
+}
+
+/* عنوان لوحة التحكم */
+#home .head h2 {
+  color: var(--lab-deep);
+  font-weight: 900;
+}
+
+/* واجهة الترحيب */
+#home .lab-welcome {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 220px;
+  padding: 30px;
+  margin: 20px 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: linear-gradient(120deg, #39205f, #7046b5 65%, #b18bdb);
+  color: white;
+  box-shadow: 0 12px 28px rgba(66, 36, 105, .22);
+}
+
+#home .lab-welcome::before,
+#home .lab-welcome::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.18);
+  pointer-events: none;
+}
+
+#home .lab-welcome::before {
+  width: 260px;
+  height: 260px;
+  left: -80px;
+  top: -130px;
+}
+
+#home .lab-welcome::after {
+  width: 190px;
+  height: 190px;
+  right: 20%;
+  bottom: -140px;
+}
+
+#home .lab-welcome-text {
+  position: relative;
+  z-index: 2;
+}
+
+#home .lab-welcome-label {
+  display: inline-block;
+  color: #ffe6a0;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+#home .lab-welcome h1 {
+  color: white;
+  font-size: clamp(23px, 3vw, 36px);
+  margin: 8px 0;
+}
+
+#home .lab-welcome p {
+  color: #f4eaff;
+  font-size: 16px;
+}
+
+#home .lab-welcome-line {
+  width: 110px;
+  height: 5px;
+  margin-top: 18px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #ffe39a, #d9ad45);
+}
+
+/* الرسومات المخبرية المتحركة */
+#home .lab-welcome-art {
+  position: relative;
+  width: 220px;
+  height: 165px;
+  flex-shrink: 0;
+}
+
+#home .lab-beaker {
+  position: absolute;
+  bottom: 8px;
+  width: 55px;
+  height: 100px;
+  border: 4px solid rgba(255,255,255,.9);
+  border-top: 0;
+  border-radius: 8px 8px 20px 20px;
+  transform-origin: bottom center;
+  overflow: hidden;
+  background: rgba(255,255,255,.12);
+  box-shadow: inset 0 0 15px rgba(255,255,255,.15);
+  animation: labFloat 3s ease-in-out infinite;
+}
+
+#home .lab-beaker::before {
+  content: "";
+  position: absolute;
+  top: -9px;
+  left: -5px;
+  width: 57px;
+  height: 12px;
+  border: 3px solid white;
+  border-radius: 5px;
+}
+
+#home .lab-beaker-one {
+  left: 35px;
+  height: 105px;
+}
+
+#home .lab-beaker-two {
+  left: 115px;
+  height: 125px;
+  animation-delay: .7s;
+}
+
+#home .lab-liquid {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 43%;
+  background: linear-gradient(135deg, #f5d37a, #d9ad45);
+  border-radius: 45% 45% 0 0;
+  animation: labLiquid 3s ease-in-out infinite;
+}
+
+#home .lab-beaker-two .lab-liquid {
+  background: linear-gradient(135deg, #d8c0ff, #9a6de0);
+  height: 55%;
+}
+
+#home .lab-atom {
+  position: absolute;
+  top: 12px;
+  right: 4px;
+  width: 75px;
+  height: 75px;
+  border: 2px solid #ffe5a1;
+  border-radius: 50%;
+  transform: rotate(35deg) scaleY(.45);
+  animation: labRotate 8s linear infinite;
+}
+
+#home .lab-atom::before,
+#home .lab-atom::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid #ffe5a1;
+  border-radius: 50%;
+}
+
+#home .lab-atom::before {
+  transform: rotate(60deg);
+}
+
+#home .lab-atom::after {
+  transform: rotate(120deg);
+}
+
+#home .lab-atom span {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ffe5a1;
+  top: 28px;
+  left: 28px;
+}
+
+/* إشعار الطلبات */
+#home #requestsNotification {
+  background: linear-gradient(120deg, #fff9e9, #fff);
+  border: 1px solid #ead49d;
+  border-right: 6px solid var(--lab-gold);
+  border-radius: 16px;
+  box-shadow: 0 5px 18px rgba(70, 45, 100, .08);
+}
+
+#home #requestsNotification h3 {
+  color: var(--lab-deep);
+}
+
+#home #requestsNotification button {
+  background: linear-gradient(120deg, #6036a8, #8962c5);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* بطاقات الإحصائيات */
+#home .lab-dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 16px;
+  margin: 18px 0 28px;
+}
+
+#home .lab-dashboard-stats .statbox {
+  position: relative;
+  overflow: hidden;
+  padding: 22px 16px;
+  border: 1px solid #e6d9f5;
+  border-bottom: 5px solid var(--lab-purple);
+  border-radius: 18px;
+  background: linear-gradient(145deg, #fff, #f4edff);
+  box-shadow: 0 7px 18px rgba(70, 40, 110, .10);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+#home .lab-dashboard-stats .statbox:nth-child(even) {
+  background: linear-gradient(145deg, #fffdf5, #fff3d8);
+  border-color: #f0dfb6;
+  border-bottom-color: var(--lab-gold);
+}
+
+#home .lab-dashboard-stats .statbox:hover {
+  transform: translateY(-7px);
+  box-shadow: 0 14px 25px rgba(70, 40, 110, .17);
+}
+
+#home .lab-dashboard-stats .statbox span {
+  color: var(--lab-deep);
+  font-weight: bold;
+}
+
+#home .lab-dashboard-stats .statbox b {
+  display: block;
+  color: var(--lab-purple);
+  font-size: 34px;
+  margin: 12px 0 5px;
+}
+
+#home .lab-dashboard-stats .statbox small {
+  color: #77658d;
+}
+
+/* العناوين والتذييل */
+#home .lab-section-heading {
+  color: var(--lab-deep);
+  border-right: 5px solid var(--lab-gold);
+  padding-right: 12px;
+  margin: 25px 0 15px;
+}
+
+#home .lab-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px;
+  margin-top: 25px;
+  border-radius: 15px;
+  background: linear-gradient(100deg, #39205f, #7046b5);
+  color: white;
+}
+
+/* الحركات */
+@keyframes labFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+
+@keyframes labLiquid {
+  0%, 100% { border-radius: 45% 45% 0 0; }
+  50% { border-radius: 35% 55% 0 0; }
+}
+
+@keyframes labRotate {
+  to { transform: rotate(395deg) scaleY(.45); }
+}
+
+/* الهاتف */
+@media (max-width: 600px) {
+  #home .lab-welcome {
+    padding: 20px;
+    min-height: 190px;
+  }
+
+  #home .lab-welcome-art {
+    width: 120px;
+    transform: scale(.75);
+    transform-origin: center right;
+  }
+
+  #home .lab-welcome h1 {
+    font-size: 22px;
+  }
+
+  #home .lab-dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #home .lab-footer {
+    flex-direction: column;
+  }
+}
+ 
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
@@ -2555,10 +2872,7 @@ td {
   </div>
 </div>
   </div>
-<div class="lab-image-preview">
-  <img src="./lab-dashboard.png"
-       alt="التصميم الاحترافي لمنصة المخبري">
-</div>
+
   <!-- إشعار طلبات الأساتذة -->
   <div id="requestsNotification" style="
     background:linear-gradient(120deg,#fff8e6,#ffffff);
