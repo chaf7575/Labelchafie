@@ -2839,50 +2839,184 @@ td {
 <div class="container">
 
 
+
 <section id="home" class="section active">
 
-  <!-- عنوان لوحة التحكم -->
+  <style>
+    #home .interactive-dashboard {
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      margin: 18px 0;
+      box-shadow: 0 10px 30px rgba(40,25,75,.16);
+      background: #f7f3ff;
+    }
+
+    #home .interactive-dashboard img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    #home .dashboard-shortcuts {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 13px;
+      margin: 20px 0;
+    }
+
+    #home .dashboard-shortcut {
+      border: 1px solid #e4d9f5;
+      border-radius: 15px;
+      padding: 17px 8px;
+      background: linear-gradient(145deg,#fff,#f5efff);
+      color: #482875;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(55,30,90,.07);
+      transition: .25s;
+    }
+
+    #home .dashboard-shortcut:hover {
+      transform: translateY(-5px);
+      background: linear-gradient(145deg,#6036a8,#39205f);
+      color: white;
+      box-shadow: 0 9px 20px rgba(55,30,90,.2);
+    }
+
+    #home .dashboard-shortcut span {
+      display: block;
+      font-size: 27px;
+      margin-bottom: 8px;
+    }
+
+    #home .dashboard-shortcut:active {
+      transform: scale(.97);
+    }
+
+    #home .dashboard-title {
+      color: #482875;
+      margin: 24px 0 12px;
+      font-weight: bold;
+    }
+
+    #home .lab-footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 17px;
+      margin-top: 22px;
+      border-radius: 14px;
+      color: #fff;
+      background: linear-gradient(110deg,#39205f,#6036a8);
+    }
+
+    @media(max-width:700px) {
+      #home .dashboard-shortcuts {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 9px;
+      }
+
+      #home .dashboard-shortcut {
+        padding: 13px 5px;
+        font-size: 13px;
+      }
+    }
+  </style>
+
   <div class="head">
     <div>
       <h2>لوحة التحكم</h2>
-      <p class="small">إدارة أعمال المخبر بكفاءة واحترافية</p>
+      <p class="small">مرحباً بك في منصة المخبري</p>
     </div>
   </div>
 
-  <!-- واجهة الترحيب -->
-  <div class="lab-welcome">
-    <div class="lab-welcome-text">
-      <span class="lab-welcome-label">🔬 فضاء العمل المخبري</span>
-      <h1>مرحباً بك في منصة المخبري</h1>
-      <p>معاً نحو إدارة مخبرية أكثر دقة وتنظيماً واحترافية</p>
-      <div class="lab-welcome-line"></div>
-    </div>
-
-<div class="lab-welcome-art">
-  <div class="lab-beaker lab-beaker-one">
-    <div class="lab-liquid"></div>
+  <!-- الصورة الرئيسية -->
+  <div class="interactive-dashboard">
+    <img
+      src="./lab-dashboard.png"
+      alt="لوحة التحكم لمنصة المخبري"
+    >
   </div>
 
-  <div class="lab-beaker lab-beaker-two">
-    <div class="lab-liquid"></div>
+  <!-- اختصارات تفاعلية -->
+  <h3 class="dashboard-title">🚀 الوصول السريع إلى أقسام المنصة</h3>
+
+  <div class="dashboard-shortcuts">
+
+    <button class="dashboard-shortcut" onclick="show('inventory')">
+      <span>📦</span>
+      الجرد
+    </button>
+
+    <button class="dashboard-shortcut" onclick="show('invoices')">
+      <span>🧾</span>
+      الفواتير والمشتريات
+    </button>
+
+    <button class="dashboard-shortcut" onclick="show('chemicals')">
+      <span>🧪</span>
+      المحاليل الكيميائية
+    </button>
+
+    <button class="dashboard-shortcut" onclick="show('daily')">
+      <span>📋</span>
+      التقارير اليومية
+    </button>
+
+    <button class="dashboard-shortcut" onclick="show('requests')">
+      <span>📨</span>
+      طلبات الأساتذة
+    </button>
+
+    <button class="dashboard-shortcut" onclick="show('progress')">
+      <span>📊</span>
+      التدرج السنوي
+    </button>
+
+    <button class="dashboard-shortcut" onclick="show('labSchedule')">
+      <span>🗓️</span>
+      استعمال زمن المخبر
+    </button>
+
+    <button class="dashboard-shortcut" onclick="show('safety')">
+      <span>🛡️</span>
+      السلامة المخبرية
+    </button>
+
+    <button class="dashboard-shortcut" onclick="show('various')">
+      <span>📚</span>
+      منوعات
+    </button>
+
+    <button class="dashboard-shortcut" onclick="show('other')">
+      <span>🔊</span>
+      الصوتيات والسمعيات
+    </button>
+
+    <button class="dashboard-shortcut" onclick="show('settings')">
+      <span>⚙️</span>
+      الإعدادات
+    </button>
+
   </div>
 
-  <div class="lab-atom">
-    <span></span>
-  </div>
-</div>
-  </div>
+  <!-- إشعار الطلبات -->
+  <div id="requestsNotification"
+    style="
+      background:linear-gradient(120deg,#fff8e6,#ffffff);
+      border:1px solid #f2d58b;
+      border-right:6px solid #e5a400;
+      border-radius:16px;
+      padding:18px;
+      margin:20px 0;
+      box-shadow:0 5px 16px rgba(30,70,100,.07);
+    ">
 
-  <!-- إشعار طلبات الأساتذة -->
-  <div id="requestsNotification" style="
-    background:linear-gradient(120deg,#fff8e6,#ffffff);
-    border:1px solid #f2d58b;
-    border-right:6px solid #e5a400;
-    border-radius:16px;
-    padding:18px;
-    margin:20px 0;
-    box-shadow:0 5px 16px rgba(30,70,100,.07);
-  ">
     <div style="display:flex;align-items:center;gap:12px;">
       <div style="font-size:32px;">🔔</div>
       <div>
@@ -2894,12 +3028,14 @@ td {
     </div>
 
     <button onclick="show('requests')"
-      style="margin-top:14px;padding:10px 20px;border:0;border-radius:10px;">
+      style="margin-top:14px;padding:10px 20px;border:0;border-radius:10px;cursor:pointer;">
       📨 عرض الطلبات
     </button>
   </div>
 
-  <!-- بطاقات الإحصائيات -->
+  <!-- الإحصائيات الحقيقية -->
+  <h3 class="dashboard-title">📈 إحصائيات المخبر</h3>
+
   <div class="stats lab-dashboard-stats">
 
     <div class="statbox">
@@ -2940,6 +3076,7 @@ td {
   </div>
 
 </section>
+
 
 <section id="inventory" class="section">
 
