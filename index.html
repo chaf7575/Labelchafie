@@ -1413,6 +1413,82 @@ a:hover {
 ::-webkit-scrollbar-thumb:hover {
   background: #1261a0;
 }
+  /* =================================
+   جداول منصة المخبري الاحترافية
+================================= */
+
+table {
+  width: 100%;
+  border-collapse: separate !important;
+  border-spacing: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 5px 16px rgba(20,75,115,.07);
+}
+
+thead th {
+  background: linear-gradient(135deg, #124e78, #16899e) !important;
+  color: #fff !important;
+  padding: 13px 10px !important;
+  font-weight: 800;
+  border: none !important;
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: 11px 9px !important;
+  border-bottom: 1px solid #e8eff5 !important;
+  color: #29445a;
+  text-align: center;
+}
+
+tbody tr:nth-child(even) {
+  background: #f3f8fc;
+}
+
+tbody tr:hover {
+  background: #e2f5f5 !important;
+}
+
+/* خانات الجداول */
+td input,
+td select {
+  min-width: 65px;
+  max-width: 100%;
+  padding: 7px !important;
+}
+
+/* تحسين بطاقات الجرد والمحاليل */
+#inventory .card,
+#chemicals .card,
+#invoices .card {
+  border-right: 4px solid #18aaa9 !important;
+  margin-bottom: 18px;
+}
+
+/* عناوين الجداول */
+table caption {
+  padding: 12px;
+  color: #1261a0;
+  font-weight: bold;
+}
+
+/* الطباعة: إلغاء الزخارف */
+@media print {
+  table {
+    box-shadow: none !important;
+  }
+
+  thead th {
+    background: #e5eef5 !important;
+    color: #111 !important;
+  }
+
+  tbody tr:hover {
+    background: transparent !important;
+  }
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
