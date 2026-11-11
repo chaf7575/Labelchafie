@@ -1579,7 +1579,73 @@ table caption {
     padding: 12px;
     margin-bottom: 12px;
   }
-} 
+}
+  /* =================================
+   رأس منصة المخبري الاحترافي
+================================= */
+
+header {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(120deg, #103b5b, #126b91, #159eaa) !important;
+  color: white !important;
+  padding: 22px 18px !important;
+  border-radius: 0 0 24px 24px !important;
+  box-shadow: 0 8px 25px rgba(12,55,85,.22);
+}
+
+/* لمعة متحركة */
+header::after {
+  content: "";
+  position: absolute;
+  top: -80%;
+  left: -40%;
+  width: 45%;
+  height: 260%;
+  transform: rotate(25deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.13),
+    transparent
+  );
+  animation: labHeaderShine 7s infinite;
+  pointer-events: none;
+}
+
+@keyframes labHeaderShine {
+  0% { left: -50%; }
+  60%, 100% { left: 130%; }
+}
+
+header h1 {
+  color: white !important;
+  font-weight: 900;
+  text-shadow: 0 3px 8px rgba(0,0,0,.2);
+}
+
+header p {
+  color: rgba(255,255,255,.9);
+}
+
+/* الصورة الموجودة في رأس المنصة */
+header img {
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 7px 12px rgba(0,0,0,.2));
+  transition: transform .35s ease;
+}
+
+header img:hover {
+  transform: scale(1.035);
+}
+
+@media (max-width: 600px) {
+  header {
+    padding: 15px 10px !important;
+    border-radius: 0 0 16px 16px !important;
+  }
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
