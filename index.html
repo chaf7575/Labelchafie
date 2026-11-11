@@ -2196,123 +2196,117 @@ td {
 
 <div class="container">
 
+
 <section id="home" class="section active">
 
-<div class="head">
-<div>
-<h2>لوحة التحكم</h2>
-<p class="small">إدارة أعمال المخبر.</p>
-</div>
-</div>
- <!-- إشعار طلبات الأساتذة -->
-<div id="requestsNotification" style="
-  background:linear-gradient(135deg,#fff8e1,#ffffff);
-  border:1px solid #f0c36d;
-  border-right:6px solid #e6a700;
-  border-radius:14px;
-  padding:18px;
-  margin:18px 0;
-  box-shadow:0 4px 12px rgba(0,0,0,.08);
-">
-
-  <div style="display:flex;align-items:center;gap:12px;">
-    <div style="font-size:32px;">🔔</div>
-
+  <!-- عنوان لوحة التحكم -->
+  <div class="head">
     <div>
-      <h3 style="margin:0 0 6px;">
-        طلبات الأساتذة
-      </h3>
-
-      <p id="requestsNotificationText" style="margin:0;">
-        جارٍ التحقق من الطلبات...
-      </p>
+      <h2>لوحة التحكم</h2>
+      <p class="small">إدارة أعمال المخبر بكفاءة واحترافية</p>
     </div>
   </div>
 
-  <button
-    onclick="show('requests')"
-    style="
-      margin-top:14px;
-      padding:10px 18px;
-      border:0;
-      border-radius:8px;
-      cursor:pointer;
-    "
-  >
-    📨 عرض الطلبات
-  </button>
+  <!-- واجهة الترحيب -->
+  <div class="lab-welcome">
+    <div class="lab-welcome-text">
+      <span class="lab-welcome-label">🔬 فضاء العمل المخبري</span>
+      <h1>مرحباً بك في منصة المخبري</h1>
+      <p>معاً نحو إدارة مخبرية أكثر دقة وتنظيماً واحترافية</p>
+      <div class="lab-welcome-line"></div>
+    </div>
 
-</div> 
-
-<div class="stats">
-
-
-<div class="stats lab-dashboard-stats">
-
-  <div class="statbox">
-    <span>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 7l9-4 9 4-9 4-9-4z"/>
-        <path d="M3 7v10l9 4 9-4V7"/>
-        <path d="M12 11v10"/>
+    <div class="lab-welcome-art">
+      <svg viewBox="0 0 180 150" width="180" role="img"
+           aria-label="رسم أدوات مخبرية">
+        <circle cx="90" cy="75" r="67" fill="#ffffff" opacity=".13"/>
+        <path d="M38 22h27M44 22v35L23 105a12 12 0 0010 18h47a12 12 0 0010-18L69 57V22"
+              fill="#dffaff" stroke="#ffffff" stroke-width="4"
+              stroke-linejoin="round"/>
+        <path d="M32 91h59l12 18a10 10 0 01-9 14H32a10 10 0 01-9-14z"
+              fill="#16c5c0"/>
+        <path d="M108 18h25M113 18v40l-22 48a11 11 0 0010 16h44a11 11 0 0010-16l-22-48V18"
+              fill="#e7f8ff" stroke="#ffffff" stroke-width="4"
+              stroke-linejoin="round"/>
+        <path d="M101 91h61l7 15a10 10 0 01-9 16h-57a10 10 0 01-9-16z"
+              fill="#168bc7"/>
+        <circle cx="48" cy="103" r="4" fill="#ffffff"/>
+        <circle cx="59" cy="111" r="3" fill="#ffffff"/>
+        <circle cx="131" cy="103" r="4" fill="#ffffff"/>
+        <circle cx="142" cy="112" r="3" fill="#ffffff"/>
+        <path d="M87 15l4-8 4 8 8 4-8 4-4 8-4-8-8-4z"
+              fill="#ffffff"/>
       </svg>
-      الجرد
-    </span>
-    <b id="sInv">0</b>
-    <small>المعدات والتجهيزات</small>
+    </div>
   </div>
 
-  <div class="statbox">
-    <span>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M9 3h6M10 3v6l-5 10a2 2 0 002 3h10a2 2 0 002-3L14 9V3"/>
-        <path d="M8 15h8"/>
-      </svg>
-      المحاليل
-    </span>
-    <b id="sChem">0</b>
-    <small>المواد الكيميائية</small>
+  <!-- إشعار طلبات الأساتذة -->
+  <div id="requestsNotification" style="
+    background:linear-gradient(120deg,#fff8e6,#ffffff);
+    border:1px solid #f2d58b;
+    border-right:6px solid #e5a400;
+    border-radius:16px;
+    padding:18px;
+    margin:20px 0;
+    box-shadow:0 5px 16px rgba(30,70,100,.07);
+  ">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:32px;">🔔</div>
+      <div>
+        <h3 style="margin:0 0 6px;">طلبات الأساتذة</h3>
+        <p id="requestsNotificationText" style="margin:0;">
+          جارٍ التحقق من الطلبات...
+        </p>
+      </div>
+    </div>
+
+    <button onclick="show('requests')"
+      style="margin-top:14px;padding:10px 20px;border:0;border-radius:10px;">
+      📨 عرض الطلبات
+    </button>
   </div>
 
-  <div class="statbox">
-    <span>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M7 3h10l4 4v14H3V3h4z"/>
-        <path d="M7 3v5h10V3M7 13h10M7 17h7"/>
-      </svg>
-      التقارير
-    </span>
-    <b id="sDaily">0</b>
-    <small>النشاط اليومي</small>
+  <!-- بطاقات الإحصائيات -->
+  <div class="stats lab-dashboard-stats">
+
+    <div class="statbox">
+      <span>📦 الجرد</span>
+      <b id="sInv">0</b>
+      <small>المعدات والتجهيزات</small>
+    </div>
+
+    <div class="statbox">
+      <span>🧪 المحاليل</span>
+      <b id="sChem">0</b>
+      <small>المواد الكيميائية</small>
+    </div>
+
+    <div class="statbox">
+      <span>📋 التقارير</span>
+      <b id="sDaily">0</b>
+      <small>النشاط اليومي</small>
+    </div>
+
+    <div class="statbox">
+      <span>📨 الطلبات</span>
+      <b id="sReq">0</b>
+      <small>طلبات الأساتذة</small>
+    </div>
+
+    <div class="statbox">
+      <span>📊 المشاريع</span>
+      <b id="sProj">0</b>
+      <small>متابعة المشاريع</small>
+    </div>
+
   </div>
 
-  <div class="statbox">
-    <span>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M4 4h16v13H7l-3 3V4z"/>
-        <path d="M8 9h8M8 13h5"/>
-      </svg>
-      الطلبات
-    </span>
-    <b id="sReq">0</b>
-    <small>طلبات الأساتذة</small>
+  <div class="lab-footer">
+    <span>🔬 منصة المخبري — نظام متكامل لإدارة المخبر</span>
+    <span>✨ جودة · دقة · احترافية</span>
   </div>
 
-  <div class="statbox">
-    <span>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M4 19V5M4 19h17"/>
-        <path d="M8 15l4-5 3 3 5-7"/>
-      </svg>
-      المشاريع
-    </span>
-    <b id="sProj">0</b>
-    <small>متابعة المشاريع</small>
-  </div>
-
-</div>
 </section>
-
 
 <section id="inventory" class="section">
 
