@@ -1646,6 +1646,63 @@ header img:hover {
     border-radius: 0 0 16px 16px !important;
   }
 }
+  /* =================================
+   تصميم نافذة الدخول والتفعيل
+================================= */
+
+/* نافذة التفعيل وتسجيل الدخول */
+#activationOverlay,
+#loginOverlay,
+.login-overlay,
+.activation-overlay {
+  background: linear-gradient(135deg, #eaf4fc, #dceff3) !important;
+}
+
+/* بطاقات الدخول */
+#activationOverlay .card,
+#loginOverlay .card,
+.login-overlay .card,
+.activation-overlay .card {
+  max-width: 440px;
+  margin: 25px auto;
+  padding: 30px !important;
+  border-radius: 22px !important;
+  background: rgba(255,255,255,.97) !important;
+  border: 1px solid #dceaf5 !important;
+  box-shadow: 0 18px 45px rgba(15,65,100,.17);
+  animation: loginAppear .6s ease;
+}
+
+@keyframes loginAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* عناوين الدخول */
+#activationOverlay h2,
+#loginOverlay h2 {
+  color: #1261a0;
+  text-align: center;
+  border: none;
+}
+
+/* أزرار الدخول */
+#activationOverlay button,
+#loginOverlay button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1261a0, #17aaa9);
+  color: white;
+  font-weight: bold;
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
