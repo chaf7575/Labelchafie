@@ -1703,6 +1703,72 @@ header img:hover {
   color: white;
   font-weight: bold;
 }
+ /* =================================
+   أزرار الطباعة والتقارير
+================================= */
+
+button[onclick*="print"],
+button[onclick*="Print"] {
+  background: linear-gradient(135deg, #087e8b, #12aaa5) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 12px !important;
+  padding: 11px 20px !important;
+  font-weight: 800;
+  box-shadow: 0 5px 12px rgba(8,126,139,.18);
+}
+
+button[onclick*="print"]:hover,
+button[onclick*="Print"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 17px rgba(8,126,139,.25);
+}
+
+/* أزرار الحفظ */
+button[onclick*="save"],
+button[onclick*="Save"] {
+  background: linear-gradient(135deg, #1261a0, #168eaa) !important;
+  color: white !important;
+}
+
+/* أزرار الحذف */
+button[onclick*="delete"],
+button[onclick*="Delete"],
+button[onclick*="remove"],
+button[onclick*="Remove"] {
+  background: linear-gradient(135deg, #c0392b, #e05b50) !important;
+  color: white !important;
+}
+
+/* منطقة التقارير */
+#dailyReports,
+#daily,
+#reports {
+  line-height: 1.8;
+}
+
+/* المحافظة على الطباعة */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .no-print,
+  nav,
+  button {
+    display: none !important;
+  }
+
+  table {
+    box-shadow: none !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+} 
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
