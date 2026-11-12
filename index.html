@@ -2474,6 +2474,26 @@ button[onclick*="Remove"] {
     flex-direction: column;
   }
 }
+
+/* تحسين لوحة الرئيسية على الهاتف */
+@media (max-width: 600px) {
+  #home .dashboard-canvas {
+    width: 100% !important;
+    min-width: 0 !important;
+    aspect-ratio: 1648 / 928;
+  }
+
+  #home .dashboard-canvas img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+
+  #home .dashboard-wrap {
+    width: 100% !important;
+    overflow: hidden !important;
+  }
+}
  
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
