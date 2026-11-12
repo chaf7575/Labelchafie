@@ -2861,320 +2861,517 @@ td {
 
 
 
+
 <section id="home" class="section active">
 
 <style>
-#home .dashboard-wrap {
+/* إخفاء القائمة القديمة */
+#mainNav {
+  display:none !important;
+}
+
+#home {
+  direction:rtl;
+  font-family:inherit;
+  color:#173b55;
+  padding:12px;
+  background:#f1f7fb;
+}
+
+#home .new-dashboard {
+  display:grid;
+  grid-template-columns:245px minmax(0,1fr);
+  gap:18px;
+  max-width:1500px;
+  margin:auto;
+}
+
+/* القائمة الجانبية */
+#home .dash-sidebar {
+  background:linear-gradient(180deg,#075477,#087f91);
+  color:white;
+  border-radius:20px;
+  padding:22px 14px;
+  box-shadow:0 8px 25px #174b6522;
+}
+
+#home .dash-brand {
+  text-align:center;
+  padding:12px 5px 22px;
+  border-bottom:1px solid #ffffff35;
+  margin-bottom:15px;
+}
+
+#home .dash-brand .logo {
+  font-size:43px;
+}
+
+#home .dash-brand h2 {
+  font-size:21px;
+  margin:8px 0 4px;
+  color:white;
+}
+
+#home .dash-brand p {
+  font-size:12px;
+  margin:0;
+  color:#d8f4ff;
+}
+
+#home .dash-menu {
+  display:grid;
+  gap:8px;
+}
+
+#home .dashboard-nav-btn {
+  display:flex;
+  align-items:center;
+  gap:11px;
   width:100%;
+  padding:12px 13px;
+  border:0;
+  border-radius:11px;
+  color:white;
+  background:transparent;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:bold;
+  text-align:right;
+  cursor:pointer;
+  transition:.2s;
+}
+
+#home .dashboard-nav-btn:hover,
+#home .dashboard-nav-btn:focus {
+  background:#ffffff25;
+  outline:none;
+}
+
+#home .dashboard-nav-btn .ico {
+  font-size:20px;
+  width:27px;
+  text-align:center;
+}
+
+/* المحتوى الرئيسي */
+#home .dash-main {
+  min-width:0;
+}
+
+#home .dash-topbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  background:white;
+  border-radius:17px;
+  padding:16px 20px;
+  box-shadow:0 4px 15px #174b6510;
+  margin-bottom:18px;
+}
+
+#home .dash-topbar h2 {
+  margin:0 0 5px;
+  color:#075477;
+  font-size:22px;
+}
+
+#home .dash-topbar p {
+  margin:0;
+  color:#78909f;
+  font-size:13px;
+}
+
+#home .dash-date {
+  color:#087f91;
+  font-weight:bold;
+  font-size:13px;
+}
+
+/* واجهة الترحيب */
+#home .dash-hero {
+  position:relative;
   overflow:hidden;
   border-radius:20px;
-  margin:15px 0;
-  box-shadow:0 8px 28px rgba(0,50,90,.16);
+  padding:28px;
+  color:white;
+  background:linear-gradient(115deg,#075477,#0799a5);
+  box-shadow:0 8px 25px #087f9130;
+  margin-bottom:18px;
 }
 
-#home .dashboard-canvas {
-  position:relative;
-  width:100%;
-  aspect-ratio:1648 / 928;
-  overflow:hidden;
-  background:#dff5ff;
+#home .dash-hero h2 {
+  color:white;
+  font-size:25px;
+  margin:0 0 10px;
 }
 
-#home .dashboard-canvas > img {
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:fill;
-  display:block;
-}
-
-/* مناطق النقر فوق القائمة الجانبية */
-#home .dash-hotspot {
-  position:absolute;
-  z-index:5;
-  display:block;
-  border:0;
-  padding:0;
+#home .dash-hero p {
+  color:#e0faff;
   margin:0;
-  background:transparent;
-  cursor:pointer;
-  border-radius:12px;
-  transition:background .2s, box-shadow .2s;
+  line-height:1.8;
+  max-width:600px;
 }
 
-#home .dash-hotspot:hover {
-  background:rgba(255,255,255,.17);
-  box-shadow:inset 0 0 0 2px rgba(255,255,255,.55);
-}
-
-#home .dash-hotspot:focus-visible {
-  outline:3px solid #ffcf48;
-}
-
-/* القائمة اليمنى */
-#home .nav-home     {right:.7%;top:20.5%;width:14%;height:8.5%}
-#home .nav-lab      {right:.7%;top:30%;width:14%;height:7.5%}
-#home .nav-chem     {right:.7%;top:38.1%;width:14%;height:7.5%}
-#home .nav-equipment{right:.7%;top:46.5%;width:14%;height:7.5%}
-#home .nav-inventory{right:.7%;top:54.7%;width:14%;height:7.5%}
-#home .nav-invoices {right:.7%;top:63%;width:14%;height:7.5%}
-#home .nav-settings {right:.7%;top:70.5%;width:14%;height:7.5%}
-#home .nav-help     {right:.7%;top:76.8%;width:14%;height:7.5%}
-
-/* إحصائيات حقيقية فوق الأرقام المطبوعة */
-#home .live-stats {
+#home .dash-hero .hero-icon {
   position:absolute;
-  z-index:4;
-  left:1.7%;
-  top:52.3%;
-  width:81.5%;
-  height:14.1%;
+  left:25px;
+  top:15px;
+  font-size:75px;
+  opacity:.22;
+}
+
+/* الإحصائيات */
+#home .dash-stats {
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:.7%;
+  gap:12px;
+  margin-bottom:20px;
 }
 
-#home .live-stat {
-  min-width:0;
-  border-radius:15px;
-  background:rgba(255,255,255,.96);
-  border:1px solid #c6eafa;
-  box-shadow:0 4px 12px rgba(0,80,130,.16);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+#home .dash-stat {
+  background:white;
+  border-radius:16px;
+  padding:16px 8px;
   text-align:center;
-  padding:4px;
-  color:#075477;
+  border:1px solid #e1edf3;
+  box-shadow:0 4px 14px #174b650c;
 }
 
-#home .live-stat b {
-  font-size:clamp(13px,2.2vw,30px);
-  color:#087eae;
-  line-height:1.3;
+#home .dash-stat .stat-icon {
+  font-size:25px;
 }
 
-#home .live-stat span {
-  font-size:clamp(8px,1vw,13px);
+#home .dash-stat b {
+  display:block;
+  font-size:25px;
+  color:#087f91;
+  margin:6px 0;
+}
+
+#home .dash-stat span {
+  display:block;
+  font-size:11px;
   font-weight:bold;
+  color:#607d8b;
 }
 
-/* البطاقات الأربع أسفل الصورة */
-#home .quick-print {left:1.8%;top:69%;width:19%;height:20.5%}
-#home .quick-stock {left:22.4%;top:69%;width:19.1%;height:20.5%}
-#home .quick-chem  {left:43.6%;top:69%;width:19.3%;height:20.5%}
-#home .quick-lab   {left:64.8%;top:69%;width:18.3%;height:20.5%}
+/* الاختصارات */
+#home .dash-heading {
+  color:#075477;
+  font-size:18px;
+  margin:22px 0 12px;
+}
+
+#home .dash-shortcuts {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+
+#home .dash-card {
+  background:white;
+  border:1px solid #e1edf3;
+  border-radius:16px;
+  padding:17px 10px;
+  min-height:110px;
+  text-align:center;
+  cursor:pointer;
+  font-family:inherit;
+  color:#075477;
+  font-weight:bold;
+  box-shadow:0 4px 14px #174b650c;
+  transition:.2s;
+}
+
+#home .dash-card:hover {
+  transform:translateY(-3px);
+  border-color:#0799a5;
+  box-shadow:0 7px 18px #087f9120;
+}
+
+#home .dash-card .card-icon {
+  display:block;
+  font-size:29px;
+  margin-bottom:9px;
+}
+
+#home .dash-card span:last-child {
+  font-size:13px;
+}
 
 /* إشعار الطلبات */
 #home .home-notification {
-  background:linear-gradient(120deg,#e9faff,#fff);
-  border:1px solid #b9e5f4;
-  border-right:5px solid #0798bd;
+  background:white;
+  border:1px solid #d6eaf2;
+  border-right:5px solid #0799a5;
   border-radius:15px;
   padding:16px;
-  margin:18px 0;
-  box-shadow:0 4px 14px rgba(0,70,100,.07);
+  margin-top:20px;
+  box-shadow:0 4px 14px #174b650c;
 }
 
 #home .home-notification button {
-  background:#087fa8;
+  background:#087f91;
   color:white;
   border:0;
   border-radius:9px;
   padding:10px 18px;
   cursor:pointer;
   font-family:inherit;
-}
-
-/* اختصارات الأقسام الأخرى */
-#home .extra-links {
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-  margin:16px 0;
-}
-
-#home .extra-links button {
-  border:1px solid #c8e7f2;
-  border-radius:12px;
-  padding:13px 7px;
-  background:linear-gradient(145deg,#fff,#eaf8ff);
-  color:#075477;
-  font-family:inherit;
   font-weight:bold;
-  cursor:pointer;
-  transition:.2s;
 }
 
-#home .extra-links button:hover {
-  background:#087fa8;
-  color:white;
-  transform:translateY(-3px);
+#home .dash-footer {
+  text-align:center;
+  color:#8299a7;
+  font-size:12px;
+  padding:22px 5px 8px;
 }
 
-@media(max-width:650px) {
-  #home .dashboard-wrap {
-    overflow-x:auto;
+/* الهاتف */
+@media(max-width:850px) {
+  #home .new-dashboard {
+    grid-template-columns:1fr;
   }
 
-  #home .dashboard-canvas {
-    min-width:760px;
+  #home .dash-sidebar {
+    padding:13px;
   }
 
-  #home .extra-links {
+  #home .dash-brand {
+    padding:5px 5px 12px;
+    margin-bottom:10px;
+  }
+
+  #home .dash-brand .logo {
+    font-size:30px;
+  }
+
+  #home .dash-brand h2 {
+    font-size:18px;
+  }
+
+  #home .dash-menu {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+
+  #home .dashboard-nav-btn {
+    font-size:12px;
+    padding:10px 7px;
+    justify-content:flex-start;
+  }
+
+  #home .dash-stats {
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
-  #home .live-stat b {
-    font-size:19px;
+  #home .dash-stats .dash-stat:last-child {
+    grid-column:span 2;
   }
 
-  #home .live-stat span {
-    font-size:11px;
+  #home .dash-shortcuts {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+
+  #home .dash-hero {
+    padding:22px 17px;
+  }
+
+  #home .dash-hero h2 {
+    font-size:21px;
+  }
+
+  #home .dash-hero .hero-icon {
+    font-size:55px;
+    left:12px;
+  }
+
+  #home .dash-topbar {
+    padding:13px;
+  }
+
+  #home .dash-topbar h2 {
+    font-size:18px;
   }
 }
 </style>
 
-<div class="head">
-  <div>
-    <h2>لوحة التحكم</h2>
-    <p class="small">مرحباً بك في منصة المخبري</p>
-  </div>
-</div>
+<div class="new-dashboard">
 
-<div class="dashboard-wrap">
-  <div class="dashboard-canvas">
+  <!-- القائمة الرئيسية -->
+  <aside class="dash-sidebar">
 
-    <img src="./lab-dashboard.png"
-         alt="لوحة التحكم لمنصة المخبري">
-
-    <!-- القائمة الجانبية التفاعلية -->
-    <button class="dash-hotspot nav-home"
-      onclick="show('home')" title="الرئيسية"
-      aria-label="الرئيسية"></button>
-
-    <button class="dash-hotspot nav-lab"
-      onclick="show('daily')" title="إدارة المختبر"
-      aria-label="إدارة المختبر"></button>
-
-    <button class="dash-hotspot nav-chem"
-      onclick="show('chemicals')" title="المواد الكيميائية"
-      aria-label="المواد الكيميائية"></button>
-
-    <button class="dash-hotspot nav-equipment"
-      onclick="show('inventory')" title="العتاد والمستلزمات"
-      aria-label="العتاد والمستلزمات"></button>
-
-    <button class="dash-hotspot nav-inventory"
-      onclick="show('inventory')" title="الجرد والمخزون"
-      aria-label="الجرد والمخزون"></button>
-
-    <button class="dash-hotspot nav-invoices"
-      onclick="show('invoices')" title="الفواتير والتقارير"
-      aria-label="الفواتير والتقارير"></button>
-
-    <button class="dash-hotspot nav-settings"
-      onclick="show('settings')" title="الإعدادات"
-      aria-label="الإعدادات"></button>
-
-    <button class="dash-hotspot nav-help"
-      onclick="show('safety')" title="المساعدة والسلامة"
-      aria-label="المساعدة والسلامة"></button>
-
-    <!-- الإحصائيات الحقيقية -->
-    <div class="live-stats">
-
-      <div class="live-stat">
-        <b id="sInv">0</b>
-        <span>📦 العتاد والتجهيزات</span>
-      </div>
-
-      <div class="live-stat">
-        <b id="sChem">0</b>
-        <span>🧪 المواد الكيميائية</span>
-      </div>
-
-      <div class="live-stat">
-        <b id="sDaily">0</b>
-        <span>📋 التقارير اليومية</span>
-      </div>
-
-      <div class="live-stat">
-        <b id="sReq">0</b>
-        <span>📨 طلبات الأساتذة</span>
-      </div>
-
-      <div class="live-stat">
-        <b id="sProj">0</b>
-        <span>📊 المشاريع</span>
-      </div>
-
+    <div class="dash-brand">
+      <div class="logo">🔬</div>
+      <h2>منصة المخبري</h2>
+      <p>إدارة مخابر المؤسسات التربوية</p>
     </div>
 
-    <!-- البطاقات السفلية التفاعلية -->
-    <button class="dash-hotspot quick-print"
-      onclick="show('daily')"
-      title="التقارير اليومية والطباعة"
-      aria-label="التقارير اليومية والطباعة"></button>
+    <div class="dash-menu">
 
-    <button class="dash-hotspot quick-stock"
-      onclick="show('inventory')"
-      title="المخزون والجرد"
-      aria-label="المخزون والجرد"></button>
+      <button class="dashboard-nav-btn" onclick="show('home')">
+        <span class="ico">🏠</span> الرئيسية
+      </button>
 
-    <button class="dash-hotspot quick-chem"
-      onclick="show('chemicals')"
-      title="المحاليل الكيميائية"
-      aria-label="المحاليل الكيميائية"></button>
+      <button class="dashboard-nav-btn" onclick="show('daily')">
+        <span class="ico">📋</span> التقارير اليومية
+      </button>
 
-    <button class="dash-hotspot quick-lab"
-      onclick="show('daily')"
-      title="إدارة المختبر"
-      aria-label="إدارة المختبر"></button>
+      <button class="dashboard-nav-btn" onclick="show('chemicals')">
+        <span class="ico">🧪</span> المحاليل الكيميائية
+      </button>
 
-  </div>
-</div>
+      <button class="dashboard-nav-btn" onclick="show('inventory')">
+        <span class="ico">📦</span> الجرد والمخزون
+      </button>
 
-<!-- إشعار الطلبات -->
-<div id="requestsNotification" class="home-notification">
+      <button class="dashboard-nav-btn" onclick="show('invoices')">
+        <span class="ico">🧾</span> الفواتير والمشتريات
+      </button>
 
-  <div style="display:flex;align-items:center;gap:12px">
-    <div style="font-size:30px">🔔</div>
-    <div>
-      <h3 style="margin:0 0 6px">طلبات الأساتذة</h3>
-      <p id="requestsNotificationText" style="margin:0">
-        جارٍ التحقق من الطلبات...
+      <button class="dashboard-nav-btn" onclick="show('requests')">
+        <span class="ico">📨</span> الطلبات
+      </button>
+
+      <button class="dashboard-nav-btn" onclick="show('progress')">
+        <span class="ico">📊</span> التدرج السنوي
+      </button>
+
+      <button class="dashboard-nav-btn" onclick="show('labSchedule')">
+        <span class="ico">🗓️</span> استعمال الزمن
+      </button>
+
+      <button class="dashboard-nav-btn" onclick="show('safety')">
+        <span class="ico">🛡️</span> السلامة المخبرية
+      </button>
+
+      <button class="dashboard-nav-btn" onclick="show('various')">
+        <span class="ico">📚</span> منوعات
+      </button>
+
+      <button class="dashboard-nav-btn" onclick="show('other')">
+        <span class="ico">🔊</span> الصوتيات والسمعيات
+      </button>
+
+      <button class="dashboard-nav-btn" onclick="show('settings')">
+        <span class="ico">⚙️</span> الإعدادات
+      </button>
+
+    </div>
+  </aside>
+
+  <!-- محتوى لوحة التحكم -->
+  <main class="dash-main">
+
+    <div class="dash-topbar">
+      <div>
+        <h2>لوحة التحكم</h2>
+        <p>مرحباً بك في منصة المخبري</p>
+      </div>
+      <div class="dash-date">🔬 فضاء إدارة المخبر</div>
+    </div>
+
+    <div class="dash-hero">
+      <div class="hero-icon">⚗️</div>
+      <h2>مرحباً بك في منصة المخبري</h2>
+      <p>
+        فضاء متكامل لتنظيم العتاد والتجهيزات،
+        متابعة المحاليل الكيميائية، وتسيير أعمال المخبر
+        والتقارير والطلبات.
       </p>
     </div>
-  </div>
 
-  <button onclick="show('requests')" style="margin-top:13px">
-    📨 عرض الطلبات
-  </button>
+    <h3 class="dash-heading">📊 إحصائيات المخبر</h3>
 
-</div>
+    <div class="dash-stats">
 
-<!-- أقسام إضافية -->
-<h3 style="color:#075477;margin:22px 0 12px">
-  🚀 أقسام أخرى في المنصة
-</h3>
+      <div class="dash-stat">
+        <div class="stat-icon">📦</div>
+        <b id="sInv">0</b>
+        <span>العتاد والتجهيزات</span>
+      </div>
 
-<div class="extra-links">
+      <div class="dash-stat">
+        <div class="stat-icon">🧪</div>
+        <b id="sChem">0</b>
+        <span>المواد الكيميائية</span>
+      </div>
 
-  <button onclick="show('requests')">📨 طلبات الأساتذة</button>
-  <button onclick="show('progress')">📊 التدرج السنوي</button>
-  <button onclick="show('labSchedule')">🗓️ استعمال الزمن</button>
-  <button onclick="show('safety')">🛡️ السلامة المخبرية</button>
-  <button onclick="show('various')">📚 منوعات</button>
-  <button onclick="show('other')">🔊 الصوتيات والسمعيات</button>
-  <button onclick="show('settings')">⚙️ الإعدادات</button>
+      <div class="dash-stat">
+        <div class="stat-icon">📋</div>
+        <b id="sDaily">0</b>
+        <span>التقارير اليومية</span>
+      </div>
 
+      <div class="dash-stat">
+        <div class="stat-icon">📨</div>
+        <b id="sReq">0</b>
+        <span>طلبات الأساتذة</span>
+      </div>
+
+      <div class="dash-stat">
+        <div class="stat-icon">📊</div>
+        <b id="sProj">0</b>
+        <span>المشاريع</span>
+      </div>
+
+    </div>
+
+    <h3 class="dash-heading">🚀 الوصول السريع إلى الأقسام</h3>
+
+    <div class="dash-shortcuts">
+
+      <button class="dash-card" onclick="show('inventory')">
+        <span class="card-icon">📦</span>
+        <span>الجرد والمخزون</span>
+      </button>
+
+      <button class="dash-card" onclick="show('chemicals')">
+        <span class="card-icon">🧪</span>
+        <span>المحاليل الكيميائية</span>
+      </button>
+
+      <button class="dash-card" onclick="show('invoices')">
+        <span class="card-icon">🧾</span>
+        <span>الفواتير والمشتريات</span>
+      </button>
+
+      <button class="dash-card" onclick="show('daily')">
+        <span class="card-icon">📋</span>
+        <span>التقارير اليومية</span>
+      </button>
+
+    </div>
+
+    <!-- إشعار الطلبات -->
+    <div id="requestsNotification" class="home-notification">
+
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-size:30px">🔔</div>
+        <div>
+          <h3 style="margin:0 0 6px">طلبات الأساتذة</h3>
+          <p id="requestsNotificationText" style="margin:0">
+            جارٍ التحقق من الطلبات...
+          </p>
+        </div>
+      </div>
+
+      <button onclick="show('requests')" style="margin-top:13px">
+        📨 عرض الطلبات
+      </button>
+
+    </div>
+
+    <div class="dash-footer">
+      منصة المخبري — متوسطة قايد أحمد – غليزان
+    </div>
+
+  </main>
 </div>
 
 </section>
-
 
 <section id="inventory" class="section">
 
