@@ -2862,257 +2862,147 @@ td {
 
 
 
+
 <section id="home" class="section active">
 
 <style>
-/* إخفاء القائمة القديمة */
-#mainNav {
-  display:none !important;
-}
+#mainNav{display:none!important}
 
-#home {
+#home{
   direction:rtl;
-  font-family:inherit;
-  color:#173b55;
   padding:12px;
   background:#f1f7fb;
-}
-
-#home .new-dashboard {
-  display:grid;
-  grid-template-columns:245px minmax(0,1fr);
-  gap:18px;
-  max-width:1500px;
-  margin:auto;
-}
-
-/* القائمة الجانبية */
-#home .dash-sidebar {
-  background:linear-gradient(180deg,#075477,#087f91);
-  color:white;
-  border-radius:20px;
-  padding:22px 14px;
-  box-shadow:0 8px 25px #174b6522;
-}
-
-#home .dash-brand {
-  text-align:center;
-  padding:12px 5px 22px;
-  border-bottom:1px solid #ffffff35;
-  margin-bottom:15px;
-}
-
-#home .dash-brand .logo {
-  font-size:43px;
-}
-
-#home .dash-brand h2 {
-  font-size:21px;
-  margin:8px 0 4px;
-  color:white;
-}
-
-#home .dash-brand p {
-  font-size:12px;
-  margin:0;
-  color:#d8f4ff;
-}
-
-#home .dash-menu {
-  display:grid;
-  gap:8px;
-}
-
-#home .dashboard-nav-btn {
-  display:flex;
-  align-items:center;
-  gap:11px;
-  width:100%;
-  padding:12px 13px;
-  border:0;
-  border-radius:11px;
-  color:white;
-  background:transparent;
+  color:#173b55;
   font-family:inherit;
-  font-size:14px;
-  font-weight:bold;
-  text-align:right;
+}
+
+#home .dashboard-wrap{
+  width:100%;
+  max-width:1500px;
+  margin:12px auto;
+  overflow:hidden;
+  border-radius:18px;
+  box-shadow:0 8px 28px rgba(0,50,90,.16);
+}
+
+#home .dashboard-canvas{
+  position:relative;
+  width:100%;
+  aspect-ratio:1648 / 928;
+  overflow:hidden;
+  background:#dff5ff;
+}
+
+#home .dashboard-canvas>img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  display:block;
+}
+
+#home .dash-hotspot{
+  position:absolute;
+  z-index:5;
+  display:block;
+  border:0;
+  padding:0;
+  margin:0;
+  background:transparent;
   cursor:pointer;
+  border-radius:12px;
   transition:.2s;
 }
 
-#home .dashboard-nav-btn:hover,
-#home .dashboard-nav-btn:focus {
-  background:#ffffff25;
-  outline:none;
+#home .dash-hotspot:hover{
+  background:rgba(255,255,255,.25);
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.8);
 }
 
-#home .dashboard-nav-btn .ico {
-  font-size:20px;
-  width:27px;
-  text-align:center;
+#home .dash-hotspot:focus-visible{
+  outline:3px solid #ffcf48;
 }
 
-/* المحتوى الرئيسي */
-#home .dash-main {
-  min-width:0;
-}
-
-#home .dash-topbar {
+/* أزرار القائمة الجانبية */
+#home .nav-home{right:.7%;top:20.5%;width:14%;height:8.5%}
+#home .nav-daily{right:.7%;top:30%;width:14%;height:7.5%}
+#home .nav-chem{right:.7%;top:38.1%;width:14%;height:7.5%}
+#home .nav-requests{
+  right:.7%;top:46.5%;width:14%;height:7.5%;
+  background:rgba(7,84,119,.94);
+  color:white;
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  gap:12px;
-  background:white;
-  border-radius:17px;
-  padding:16px 20px;
-  box-shadow:0 4px 15px #174b6510;
-  margin-bottom:18px;
-}
-
-#home .dash-topbar h2 {
-  margin:0 0 5px;
-  color:#075477;
-  font-size:22px;
-}
-
-#home .dash-topbar p {
-  margin:0;
-  color:#78909f;
-  font-size:13px;
-}
-
-#home .dash-date {
-  color:#087f91;
+  justify-content:center;
+  font-family:inherit;
   font-weight:bold;
-  font-size:13px;
+  font-size:clamp(8px,1.1vw,15px);
 }
-
-/* واجهة الترحيب */
-#home .dash-hero {
-  position:relative;
-  overflow:hidden;
-  border-radius:20px;
-  padding:28px;
-  color:white;
-  background:linear-gradient(115deg,#075477,#0799a5);
-  box-shadow:0 8px 25px #087f9130;
-  margin-bottom:18px;
-}
-
-#home .dash-hero h2 {
-  color:white;
-  font-size:25px;
-  margin:0 0 10px;
-}
-
-#home .dash-hero p {
-  color:#e0faff;
-  margin:0;
-  line-height:1.8;
-  max-width:600px;
-}
-
-#home .dash-hero .hero-icon {
-  position:absolute;
-  left:25px;
-  top:15px;
-  font-size:75px;
-  opacity:.22;
-}
+#home .nav-inventory{right:.7%;top:54.7%;width:14%;height:7.5%}
+#home .nav-invoices{right:.7%;top:63%;width:14%;height:7.5%}
+#home .nav-settings{right:.7%;top:70.5%;width:14%;height:7.5%}
+#home .nav-safety{right:.7%;top:76.8%;width:14%;height:7.5%}
 
 /* الإحصائيات */
-#home .dash-stats {
+#home .live-stats{
+  position:absolute;
+  z-index:4;
+  left:1.7%;
+  top:52.3%;
+  width:81.5%;
+  height:14.1%;
   display:grid;
   grid-template-columns:repeat(5,minmax(0,1fr));
-  gap:12px;
-  margin-bottom:20px;
+  gap:.7%;
 }
 
-#home .dash-stat {
-  background:white;
-  border-radius:16px;
-  padding:16px 8px;
+#home .live-stat{
+  min-width:0;
+  border-radius:12px;
+  background:rgba(255,255,255,.96);
+  border:1px solid #c6eafa;
+  box-shadow:0 4px 12px rgba(0,80,130,.16);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
   text-align:center;
-  border:1px solid #e1edf3;
-  box-shadow:0 4px 14px #174b650c;
-}
-
-#home .dash-stat .stat-icon {
-  font-size:25px;
-}
-
-#home .dash-stat b {
-  display:block;
-  font-size:25px;
-  color:#087f91;
-  margin:6px 0;
-}
-
-#home .dash-stat span {
-  display:block;
-  font-size:11px;
-  font-weight:bold;
-  color:#607d8b;
-}
-
-/* الاختصارات */
-#home .dash-heading {
+  padding:3px;
   color:#075477;
-  font-size:18px;
-  margin:22px 0 12px;
 }
 
-#home .dash-shortcuts {
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:12px;
+#home .live-stat b{
+  font-size:clamp(12px,2.2vw,30px);
+  color:#087eae;
+  line-height:1.3;
 }
 
-#home .dash-card {
-  background:white;
-  border:1px solid #e1edf3;
-  border-radius:16px;
-  padding:17px 10px;
-  min-height:110px;
-  text-align:center;
-  cursor:pointer;
-  font-family:inherit;
-  color:#075477;
+#home .live-stat span{
+  font-size:clamp(7px,.9vw,13px);
   font-weight:bold;
-  box-shadow:0 4px 14px #174b650c;
-  transition:.2s;
 }
 
-#home .dash-card:hover {
-  transform:translateY(-3px);
-  border-color:#0799a5;
-  box-shadow:0 7px 18px #087f9120;
-}
-
-#home .dash-card .card-icon {
-  display:block;
-  font-size:29px;
-  margin-bottom:9px;
-}
-
-#home .dash-card span:last-child {
-  font-size:13px;
-}
+/* البطاقات الأربع أسفل الصورة */
+#home .quick-progress{left:1.8%;top:69%;width:19%;height:20.5%}
+#home .quick-schedule{left:22.4%;top:69%;width:19.1%;height:20.5%}
+#home .quick-various{left:43.6%;top:69%;width:19.3%;height:20.5%}
+#home .quick-audio{left:64.8%;top:69%;width:18.3%;height:20.5%}
 
 /* إشعار الطلبات */
-#home .home-notification {
-  background:white;
-  border:1px solid #d6eaf2;
-  border-right:5px solid #0799a5;
+#home .home-notification{
+  max-width:1500px;
+  margin:18px auto;
+  background:linear-gradient(120deg,#e9faff,#fff);
+  border:1px solid #b9e5f4;
+  border-right:5px solid #0798bd;
   border-radius:15px;
   padding:16px;
-  margin-top:20px;
-  box-shadow:0 4px 14px #174b650c;
+  box-shadow:0 4px 14px rgba(0,70,100,.07);
 }
 
-#home .home-notification button {
-  background:#087f91;
+#home .home-notification button{
+  background:#087fa8;
   color:white;
   border:0;
   border-radius:9px;
@@ -3122,253 +3012,153 @@ td {
   font-weight:bold;
 }
 
-#home .dash-footer {
+#home .home-footer{
   text-align:center;
-  color:#8299a7;
+  color:#78909f;
   font-size:12px;
-  padding:22px 5px 8px;
+  padding:12px;
 }
 
-/* الهاتف */
-@media(max-width:850px) {
-  #home .new-dashboard {
-    grid-template-columns:1fr;
+/* ملاءمة الهاتف */
+@media(max-width:650px){
+  #home{padding:5px}
+  #home .dashboard-wrap{
+    width:100%;
+    overflow:hidden;
+    border-radius:10px;
   }
-
-  #home .dash-sidebar {
-    padding:13px;
+  #home .dashboard-canvas{
+    width:100%;
+    min-width:0;
   }
-
-  #home .dash-brand {
-    padding:5px 5px 12px;
-    margin-bottom:10px;
+  #home .live-stat{
+    border-radius:5px;
+    padding:1px;
   }
-
-  #home .dash-brand .logo {
-    font-size:30px;
-  }
-
-  #home .dash-brand h2 {
-    font-size:18px;
-  }
-
-  #home .dash-menu {
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:6px;
-  }
-
-  #home .dashboard-nav-btn {
-    font-size:12px;
-    padding:10px 7px;
-    justify-content:flex-start;
-  }
-
-  #home .dash-stats {
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  #home .dash-stats .dash-stat:last-child {
-    grid-column:span 2;
-  }
-
-  #home .dash-shortcuts {
-    grid-template-columns:repeat(2,minmax(0,1fr));
-  }
-
-  #home .dash-hero {
-    padding:22px 17px;
-  }
-
-  #home .dash-hero h2 {
-    font-size:21px;
-  }
-
-  #home .dash-hero .hero-icon {
-    font-size:55px;
-    left:12px;
-  }
-
-  #home .dash-topbar {
-    padding:13px;
-  }
-
-  #home .dash-topbar h2 {
-    font-size:18px;
+  #home .live-stat b{font-size:clamp(9px,3vw,15px)}
+  #home .live-stat span{font-size:clamp(5px,1.5vw,8px)}
+  #home .nav-requests{
+    font-size:clamp(6px,1.7vw,10px);
+    border-radius:5px;
   }
 }
 </style>
 
-<div class="new-dashboard">
+<div class="head">
+  <div>
+    <h2>لوحة التحكم</h2>
+    <p class="small">مرحباً بك في منصة المخبري</p>
+  </div>
+</div>
 
-  <!-- القائمة الرئيسية -->
-  <aside class="dash-sidebar">
+<div class="dashboard-wrap">
+  <div class="dashboard-canvas">
 
-    <div class="dash-brand">
-      <div class="logo">🔬</div>
-      <h2>منصة المخبري</h2>
-      <p>إدارة مخابر المؤسسات التربوية</p>
-    </div>
+    <img src="./lab-dashboard.png"
+         alt="لوحة التحكم لمنصة المخبري">
 
-    <div class="dash-menu">
+    <!-- القائمة التفاعلية -->
+    <button class="dash-hotspot nav-home"
+      onclick="show('home')" title="الرئيسية"
+      aria-label="الرئيسية"></button>
 
-      <button class="dashboard-nav-btn" onclick="show('home')">
-        <span class="ico">🏠</span> الرئيسية
-      </button>
+    <button class="dash-hotspot nav-daily"
+      onclick="show('daily')" title="التقارير اليومية"
+      aria-label="التقارير اليومية"></button>
 
-      <button class="dashboard-nav-btn" onclick="show('daily')">
-        <span class="ico">📋</span> التقارير اليومية
-      </button>
+    <button class="dash-hotspot nav-chem"
+      onclick="show('chemicals')" title="المحاليل الكيميائية"
+      aria-label="المحاليل الكيميائية"></button>
 
-      <button class="dashboard-nav-btn" onclick="show('chemicals')">
-        <span class="ico">🧪</span> المحاليل الكيميائية
-      </button>
+    <button class="dash-hotspot nav-requests"
+      onclick="show('requests')" title="الطلبات"
+      aria-label="الطلبات">
+      📨 الطلبات
+    </button>
 
-      <button class="dashboard-nav-btn" onclick="show('inventory')">
-        <span class="ico">📦</span> الجرد والمخزون
-      </button>
+    <button class="dash-hotspot nav-inventory"
+      onclick="show('inventory')" title="الجرد والمخزون"
+      aria-label="الجرد والمخزون"></button>
 
-      <button class="dashboard-nav-btn" onclick="show('invoices')">
-        <span class="ico">🧾</span> الفواتير والمشتريات
-      </button>
+    <button class="dash-hotspot nav-invoices"
+      onclick="show('invoices')" title="الفواتير والمشتريات"
+      aria-label="الفواتير والمشتريات"></button>
 
-      <button class="dashboard-nav-btn" onclick="show('requests')">
-        <span class="ico">📨</span> الطلبات
-      </button>
+    <button class="dash-hotspot nav-settings"
+      onclick="show('settings')" title="الإعدادات"
+      aria-label="الإعدادات"></button>
 
-      <button class="dashboard-nav-btn" onclick="show('progress')">
-        <span class="ico">📊</span> التدرج السنوي
-      </button>
+    <button class="dash-hotspot nav-safety"
+      onclick="show('safety')" title="السلامة المخبرية"
+      aria-label="السلامة المخبرية"></button>
 
-      <button class="dashboard-nav-btn" onclick="show('labSchedule')">
-        <span class="ico">🗓️</span> استعمال الزمن
-      </button>
-
-      <button class="dashboard-nav-btn" onclick="show('safety')">
-        <span class="ico">🛡️</span> السلامة المخبرية
-      </button>
-
-      <button class="dashboard-nav-btn" onclick="show('various')">
-        <span class="ico">📚</span> منوعات
-      </button>
-
-      <button class="dashboard-nav-btn" onclick="show('other')">
-        <span class="ico">🔊</span> الصوتيات والسمعيات
-      </button>
-
-      <button class="dashboard-nav-btn" onclick="show('settings')">
-        <span class="ico">⚙️</span> الإعدادات
-      </button>
-
-    </div>
-  </aside>
-
-  <!-- محتوى لوحة التحكم -->
-  <main class="dash-main">
-
-    <div class="dash-topbar">
-      <div>
-        <h2>لوحة التحكم</h2>
-        <p>مرحباً بك في منصة المخبري</p>
+    <!-- الإحصائيات الحقيقية -->
+    <div class="live-stats">
+      <div class="live-stat">
+        <b id="sInv">0</b>
+        <span>📦 العتاد والتجهيزات</span>
       </div>
-      <div class="dash-date">🔬 فضاء إدارة المخبر</div>
+      <div class="live-stat">
+        <b id="sChem">0</b>
+        <span>🧪 المواد الكيميائية</span>
+      </div>
+      <div class="live-stat">
+        <b id="sDaily">0</b>
+        <span>📋 التقارير اليومية</span>
+      </div>
+      <div class="live-stat">
+        <b id="sReq">0</b>
+        <span>📨 طلبات الأساتذة</span>
+      </div>
+      <div class="live-stat">
+        <b id="sProj">0</b>
+        <span>📊 المشاريع</span>
+      </div>
     </div>
 
-    <div class="dash-hero">
-      <div class="hero-icon">⚗️</div>
-      <h2>مرحباً بك في منصة المخبري</h2>
-      <p>
-        فضاء متكامل لتنظيم العتاد والتجهيزات،
-        متابعة المحاليل الكيميائية، وتسيير أعمال المخبر
-        والتقارير والطلبات.
+    <!-- البطاقات السفلية -->
+    <button class="dash-hotspot quick-progress"
+      onclick="show('progress')"
+      title="التدرج السنوي"
+      aria-label="التدرج السنوي"></button>
+
+    <button class="dash-hotspot quick-schedule"
+      onclick="show('labSchedule')"
+      title="استعمال الزمن"
+      aria-label="استعمال الزمن"></button>
+
+    <button class="dash-hotspot quick-various"
+      onclick="show('various')"
+      title="منوعات"
+      aria-label="منوعات"></button>
+
+    <button class="dash-hotspot quick-audio"
+      onclick="show('other')"
+      title="الصوتيات والسمعيات"
+      aria-label="الصوتيات والسمعيات"></button>
+
+  </div>
+</div>
+
+<!-- إشعار الطلبات -->
+<div id="requestsNotification" class="home-notification">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="font-size:30px">🔔</div>
+    <div>
+      <h3 style="margin:0 0 6px">طلبات الأساتذة</h3>
+      <p id="requestsNotificationText" style="margin:0">
+        جارٍ التحقق من الطلبات...
       </p>
     </div>
+  </div>
 
-    <h3 class="dash-heading">📊 إحصائيات المخبر</h3>
+  <button onclick="show('requests')" style="margin-top:13px">
+    📨 عرض الطلبات
+  </button>
+</div>
 
-    <div class="dash-stats">
-
-      <div class="dash-stat">
-        <div class="stat-icon">📦</div>
-        <b id="sInv">0</b>
-        <span>العتاد والتجهيزات</span>
-      </div>
-
-      <div class="dash-stat">
-        <div class="stat-icon">🧪</div>
-        <b id="sChem">0</b>
-        <span>المواد الكيميائية</span>
-      </div>
-
-      <div class="dash-stat">
-        <div class="stat-icon">📋</div>
-        <b id="sDaily">0</b>
-        <span>التقارير اليومية</span>
-      </div>
-
-      <div class="dash-stat">
-        <div class="stat-icon">📨</div>
-        <b id="sReq">0</b>
-        <span>طلبات الأساتذة</span>
-      </div>
-
-      <div class="dash-stat">
-        <div class="stat-icon">📊</div>
-        <b id="sProj">0</b>
-        <span>المشاريع</span>
-      </div>
-
-    </div>
-
-    <h3 class="dash-heading">🚀 الوصول السريع إلى الأقسام</h3>
-
-    <div class="dash-shortcuts">
-
-      <button class="dash-card" onclick="show('inventory')">
-        <span class="card-icon">📦</span>
-        <span>الجرد والمخزون</span>
-      </button>
-
-      <button class="dash-card" onclick="show('chemicals')">
-        <span class="card-icon">🧪</span>
-        <span>المحاليل الكيميائية</span>
-      </button>
-
-      <button class="dash-card" onclick="show('invoices')">
-        <span class="card-icon">🧾</span>
-        <span>الفواتير والمشتريات</span>
-      </button>
-
-      <button class="dash-card" onclick="show('daily')">
-        <span class="card-icon">📋</span>
-        <span>التقارير اليومية</span>
-      </button>
-
-    </div>
-
-    <!-- إشعار الطلبات -->
-    <div id="requestsNotification" class="home-notification">
-
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="font-size:30px">🔔</div>
-        <div>
-          <h3 style="margin:0 0 6px">طلبات الأساتذة</h3>
-          <p id="requestsNotificationText" style="margin:0">
-            جارٍ التحقق من الطلبات...
-          </p>
-        </div>
-      </div>
-
-      <button onclick="show('requests')" style="margin-top:13px">
-        📨 عرض الطلبات
-      </button>
-
-    </div>
-
-    <div class="dash-footer">
-      منصة المخبري — متوسطة قايد أحمد – غليزان
-    </div>
-
-  </main>
+<div class="home-footer">
+  منصة المخبري — متوسطة قايد أحمد – غليزان
 </div>
 
 </section>
