@@ -2494,6 +2494,14 @@ button[onclick*="Remove"] {
   header > button.primary {
   display: none !important;
 }
+#home .logout-hotspot {
+  left: 86%;
+  top: 82%;
+  width: 13%;
+  height: 8%;
+  z-index: 20;
+  background: transparent;
+}
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
@@ -3091,7 +3099,14 @@ td {
     <button class="dash-hotspot nav-safety"
       onclick="show('safety')" title="السلامة المخبرية"
       aria-label="السلامة المخبرية"></button>
-
+<!-- زر تسجيل الخروج الأحمر -->
+<button
+  type="button"
+  class="dash-hotspot logout-hotspot"
+  onclick="logoutUser()"
+  title="تسجيل الخروج"
+  aria-label="تسجيل الخروج">
+</button>
     <!-- الإحصائيات الحقيقية -->
   <div class="live-stats" style="display:none !important;">
       <div class="live-stat">
