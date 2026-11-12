@@ -4424,12 +4424,13 @@ function nowTime(){
 }
 
 
+
 function show(id){
   document.querySelectorAll('.section').forEach(x=>{
     x.classList.remove('active','printing');
   });
 
-  const s=document.getElementById(id);
+  const s = document.getElementById(id);
 
   if(s){
     s.classList.add('active');
@@ -4444,10 +4445,43 @@ function show(id){
     }
   });
 
-  // إغلاق قائمة الهاتف بعد اختيار القسم
+  // إغلاق قائمة الهاتف
   const menu = document.getElementById('mainNav');
   if(menu){
     menu.classList.remove('mobile-open');
+  }
+
+  // إظهار زر العودة للرئيسية في الأقسام
+  document.querySelectorAll('.home-return-btn').forEach(btn=>{
+    btn.remove();
+  });
+
+  if(id !== 'home' && s){
+    const backBtn = document.createElement('button');
+
+    backBtn.className = 'home-return-btn';
+    backBtn.innerHTML = '🏠 العودة إلى الرئيسية';
+    backBtn.type = 'button';
+    backBtn.onclick = function(){
+      show('home');
+    };
+
+    backBtn.style.cssText = `
+      display:block;
+      margin:12px auto;
+      padding:12px 20px;
+      background:#087f8c;
+      color:white;
+      border:0;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:bold;
+      cursor:pointer;
+      width:calc(100% - 24px);
+      max-width:320px;
+    `;
+
+    s.insertBefore(backBtn, s.firstChild);
   }
 
   window.scrollTo(0,0);
@@ -4457,6 +4491,7 @@ function show(id){
     loadInvoices();
   }
 }
+
 function toggle(id){
   const e=document.getElementById(id);
   if(e)e.classList.toggle('hidden');
