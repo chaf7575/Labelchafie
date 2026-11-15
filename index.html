@@ -3086,29 +3086,54 @@ td {
   padding:12px;
 }
 
-/* ملاءمة الهاتف */
-@media(max-width:650px){
-  #home{padding:5px}
-  #home .dashboard-wrap{
-    width:100%;
-    overflow:hidden;
-    border-radius:10px;
+
+/* ملاءمة الهاتف وتكبير لوحة التحكم */
+@media screen and (max-width: 650px) {
+  #home {
+    padding: 5px !important;
   }
-  #home .dashboard-canvas{
-    width:100%;
-    min-width:0;
+
+  #home .dashboard-wrap {
+    width: 110% !important;
+    max-width: none !important;
+    margin: 12px 0 12px -5% !important;
+    overflow: hidden !important;
+    border-radius: 10px;
   }
-  #home .live-stat{
-    border-radius:5px;
-    padding:1px;
+
+  #home .dashboard-canvas {
+    position: relative !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    aspect-ratio: 1648 / 928 !important;
   }
-  #home .live-stat b{font-size:clamp(9px,3vw,15px)}
-  #home .live-stat span{font-size:clamp(5px,1.5vw,8px)}
-  #home .nav-requests{
-    font-size:clamp(6px,1.7vw,10px);
-    border-radius:5px;
+
+  #home .dashboard-canvas > img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important;
+  }
+
+  #home .live-stat {
+    border-radius: 5px;
+    padding: 1px;
+  }
+
+  #home .live-stat b {
+    font-size: clamp(9px, 3vw, 15px);
+  }
+
+  #home .live-stat span {
+    font-size: clamp(5px, 1.5vw, 8px);
+  }
+
+  #home .nav-requests {
+    font-size: clamp(6px, 1.7vw, 10px);
+    border-radius: 5px;
   }
 }
+
+  
 </style>
 
 <div class="head">
