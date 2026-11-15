@@ -6787,82 +6787,145 @@ function printSavedDaily(id){
   printDaily();
 }
 
-function printDaily(){
+
+function printDaily() {
   applyReportColumnWidths();
-  const official=document.querySelector('#daily .official');
-  if(!official){
+
+  const official = document.querySelector('#daily .official');
+
+  if (!official) {
     alert('❌ تعذر العثور على نموذج التقرير للطباعة');
     return;
   }
 
-  // طباعة نسخة مستقلة من التقرير مع فرض حدود سوداء واضحة على كل خلايا الجدول
-  const report=official.cloneNode(true);
-  report.querySelectorAll('.no-print,button').forEach(el=>el.remove());
+  const report = official.cloneNode(true);
+  report.querySelectorAll('.no-print, button').forEach(el => el.remove());
 
-  const printWindow=window.open('', '_blank', 'width=1100,height=800');
-  if(!printWindow){
-    alert('❌ منع المتصفح نافذة الطباعة. اسمح بالنوافذ المنبثقة لهذا الموقع ثم أعد المحاولة.');
-    return;
-  }
+  // إنشاء إطار طباعة مخفي
+  let frame = document.getElementById('dailyPrintFrame');
 
-  printWindow.document.open();
-  printWindow.document.write(`<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>تقرير يومي للمخبر</title>
-<style>
-@page{size:A4 landscape;margin:10mm}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#fff;color:#000;font-family:Arial,Tahoma,sans-serif;direction:rtl}
-.report{width:100%;background:#fff;color:#000}
-h2,h3,h4,p{text-align:inherit}
-table{display:table!important;width:100%!important;min-width:0!important;border-collapse:collapse!important;border-spacing:0!important;table-layout:fixed!important;background:#fff!important;color:#000!important}
-thead{display:table-header-group!important}
-tbody{display:table-row-group!important}
-tr{display:table-row!important;break-inside:avoid;page-break-inside:avoid}
-th,td{display:table-cell!important;border:1.5px solid #000!important;padding:6px 5px!important;color:#000!important;background:#fff!important;text-align:right;vertical-align:middle;overflow-wrap:anywhere;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-th{font-weight:bold!important}
-.tablewrap{width:100%!important;overflow:visible!important}
-.signatures{display:flex!important;flex-direction:row!important;direction:rtl!important;justify-content:space-between!important;align-items:flex-start!important;text-align:center!important;width:100%!important;margin-top:35px!important;gap:10px!important;break-inside:avoid!important}
-.signatures>div{flex:1 1 0!important;text-align:center!important;direction:rtl!important}
-@media screen{body{padding:18px}.report{max-width:1200px;margin:auto}}
-</style>
-</head>
-<body><main class="report">${report.innerHTML}</main>
-<script>
-window.addEventListener('load', async function () {
-  try {
-    if (document.fonts && document.fonts.ready) {
-      await document.fonts.ready;
-    }
+  if (frame) frame.remove();
 
-    const images = Array.from(document.images);
-    await Promise.all(images.map(img => {
-      if (img.complete) return Promise.resolve();
-      return new Promise(resolve => {
-        img.onload = resolve;
-        img.onerror = resolve;
-      });
-    }));
+  frame = document.createElement('iframe');
+  frame.id = 'dailyPrintFrame';
 
+  frame.style.position = 'fixed';
+  frame.style.right = '0';
+  frame.style.bottom = '0';
+  frame.style.width = '0';
+  frame.style.height = '0';
+  frame.style.border = '0';
+
+  document.body.appendChild(frame);
+
+  const printDoc = frame.contentWindow.document;
+
+  printDoc.open();
+  printDoc.write(`
+    <!doctype html>
+    <html lang="ar" dir="rtl">
+    <head>
+      <meta charset="utf-8">
+      <title>تقرير يومي للمخبر</title>
+
+      <style>
+        @page {
+          size: A4 landscape;
+          margin: 10mm;
+        }
+
+        * {
+          box-sizing: border-box;
+        }
+
+        html, body {
+          margin: 0;
+          padding: 0;
+          background: white;
+          color: black;
+          font-family: Arial, Tahoma, sans-serif;
+          direction: rtl;
+        }
+
+        .report {
+          width: 100%;
+          background: white;
+          color: black;
+        }
+
+        table {
+          width: 100% !important;
+          border-collapse: collapse !important;
+          table-layout: fixed !important;
+        }
+
+        thead {
+          display: table-header-group !important;
+        }
+
+        tbody {
+          display: table-row-group !important;
+        }
+
+        tr {
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+
+        th, td {
+          border: 1.5px solid black !important;
+          padding: 6px 5px !important;
+          color: black !important;
+          background: white !important;
+          text-align: right;
+          vertical-align: middle;
+          overflow-wrap: anywhere;
+        }
+
+        .tablewrap {
+          width: 100% !important;
+          overflow: visible !important;
+        }
+
+        .signatures {
+          display: flex !important;
+          flex-direction: row !important;
+          direction: rtl !important;
+          justify-content: space-between !important;
+          align-items: flex-start !important;
+          text-align: center !important;
+          width: 100% !important;
+          margin-top: 35px !important;
+          gap: 10px !important;
+          break-inside: avoid !important;
+        }
+
+        .signatures > div {
+          flex: 1 1 0 !important;
+          text-align: center !important;
+        }
+      </style>
+    </head>
+
+    <body>
+      <main class="report">
+        ${report.innerHTML}
+      </main>
+    </body>
+    </html>
+  `);
+
+  printDoc.close();
+
+  // انتظار تحميل محتوى إطار الطباعة
+  frame.onload = function () {
     setTimeout(function () {
-      window.focus();
-      window.print();
-    }, 1200);
-
-  } catch (error) {
-    setTimeout(function () {
-      window.focus();
-      window.print();
-    }, 1200);
-  }
-});
-<\/script>
-</body></html>`);
-  printWindow.document.close();
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+    }, 700);
+  };
 }
+
 
 const defaultReportColumnWidths = [9, 7, 8, 6, 20, 25, 12, 13];
 let reportColumnWidths = [...defaultReportColumnWidths];
