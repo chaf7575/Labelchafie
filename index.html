@@ -2463,36 +2463,8 @@ button[onclick*="Remove"] {
   }
 }
 
-/* تحسين لوحة الرئيسية على الهاتف */
 
-/* تحسين لوحة التحكم على الهاتف */
-@media (max-width: 600px) {
 
-  #home .dashboard-wrap {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    overflow: visible !important;
-  }
-
-  #home .dashboard-canvas {
-    position: relative !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    height: auto !important;
-    aspect-ratio: 1648 / 928 !important;
-    margin: 0 auto !important;
-  }
-
-  #home .dashboard-canvas img {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: fill !important;
-  }
-}
 
  /* إزالة البطاقات البيضاء من لوحة التحكم */
 #home .live-stats {
@@ -2538,29 +2510,6 @@ button[onclick*="Remove"] {
   line-height: 1.7;
 } 
   
-@media screen and (max-width: 600px) {
-  #home .dashboard-wrap,
-  #home .dashboard-canvas {
-    display: block !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    min-width: 100vw !important;
-    margin-left: calc(50% - 50vw) !important;
-    margin-right: calc(50% - 50vw) !important;
-    box-sizing: border-box !important;
-  }
-
-  #home .dashboard-canvas {
-    aspect-ratio: 1648 / 928 !important;
-    height: auto !important;
-  }
-
-  #home .dashboard-canvas img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: fill !important;
-  }
-}
 
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
