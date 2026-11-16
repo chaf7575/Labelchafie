@@ -239,7 +239,15 @@ function setCurrentDateTime(){
     time;
 }
 
+function createTrackingCode() {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
 
+  return Array.from(bytes)
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase();
+}
 async function sendTeacherRequest(){
 
   const teacherName =
@@ -297,7 +305,7 @@ async function sendTeacherRequest(){
   message.innerHTML =
     '<div class="small">⏳ جاري إرسال الطلب...</div>';
 
-
+const trackingCode = createTrackingCode();
   try{
 
     const { error } =
@@ -326,11 +334,11 @@ async function sendTeacherRequest(){
           notes:
             notes,
 
-          status:
-            "جديد",
+         status: "جديد",
 
-          is_read:
-            false
+is_read: false,
+
+tracking_code: trackingCode
 
         });
 
@@ -352,10 +360,23 @@ async function sendTeacherRequest(){
     }
 
 
-    message.innerHTML =
-      '<div class="success">' +
-      '✅ تم إرسال الطلب بنجاح إلى المخبري.' +
-      '</div>';
+  message.innerHTML = `
+  <div class="success">
+    ✅ تم إرسال الطلب بنجاح إلى المخبري.
+    <br><br>
+    <strong>رمز متابعة طلبك:</strong>
+    <br>
+    <code style="font-size:18px;direction:ltr;display:inline-block;margin:10px">
+      ${trackingCode}
+    </code>
+    <br>
+    احتفظ بهذا الرمز لمعرفة رد مسؤول المخبر.
+    <br><br>
+    <button onclick="navigator.clipboard.writeText('${trackingCode}')">
+      📋 نسخ الرمز
+    </button>
+  </div>
+`;
 
 
     document.getElementById(
