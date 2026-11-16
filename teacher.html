@@ -289,9 +289,20 @@ async function trackTeacherRequest() {
         <p><strong>الأدوات المطلوبة:</strong> <span id="trackTools"></span></p>
         <p><strong>الحالة:</strong> <span id="trackStatus"></span></p>
         <hr>
-        <h3>💬 رد مسؤول المخبر</h3>
-        <p id="trackReply"></p>
-        <p><strong>تاريخ الرد:</strong> <span id="trackReplyDate"></span></p>
+        
+<h3>💬 رد مسؤول المخبر</h3>
+<p id="trackReply"></p>
+
+<hr>
+
+<h3>📝 ملاحظات مسؤول المخبر</h3>
+<p id="trackReplyNotes"></p>
+
+<p>
+  <strong>تاريخ الرد:</strong>
+  <span id="trackReplyDate"></span>
+</p>
+
       </div>
     `;
 
@@ -303,6 +314,10 @@ async function trackTeacherRequest() {
     document.getElementById("trackStatus").textContent = request.status || "قيد المعالجة";
     document.getElementById("trackReply").textContent =
       request.reply_text || "لم يرد مسؤول المخبر على طلبك بعد.";
+   
+
+document.getElementById("trackReplyNotes").textContent =
+  request.reply_notes || "لا توجد ملاحظات إضافية.";
     document.getElementById("trackReplyDate").textContent =
       request.replied_at || "لم يتم الرد بعد.";
 
