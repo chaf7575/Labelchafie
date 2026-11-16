@@ -216,13 +216,107 @@ window.supabase.createClient(
 
     <div id="message"></div>
 
+
   </div>
 
 </div>
 
+<!-- قسم متابعة الطلبات -->
+<div class="container">
+  <div class="card">
+    <h2>🔎 متابعة طلباتي</h2>
+    <p class="small">
+      أدخل رمز المتابعة الذي حصلت عليه بعد إرسال الطلب لمعرفة حالته ورد مسؤول المخبر.
+    </p>
+
+    <label for="trackingCodeInput">رمز متابعة الطلب</label>
+    <input
+      id="trackingCodeInput"
+      type="text"
+      placeholder="أدخل رمز المتابعة هنا"
+      dir="ltr"
+      style="text-align:center;text-transform:uppercase"
+    >
+
+    <div class="actions">
+      <button class="primary" onclick="trackTeacherRequest()">
+        🔍 عرض الطلب
+      </button>
+    </div>
+
+    <div id="trackingResult" aria-live="polite"></div>
+  </div>
+</div>
+
 <script>
 
+async function trackTeacherRequest() {
+  const code = document
+    .getElementById("trackingCodeInput")
+    .value.trim().toUpperCase();
+
+  const result = document.getElementById("trackingResult");
+
+  if (!code) {
+    result.innerHTML = '<div class="error">يرجى إدخال رمز المتابعة.</div>';
+    return;
+  }
+
+  result.innerHTML = '<div class="small">⏳ جاري البحث عن طلبك...</div>';
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      "get_teacher_request",
+      { p_tracking_code: code }
+    );
+
+    if (error) throw error;
+
+    const request = Array.isArray(data) ? data[0] : data;
+
+    if (!request) {
+      result.innerHTML = '<div class="error">لم نعثر على طلب بهذا الرمز. تحقق من الرمز وحاول مجددًا.</div>';
+      return;
+    }
+
+    result.innerHTML = `
+      <div class="success" style="margin-top:18px">
+        <h3>📋 معلومات الطلب</h3>
+        <p><strong>الأستاذ:</strong> <span id="trackTeacher"></span></p>
+        <p><strong>القسم:</strong> <span id="trackClass"></span></p>
+        <p><strong>تاريخ الطلب:</strong> <span id="trackDate"></span></p>
+        <p><strong>نص الطلب:</strong> <span id="trackText"></span></p>
+        <p><strong>الأدوات المطلوبة:</strong> <span id="trackTools"></span></p>
+        <p><strong>الحالة:</strong> <span id="trackStatus"></span></p>
+        <hr>
+        <h3>💬 رد مسؤول المخبر</h3>
+        <p id="trackReply"></p>
+        <p><strong>تاريخ الرد:</strong> <span id="trackReplyDate"></span></p>
+      </div>
+    `;
+
+    document.getElementById("trackTeacher").textContent = request.teacher || "—";
+    document.getElementById("trackClass").textContent = request.class_name || "—";
+    document.getElementById("trackDate").textContent = request.request_date || "—";
+    document.getElementById("trackText").textContent = request.request_text || "—";
+    document.getElementById("trackTools").textContent = request.tools || "—";
+    document.getElementById("trackStatus").textContent = request.status || "قيد المعالجة";
+    document.getElementById("trackReply").textContent =
+      request.reply_text || "لم يرد مسؤول المخبر على طلبك بعد.";
+    document.getElementById("trackReplyDate").textContent =
+      request.replied_at || "لم يتم الرد بعد.";
+
+  } catch (error) {
+    console.error("TRACK REQUEST ERROR:", error);
+    result.innerHTML =
+      '<div class="error">حدث خطأ أثناء البحث: ' +
+      error.message +
+      '</div>';
+  }
+}
+
 function setCurrentDateTime(){
+
 
   const now = new Date();
 
