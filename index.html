@@ -2515,115 +2515,106 @@ button[onclick*="Remove"] {
   display: none;
 }
 
-@media screen and (max-width: 1000px) {
-  #home .dashboard-wrap {
-    display: none !important;
-  }
 
-  #home .mobile-dashboard {
-    display: block;
-    direction: rtl;
-    width: 100%;
-    max-width: 500px;
-    margin: 12px auto;
-  }
 
-  #home .mobile-date {
-    background: linear-gradient(135deg, #075477, #0798bd);
-    color: white;
-    padding: 15px;
-    border-radius: 16px;
-    text-align: center;
-    margin-bottom: 16px;
-    box-shadow: 0 5px 14px rgba(0,70,110,.15);
-  }
+/* =====================================
+   لوحة التحكم الأصلية على الهاتف
+   ===================================== */
 
-  #home .mobile-date strong {
-    display: block;
-    font-size: 20px;
-    margin-bottom: 4px;
-  }
-
-  #home .mobile-date span {
-    font-size: 13px;
-  }
-
-  #home .mobile-card-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-
-  #home .mobile-card {
-    min-height: 112px;
-    border: 1px solid #d5eaf2;
-    border-radius: 17px;
-    background: white;
-    color: #075477;
-    box-shadow: 0 4px 12px rgba(0,70,110,.09);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform .2s, box-shadow .2s;
-  }
-
-  #home .mobile-card:active {
-    transform: scale(.96);
-    box-shadow: 0 2px 7px rgba(0,70,110,.12);
-  }
-
-  #home .mobile-card .mobile-icon {
-    font-size: 31px;
-    line-height: 1;
-  }
-
-  #home .mobile-logout {
-    width: 100%;
-    margin-top: 13px;
-    min-height: 48px;
-    border: 0;
-    border-radius: 13px;
-    background: #c93636;
-    color: white;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: bold;
-  }
-}
-  
-
-/* إظهار صورة لوحة التحكم الأصلية على الهاتف */
 @media screen and (max-width: 1000px) {
 
+  /* إخفاء البطاقات المستقلة */
   #home .mobile-dashboard {
     display: none !important;
   }
 
+  /* إطار الصورة */
   #home .dashboard-wrap {
     display: block !important;
+    position: relative !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 12px auto !important;
+    padding: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    border-radius: 12px !important;
+    box-shadow: 0 5px 18px rgba(0,50,90,.15);
+    -webkit-overflow-scrolling: touch;
+    touch-action: auto;
+    scrollbar-width: thin;
+  }
+
+  /* تكبير مساحة اللوحة */
+  #home .dashboard-canvas {
+    position: relative !important;
+    width: 200vw !important;
+    min-width: 200vw !important;
+    max-width: none !important;
+    aspect-ratio: 1648 / 928 !important;
     overflow: hidden !important;
-    border-radius: 12px;
+    background: #dff5ff;
+  }
+
+  /* الصورة الأصلية */
+  #home .dashboard-canvas > img {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important;
+  }
+
+  /* المحافظة على أماكن الأزرار */
+  #home .dash-hotspot {
+    position: absolute !important;
+    z-index: 5;
+    cursor: pointer;
+  }
+
+  /* زر الطلبات */
+  #home .nav-requests {
+    font-size: 14px !important;
+    border-radius: 10px !important;
+  }
+
+  /* التاريخ */
+  #home .live-dashboard-date {
+    font-size: 13px !important;
+  }
+
+  /* زر تسجيل الخروج */
+  #home .logout-hotspot {
+    z-index: 20 !important;
+  }
+
+  /* إخفاء الإحصائيات غير المطلوبة */
+  #home .live-stats {
+    display: none !important;
+  }
+
+  /* التذييل */
+  #home .home-footer {
+    font-size: 12px;
+    text-align: center;
+  }
+}
+
+/* الحاسوب: لا تغيير في التصميم */
+@media screen and (min-width: 1001px) {
+  #home .dashboard-wrap {
+    width: 100%;
+    max-width: 1500px;
   }
 
   #home .dashboard-canvas {
-    width: 100% !important;
-    min-width: 0 !important;
-    aspect-ratio: 1648 / 928 !important;
+    width: 100%;
+    aspect-ratio: 1648 / 928;
   }
 
-  #home .dashboard-canvas > img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
+  #home .mobile-dashboard {
+    display: none !important;
   }
 }
 
@@ -3152,49 +3143,78 @@ td {
 }
 
 
-/* ملاءمة الهاتف وتكبير لوحة التحكم */
+
+/* لوحة التحكم الأصلية على الهاتف */
 @media screen and (max-width: 650px) {
+
   #home {
     padding: 5px !important;
   }
 
-  #home .dashboard-wrap {
-    width: 110% !important;
-    max-width: none !important;
-    margin: 12px 0 12px -5% !important;
-    overflow: hidden !important;
-    border-radius: 10px;
+  /* إخفاء البطاقات البديلة */
+  #home .mobile-dashboard {
+    display: none !important;
   }
 
+  /* السماح بالتمرير الأفقي */
+  #home .dashboard-wrap {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 10px auto !important;
+    padding: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    border-radius: 10px;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+  }
+
+  /* تكبير الصورة الأصلية */
   #home .dashboard-canvas {
     position: relative !important;
-    width: 100% !important;
-    min-width: 0 !important;
+    width: 200vw !important;
+    min-width: 200vw !important;
+    max-width: none !important;
     aspect-ratio: 1648 / 928 !important;
+    overflow: hidden !important;
   }
 
   #home .dashboard-canvas > img {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
     width: 100% !important;
     height: 100% !important;
     object-fit: fill !important;
   }
 
-  #home .live-stat {
-    border-radius: 5px;
-    padding: 1px;
+  /* الحفاظ على مواقع الأزرار فوق الصورة */
+  #home .dash-hotspot {
+    position: absolute !important;
+    z-index: 5 !important;
   }
 
-  #home .live-stat b {
-    font-size: clamp(9px, 3vw, 15px);
-  }
-
-  #home .live-stat span {
-    font-size: clamp(5px, 1.5vw, 8px);
+  #home .logout-hotspot {
+    left: 86% !important;
+    top: 82% !important;
+    width: 13% !important;
+    height: 8% !important;
+    z-index: 20 !important;
   }
 
   #home .nav-requests {
-    font-size: clamp(6px, 1.7vw, 10px);
-    border-radius: 5px;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+  }
+
+  #home .live-stats {
+    display: none !important;
+  }
+
+  #home .home-footer {
+    font-size: 12px;
+    text-align: center;
   }
 }
 
