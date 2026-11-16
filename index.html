@@ -8812,18 +8812,28 @@ async function renderRequests(){
 
         <div style="min-width:190px">
 
-          <strong>💬 الرد على الأستاذ</strong>
+          
+<strong>💬 الرد على الأستاذ</strong>
 
-          <textarea
-            id="requestReply-${esc(x.id)}"
-            placeholder="اكتب الرد هنا..."
-            style="width:100%;min-height:75px;margin:7px 0"
-          >${esc(x.reply_text || '')}</textarea>
+<textarea
+  id="requestReply-${esc(x.id)}"
+  placeholder="اكتب الرد هنا..."
+  style="width:100%;min-height:75px;margin:7px 0"
+>${esc(x.reply_text || '')}</textarea>
 
-          <button type="button"
-            onclick="saveRequestReply('${esc(x.id)}')">
-            💾 حفظ الرد
-          </button>
+<strong>📝 ملاحظات مسؤول المخبر</strong>
+
+<textarea
+  id="requestNotes-${esc(x.id)}"
+  placeholder="اكتب ملاحظات إضافية للأستاذ..."
+  style="width:100%;min-height:65px;margin:7px 0"
+>${esc(x.reply_notes || '')}</textarea>
+
+<button type="button"
+  onclick="saveRequestReply('${esc(x.id)}')">
+  💾 حفظ الرد
+</button>
+
 
           <div style="margin:6px 0">
             الحالة: ${esc(x.status || 'جديد')}
@@ -8852,13 +8862,16 @@ async function renderRequests(){
   `).join('');
 }
 
+
 async function saveRequestReply(id){
 
   const textarea = document.getElementById('requestReply-' + id);
+  const notesArea = document.getElementById('requestNotes-' + id);
 
-  if(!textarea) return;
+  if(!textarea || !notesArea) return;
 
   const reply = textarea.value.trim();
+  const replyNotes = notesArea.value.trim();
 
   if(!reply){
     alert('يرجى كتابة الرد قبل الحفظ.');
@@ -8869,6 +8882,7 @@ async function saveRequestReply(id){
     .from('requests')
     .update({
       reply_text: reply,
+      reply_notes: replyNotes,
       replied_at: new Date().toISOString(),
       status: 'تم الرد'
     })
@@ -8880,10 +8894,9 @@ async function saveRequestReply(id){
     return;
   }
 
-  alert('✅ تم حفظ الرد بنجاح.');
+  alert('✅ تم حفظ الرد والملاحظات بنجاح.');
   await renderRequests();
 }
-
 
   /* ===== وظائف استعمال زمن المخبر ===== */
 
