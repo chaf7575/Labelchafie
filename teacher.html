@@ -222,31 +222,25 @@ window.supabase.createClient(
 </div>
 
 <!-- قسم متابعة الطلبات -->
+
 <div class="container">
   <div class="card">
     <h2>🔎 متابعة طلباتي</h2>
-    <p class="small">
-      أدخل رمز المتابعة الذي حصلت عليه بعد إرسال الطلب لمعرفة حالته ورد مسؤول المخبر.
-    </p>
 
-    <label for="trackingCodeInput">رمز متابعة الطلب</label>
-    <input
-      id="trackingCodeInput"
-      type="text"
-      placeholder="أدخل رمز المتابعة هنا"
-      dir="ltr"
-      style="text-align:center;text-transform:uppercase"
-    >
+    <p class="small">
+      يمكنك الاطلاع على حالة طلبك ورد مسؤول المخبر بسهولة.
+    </p>
 
     <div class="actions">
       <button class="primary" onclick="trackTeacherRequest()">
-        🔍 عرض الطلب
+        🔎 متابعة طلبي
       </button>
     </div>
 
     <div id="trackingResult" aria-live="polite"></div>
   </div>
 </div>
+
 
 <script>
 
