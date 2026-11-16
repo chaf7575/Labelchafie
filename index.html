@@ -2509,6 +2509,93 @@ button[onclick*="Remove"] {
   font-size: clamp(10px, 1.1vw, 16px);
   line-height: 1.7;
 } 
+
+/* واجهة الهاتف الجديدة */
+#home .mobile-dashboard {
+  display: none;
+}
+
+@media screen and (max-width: 650px) {
+  #home .dashboard-wrap {
+    display: none !important;
+  }
+
+  #home .mobile-dashboard {
+    display: block;
+    direction: rtl;
+    width: 100%;
+    max-width: 500px;
+    margin: 12px auto;
+  }
+
+  #home .mobile-date {
+    background: linear-gradient(135deg, #075477, #0798bd);
+    color: white;
+    padding: 15px;
+    border-radius: 16px;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: 0 5px 14px rgba(0,70,110,.15);
+  }
+
+  #home .mobile-date strong {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  #home .mobile-date span {
+    font-size: 13px;
+  }
+
+  #home .mobile-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  #home .mobile-card {
+    min-height: 112px;
+    border: 1px solid #d5eaf2;
+    border-radius: 17px;
+    background: white;
+    color: #075477;
+    box-shadow: 0 4px 12px rgba(0,70,110,.09);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+  }
+
+  #home .mobile-card:active {
+    transform: scale(.96);
+    box-shadow: 0 2px 7px rgba(0,70,110,.12);
+  }
+
+  #home .mobile-card .mobile-icon {
+    font-size: 31px;
+    line-height: 1;
+  }
+
+  #home .mobile-logout {
+    width: 100%;
+    margin-top: 13px;
+    min-height: 48px;
+    border: 0;
+    border-radius: 13px;
+    background: #c93636;
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: bold;
+  }
+}
   
 
 </style>
@@ -3191,6 +3278,96 @@ td {
 
   </div>
 </div>
+
+<!-- لوحة التحكم الخاصة بالهاتف -->
+<div class="mobile-dashboard">
+
+  <div class="mobile-date">
+    <strong id="mobileDateDay">مرحباً بك</strong>
+    <span id="mobileDateFull"></span>
+  </div>
+
+  <div class="mobile-card-grid">
+
+    <button class="mobile-card" onclick="show('home')">
+      <span class="mobile-icon">🏠</span>
+      الرئيسية
+    </button>
+
+    <button class="mobile-card" onclick="show('daily')">
+      <span class="mobile-icon">📋</span>
+      التقارير اليومية
+    </button>
+
+    <button class="mobile-card" onclick="show('chemicals')">
+      <span class="mobile-icon">🧪</span>
+      المحاليل الكيميائية
+    </button>
+
+    <button class="mobile-card" onclick="show('requests')">
+      <span class="mobile-icon">📨</span>
+      طلبات الأساتذة
+    </button>
+
+    <button class="mobile-card" onclick="show('inventory')">
+      <span class="mobile-icon">📦</span>
+      الجرد والمخزون
+    </button>
+
+    <button class="mobile-card" onclick="show('invoices')">
+      <span class="mobile-icon">🧾</span>
+      الفواتير والمشتريات
+    </button>
+
+    <button class="mobile-card" onclick="show('labSchedule')">
+      <span class="mobile-icon">🗓️</span>
+      استعمال زمن المخبر
+    </button>
+
+    <button class="mobile-card" onclick="show('settings')">
+      <span class="mobile-icon">⚙️</span>
+      الإعدادات
+    </button>
+
+    <button class="mobile-card" onclick="show('safety')">
+      <span class="mobile-icon">🛡️</span>
+      السلامة المخبرية
+    </button>
+
+  </div>
+
+  <button class="mobile-logout" onclick="logoutUser()">
+    🚪 تسجيل الخروج
+  </button>
+
+</div>
+
+<script>
+(function () {
+  function updateMobileDate() {
+    const now = new Date();
+
+    const day = document.getElementById('mobileDateDay');
+    const full = document.getElementById('mobileDateFull');
+
+    if (day) {
+      day.textContent = now.toLocaleDateString('ar-DZ', {
+        weekday: 'long'
+      });
+    }
+
+    if (full) {
+      full.textContent = now.toLocaleDateString('ar-DZ', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+  }
+
+  updateMobileDate();
+})();
+</script>
 
 <!-- إشعار الطلبات -->
 <div id="requestsNotification" class="home-notification">
