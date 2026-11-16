@@ -244,21 +244,32 @@ window.supabase.createClient(
 
 <script>
 
+
 async function trackTeacherRequest() {
-  const code = document
-    .getElementById("trackingCodeInput")
-    .value.trim().toUpperCase();
+
+  const code = (
+    localStorage.getItem("LAB_TEACHER_TRACKING_CODE") || ""
+  ).trim().toUpperCase();
 
   const result = document.getElementById("trackingResult");
 
+  if (!result) return;
+
   if (!code) {
-    result.innerHTML = '<div class="error">يرجى إدخال رمز المتابعة.</div>';
+    result.innerHTML = `
+      <div class="error">
+        لم نعثر على طلب محفوظ في هذا المتصفح.
+        يرجى إرسال طلب أولاً من نفس الجهاز.
+      </div>
+    `;
     return;
   }
 
-  result.innerHTML = '<div class="small">⏳ جاري البحث عن طلبك...</div>';
+  result.innerHTML =
+    '<div class="small">⏳ جاري تحميل طلبك...</div>';
 
   try {
+
     const { data, error } = await supabaseClient.rpc(
       "get_teacher_request",
       { p_tracking_code: code }
@@ -269,7 +280,8 @@ async function trackTeacherRequest() {
     const request = Array.isArray(data) ? data[0] : data;
 
     if (!request) {
-      result.innerHTML = '<div class="error">لم نعثر على طلب بهذا الرمز. تحقق من الرمز وحاول مجددًا.</div>';
+      result.innerHTML =
+        '<div class="error">لم يتم العثور على الطلب.</div>';
       return;
     }
 
@@ -283,20 +295,12 @@ async function trackTeacherRequest() {
         <p><strong>الأدوات المطلوبة:</strong> <span id="trackTools"></span></p>
         <p><strong>الحالة:</strong> <span id="trackStatus"></span></p>
         <hr>
-        
-<h3>💬 رد مسؤول المخبر</h3>
-<p id="trackReply"></p>
-
-<hr>
-
-<h3>📝 ملاحظات مسؤول المخبر</h3>
-<p id="trackReplyNotes"></p>
-
-<p>
-  <strong>تاريخ الرد:</strong>
-  <span id="trackReplyDate"></span>
-</p>
-
+        <h3>💬 رد مسؤول المخبر</h3>
+        <p id="trackReply"></p>
+        <hr>
+        <h3>📝 ملاحظات مسؤول المخبر</h3>
+        <p id="trackReplyNotes"></p>
+        <p><strong>تاريخ الرد:</strong> <span id="trackReplyDate"></span></p>
       </div>
     `;
 
@@ -305,20 +309,23 @@ async function trackTeacherRequest() {
     document.getElementById("trackDate").textContent = request.request_date || "—";
     document.getElementById("trackText").textContent = request.request_text || "—";
     document.getElementById("trackTools").textContent = request.tools || "—";
-    document.getElementById("trackStatus").textContent = request.status || "قيد المعالجة";
+    document.getElementById("trackStatus").textContent = request.status || "جديد";
+
     document.getElementById("trackReply").textContent =
       request.reply_text || "لم يرد مسؤول المخبر على طلبك بعد.";
-   
 
-document.getElementById("trackReplyNotes").textContent =
-  request.reply_notes || "لا توجد ملاحظات إضافية.";
+    document.getElementById("trackReplyNotes").textContent =
+      request.reply_notes || "لا توجد ملاحظات إضافية.";
+
     document.getElementById("trackReplyDate").textContent =
       request.replied_at || "لم يتم الرد بعد.";
 
   } catch (error) {
+
     console.error("TRACK REQUEST ERROR:", error);
+
     result.innerHTML =
-      '<div class="error">حدث خطأ أثناء البحث: ' +
+      '<div class="error">تعذر تحميل الطلب: ' +
       error.message +
       '</div>';
   }
@@ -446,24 +453,23 @@ tracking_code: trackingCode
         });
 
 
-    if(error){
+   if(error){
 
-      console.error(
-        "REQUEST ERROR:",
-        error
-      );
+  console.error("REQUEST ERROR:", error);
 
-      message.innerHTML =
-        '<div class="error">' +
-        '❌ تعذر إرسال الطلب:<br><br>' +
-        error.message +
-        '</div>';
+  message.innerHTML =
+    '<div class="error">' +
+    '❌ تعذر إرسال الطلب:<br><br>' +
+    error.message +
+    '</div>';
 
-      return;
-    }
+  return;
+}
 
+// حفظ رمز المتابعة تلقائيًا
+localStorage.setItem("LAB_TEACHER_TRACKING_CODE", trackingCode);
 
- 
+// رسالة النجاح
 message.innerHTML = `
   <div class="success">
     ✅ تم إرسال طلبك بنجاح إلى المخبري.
