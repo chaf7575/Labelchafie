@@ -2598,6 +2598,35 @@ button[onclick*="Remove"] {
 }
   
 
+/* إظهار صورة لوحة التحكم الأصلية على الهاتف */
+@media screen and (max-width: 1000px) {
+
+  #home .mobile-dashboard {
+    display: none !important;
+  }
+
+  #home .dashboard-wrap {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 12px auto !important;
+    overflow: hidden !important;
+    border-radius: 12px;
+  }
+
+  #home .dashboard-canvas {
+    width: 100% !important;
+    min-width: 0 !important;
+    aspect-ratio: 1648 / 928 !important;
+  }
+
+  #home .dashboard-canvas > img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+}
+
 </style>
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 <script>
