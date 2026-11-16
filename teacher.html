@@ -469,23 +469,19 @@ tracking_code: trackingCode
     }
 
 
-  message.innerHTML = `
+ 
+message.innerHTML = `
   <div class="success">
-    ✅ تم إرسال الطلب بنجاح إلى المخبري.
+    ✅ تم إرسال طلبك بنجاح إلى المخبري.
     <br><br>
-    <strong>رمز متابعة طلبك:</strong>
-    <br>
-    <code style="font-size:18px;direction:ltr;display:inline-block;margin:10px">
-      ${trackingCode}
-    </code>
-    <br>
-    احتفظ بهذا الرمز لمعرفة رد مسؤول المخبر.
+    يمكنك متابعة طلبك والاطلاع على الرد بالضغط هنا:
     <br><br>
-    <button onclick="navigator.clipboard.writeText('${trackingCode}')">
-      📋 نسخ الرمز
+    <button class="primary" onclick="trackTeacherRequest()">
+      🔎 متابعة طلبي
     </button>
   </div>
 `;
+
 
 
     document.getElementById(
