@@ -503,7 +503,7 @@ async function loginTeacher() {
   if (button) button.disabled = true;
 
   try {
-    const { data, error } = await supabase.rpc('login_teacher', {
+    const { data, error } = await supabaseClient.rpc('login_teacher', {
       p_teacher_name: name,
       p_pin: pin
     });
@@ -548,7 +548,7 @@ async function checkTeacherSession() {
   if (!token) return;
 
   try {
-    const { data, error } = await supabase.rpc('verify_teacher_session', {
+    const { data, error } = await supabaseClient.rpc('verify_teacher_session', {
       p_session_token: token
     });
 
@@ -611,7 +611,7 @@ async function sendTeacherRequest() {
   try {
     const trackingCode = createTrackingCode();
 
-    const { data, error } = await supabase.rpc('submit_teacher_request', {
+    const { data, error } = await supabaseClient.rpc('submit_teacher_request', {
       p_session_token: token,
       p_class_name: className,
       p_request_date: date,
@@ -672,7 +672,7 @@ async function loadMyTeacherRequests() {
   list.textContent = 'جارٍ تحميل الطلبات...';
 
   try {
-    const { data, error } = await supabase.rpc('get_my_teacher_requests', {
+    const { data, error } = await supabaseClient.rpc('get_my_teacher_requests', {
       p_session_token: token
     });
 
