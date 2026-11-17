@@ -8628,6 +8628,83 @@ await loadChemicalsFromSupabase();
   renderAll();
 }
 
+// إنشاء رمز دعوة لأستاذ جديد
+async function createTeacherInviteFromAdmin() {
+  const name = document.getElementById('newTeacherName').value.trim();
+  const result = document.getElementById('teacherInviteResult');
+
+  if (!name) {
+    result.textContent = 'يرجى إدخال اسم الأستاذ.';
+    return;
+  }
+
+  result.textContent = 'جارٍ إنشاء رمز الدعوة...';
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      'admin_create_teacher_invite',
+      { p_teacher_name: name }
+    );
+
+    if (error) throw error;
+
+    result.textContent =
+      'تم إنشاء رمز الدعوة للأستاذ ' + name +
+      '، الرمز: ' + data +
+      ' — صالح لمدة 24 ساعة.';
+
+    document.getElementById('newTeacherName').value = '';
+  } catch (error) {
+    console.error(error);
+    result.textContent = 'تعذر إنشاء رمز الدعوة: ' + error.message;
+  }
+}
+
+
+// عرض قائمة حسابات الأساتذة
+async function loadTeachersList() {
+  const list = document.getElementById('teachersList');
+
+  list.textContent = 'جارٍ تحميل قائمة الأساتذة...';
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      'admin_list_teachers'
+    );
+
+    if (error) throw error;
+
+    list.replaceChildren();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      list.textContent = 'لا توجد حسابات أساتذة مسجلة.';
+      return;
+    }
+
+    data.forEach((teacher, index) => {
+      const item = document.createElement('div');
+      item.className = 'card';
+
+      const name = document.createElement('strong');
+      name.textContent = (index + 1) + '- ' + teacher.teacher_name;
+
+      const date = document.createElement('p');
+      date.textContent = teacher.created_at
+        ? 'تاريخ إنشاء الحساب: ' +
+          new Date(teacher.created_at).toLocaleDateString('ar-DZ')
+        : '';
+
+      item.appendChild(name);
+      item.appendChild(date);
+      list.appendChild(item);
+    });
+
+  } catch (error) {
+    console.error(error);
+    list.textContent = 'تعذر تحميل قائمة الأساتذة: ' + error.message;
+  }
+}
+
 </script> 
   
  <script>
