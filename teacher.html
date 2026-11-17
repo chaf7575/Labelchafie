@@ -457,8 +457,7 @@ async function registerTeacher() {
   const button = document.querySelector('#authCard button[onclick="registerTeacher()"]');
   if (button) button.disabled = true;
 
-  try {
-    const { data, error } = await supabase.rpc('register_teacher', {
+  try {const { data, error } = await supabaseClient.rpc('register_teacher', {
       p_teacher_name: name,
       p_invite_code: invite,
       p_pin: pin
