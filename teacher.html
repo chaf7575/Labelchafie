@@ -678,11 +678,13 @@ async function loadMyTeacherRequests() {
 
     if (error) throw error;
 
-    const requests = Array.isArray(data)
-      ? data
-      : Array.isArray(data?.data)
-        ? data.data
-        : [];
+   const requests = Array.isArray(data)
+  ? data
+  : Array.isArray(data?.requests)
+    ? data.requests
+    : Array.isArray(data?.data)
+      ? data.data
+      : [];
 
     list.replaceChildren();
 
