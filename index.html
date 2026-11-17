@@ -2985,6 +2985,33 @@ td {
 
 
 <div class="container">
+ <section id="teachers" class="section">
+
+  <h2>👩‍🏫 إدارة حسابات الأساتذة</h2>
+
+  <div class="card">
+    <h3>إنشاء رمز دعوة لأستاذ جديد</h3>
+
+    <label>اسم الأستاذ</label>
+    <input id="newTeacherName" type="text"
+           placeholder="أدخل اسم الأستاذ">
+
+    <button onclick="createTeacherInviteFromAdmin()">
+      إنشاء رمز الدعوة
+    </button>
+
+    <div id="teacherInviteResult"></div>
+  </div>
+
+  <div class="card">
+    <h3>الأساتذة المسجلون</h3>
+    <button onclick="loadTeachersList()">
+      تحديث القائمة
+    </button>
+    <div id="teachersList">اضغطي تحديث القائمة.</div>
+  </div>
+
+</section> 
 
 
 
