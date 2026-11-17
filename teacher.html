@@ -36,9 +36,7 @@ header{
   box-shadow:0 4px 16px #0001;
 }
 
-h1,h2{
-  margin-top:0;
-}
+h1,h2{margin-top:0}
 
 label{
   display:block;
@@ -46,9 +44,7 @@ label{
   margin-top:14px;
 }
 
-input,
-select,
-textarea{
+input,select,textarea{
   width:100%;
   padding:11px;
   margin-top:6px;
@@ -102,6 +98,83 @@ button{
   flex-wrap:wrap;
   margin-top:18px;
 }
+
+.auth-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:15px
+}
+
+.auth-panel{
+  border:1px solid #dce5ef;
+  border-radius:12px;
+  padding:16px;
+  background:#fbfdff
+}
+
+.auth-panel h3{
+  margin-top:0;
+  color:#123b5d
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed
+}
+
+.request-item{
+  border:1px solid #dce5ef;
+  border-radius:12px;
+  padding:15px;
+  margin:12px 0;
+  background:#fff
+}
+
+.request-item h3{
+  margin:0 0 10px;
+  color:#123b5d
+}
+
+.request-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 16px;
+  color:#607086;
+  font-size:14px
+}
+
+.request-detail{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  line-height:1.7
+}
+
+.status-pill{
+  display:inline-block;
+  padding:5px 10px;
+  border-radius:20px;
+  background:#eaf2fb;
+  color:#174d78;
+  font-size:13px
+}
+
+#accountBar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap
+}
+
+#teacherWorkspace[hidden],
+#authCard[hidden]{
+  display:none!important
+}
+
+@media(max-width:500px){
+  .container{padding:12px}
+  .card{padding:16px}
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -125,426 +198,542 @@ window.supabase.createClient(
 <body>
 
 <header>
-  <h1>📨 إرسال طلب إلى المخبري</h1>
+  <h1>📨 صفحة الأستاذ</h1>
   <div>متوسطة قايد أحمد – غليزان</div>
 </header>
 
 <div class="container">
-
-  <div class="card">
-
-    <h2>طلب الأستاذ</h2>
+  <section class="card" id="authCard">
+    <h2>🔐 حساب الأستاذ</h2>
 
     <p class="small">
-      يرجى ملء المعلومات التالية ثم الضغط على «إرسال الطلب».
+      سجّل الدخول للاطلاع على طلباتك وإرسال طلب جديد.
+      إذا كانت هذه أول مرة، أنشئ حسابك برمز التسجيل
+      الذي تسلّمته من مسؤول المخبر.
     </p>
 
-    <label>
-      اسم الأستاذ
-      <input
-        id="teacherName"
-        type="text"
-        placeholder="اكتب اسم الأستاذ"
-      >
+    <div class="auth-grid">
+
+      <div class="auth-panel">
+        <h3>تسجيل الدخول</h3>
+
+        <label>اسم الأستاذ
+          <input id="loginTeacherName"
+                 type="text"
+                 autocomplete="username"
+                 placeholder="اكتب اسمك كما سُجّل">
+        </label>
+
+        <label>الرمز السري (6 أرقام)
+          <input id="loginPin"
+                 type="password"
+                 inputmode="numeric"
+                 maxlength="6"
+                 autocomplete="current-password"
+                 placeholder="••••••">
+        </label>
+
+        <div class="actions">
+          <button class="primary"
+                  id="loginButton"
+                  onclick="loginTeacher()">
+            دخول
+          </button>
+        </div>
+
+        <div id="loginMessage" aria-live="polite"></div>
+      </div>
+
+      <div class="auth-panel">
+        <h3>إنشاء حساب لأول مرة</h3>
+
+        <label>اسم الأستاذ
+          <input id="registerTeacherName"
+                 type="text"
+                 autocomplete="name"
+                 placeholder="الاسم المرتبط برمز التسجيل">
+        </label>
+
+        <label>رمز التسجيل الذي استلمته
+          <input id="inviteCode"
+                 type="password"
+                 inputmode="numeric"
+                 maxlength="6"
+                 autocomplete="one-time-code"
+                 placeholder="6 أرقام">
+        </label>
+
+        <label>اختر رمزًا سريًا لحسابك
+          <input id="registerPin"
+                 type="password"
+                 inputmode="numeric"
+                 maxlength="6"
+                 autocomplete="new-password"
+                 placeholder="6 أرقام">
+        </label>
+
+        <label>تأكيد الرمز السري
+          <input id="registerPinConfirm"
+                 type="password"
+                 inputmode="numeric"
+                 maxlength="6"
+                 autocomplete="new-password"
+                 placeholder="أعد كتابة الرمز">
+        </label>
+
+        <div class="actions">
+          <button class="primary"
+                  id="registerButton"
+                  onclick="registerTeacher()">
+            إنشاء الحساب
+          </button>
+        </div>
+
+        <div id="registerMessage" aria-live="polite"></div>
+      </div>
+
+    </div>
+  </section> 
+</div>
+<div class="container" id="teacherWorkspace" hidden>
+
+  <section class="card">
+    <div id="accountBar">
+      <div>
+        <h2>👋 مرحبًا بك</h2>
+        <strong id="connectedTeacherName"></strong>
+      </div>
+
+      <button onclick="logoutTeacher()">
+        تسجيل الخروج
+      </button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📨 إرسال طلب جديد</h2>
+
+    <p class="small">
+      املأ المعلومات التالية لإرسال طلبك إلى مسؤول المخبر.
+    </p>
+
+    <label>القسم
+      <input id="className"
+             type="text"
+             placeholder="مثال: 4 متوسط 1">
     </label>
 
-    <label>
-      القسم
-      <input
-        id="className"
-        type="text"
-        placeholder="مثال: 4 متوسط 1"
-      >
+    <label>تاريخ الطلب
+      <input id="requestDate" type="date">
     </label>
 
-    <label>
-      تاريخ الطلب
-      <input
-        id="requestDate"
-        type="date"
-      >
+    <label>وقت الطلب
+      <input id="requestTime" type="time">
     </label>
 
-    <label>
-      وقت الطلب
-      <input
-        id="requestTime"
-        type="time"
-      >
+    <label>نص الطلب
+      <textarea id="requestText"
+                placeholder="اكتب تفاصيل الطلب أو التجربة..."></textarea>
     </label>
 
-    <label>
-      نص الطلب
-      <textarea
-        id="requestText"
-        placeholder="اكتب تفاصيل الطلب أو التجربة..."
-      ></textarea>
+    <label>الأدوات والوسائل المطلوبة
+      <textarea id="tools"
+                placeholder="اكتب الأدوات أو الوسائل المطلوبة..."></textarea>
     </label>
 
-    <label>
-      الأدوات والوسائل المطلوبة
-      <textarea
-        id="tools"
-        placeholder="اكتب الأدوات أو الوسائل المطلوبة..."
-      ></textarea>
-    </label>
-
-    <label>
-      ملاحظات
-      <textarea
-        id="notes"
-        placeholder="ملاحظات إضافية..."
-      ></textarea>
+    <label>ملاحظات إضافية
+      <textarea id="notes"
+                placeholder="ملاحظات إضافية..."></textarea>
     </label>
 
     <div class="actions">
-
-      <button
-        class="primary"
-        onclick="sendTeacherRequest()"
-      >
+      <button class="primary"
+              id="sendButton"
+              onclick="sendTeacherRequest()">
         📤 إرسال الطلب
       </button>
 
-      <button
-        onclick="clearForm()"
-      >
+      <button onclick="clearForm()">
         مسح
       </button>
-
     </div>
 
-    <div id="message"></div>
+    <div id="message" aria-live="polite"></div>
+  </section>
 
-
-  </div>
-
-</div>
-
-<!-- قسم متابعة الطلبات -->
-
-<div class="container">
-  <div class="card">
-    <h2>🔎 متابعة طلباتي</h2>
+  <section class="card">
+    <h2>📋 طلباتي السابقة والجديدة</h2>
 
     <p class="small">
-      يمكنك الاطلاع على حالة طلبك ورد مسؤول المخبر بسهولة.
+      تظهر هنا جميع طلباتك وحالاتها وردود مسؤول المخبر وملاحظاته.
     </p>
 
     <div class="actions">
-      <button class="primary" onclick="trackTeacherRequest()">
-        🔎 متابعة طلبي
+      <button class="primary"
+              id="refreshButton"
+              onclick="loadMyTeacherRequests()">
+        🔄 تحديث الطلبات
       </button>
     </div>
 
-    <div id="trackingResult" aria-live="polite"></div>
-  </div>
+    <div id="requestsList" aria-live="polite">
+      <p class="small">جاري التحضير...</p>
+    </div>
+  </section>
+
 </div>
-
-
 <script>
+const SESSION_KEY = 'LAB_TEACHER_SESSION_TOKEN';
+const NAME_KEY = 'LAB_TEACHER_NAME';
 
-
-async function trackTeacherRequest() {
-
-  const code = (
-    localStorage.getItem("LAB_TEACHER_TRACKING_CODE") || ""
-  ).trim().toUpperCase();
-
-  const result = document.getElementById("trackingResult");
-
-  if (!result) return;
-
-  if (!code) {
-    result.innerHTML = `
-      <div class="error">
-        لم نعثر على طلب محفوظ في هذا المتصفح.
-        يرجى إرسال طلب أولاً من نفس الجهاز.
-      </div>
-    `;
-    return;
-  }
-
-  result.innerHTML =
-    '<div class="small">⏳ جاري تحميل طلبك...</div>';
-
-  try {
-
-    const { data, error } = await supabaseClient.rpc(
-      "get_teacher_request",
-      { p_tracking_code: code }
-    );
-
-    if (error) throw error;
-
-    const request = Array.isArray(data) ? data[0] : data;
-
-    if (!request) {
-      result.innerHTML =
-        '<div class="error">لم يتم العثور على الطلب.</div>';
-      return;
-    }
-
-    result.innerHTML = `
-      <div class="success" style="margin-top:18px">
-        <h3>📋 معلومات الطلب</h3>
-        <p><strong>الأستاذ:</strong> <span id="trackTeacher"></span></p>
-        <p><strong>القسم:</strong> <span id="trackClass"></span></p>
-        <p><strong>تاريخ الطلب:</strong> <span id="trackDate"></span></p>
-        <p><strong>نص الطلب:</strong> <span id="trackText"></span></p>
-        <p><strong>الأدوات المطلوبة:</strong> <span id="trackTools"></span></p>
-        <p><strong>الحالة:</strong> <span id="trackStatus"></span></p>
-        <hr>
-        <h3>💬 رد مسؤول المخبر</h3>
-        <p id="trackReply"></p>
-        <hr>
-        <h3>📝 ملاحظات مسؤول المخبر</h3>
-        <p id="trackReplyNotes"></p>
-        <p><strong>تاريخ الرد:</strong> <span id="trackReplyDate"></span></p>
-      </div>
-    `;
-
-    document.getElementById("trackTeacher").textContent = request.teacher || "—";
-    document.getElementById("trackClass").textContent = request.class_name || "—";
-    document.getElementById("trackDate").textContent = request.request_date || "—";
-    document.getElementById("trackText").textContent = request.request_text || "—";
-    document.getElementById("trackTools").textContent = request.tools || "—";
-    document.getElementById("trackStatus").textContent = request.status || "جديد";
-
-    document.getElementById("trackReply").textContent =
-      request.reply_text || "لم يرد مسؤول المخبر على طلبك بعد.";
-
-    document.getElementById("trackReplyNotes").textContent =
-      request.reply_notes || "لا توجد ملاحظات إضافية.";
-
-    document.getElementById("trackReplyDate").textContent =
-      request.replied_at || "لم يتم الرد بعد.";
-
-  } catch (error) {
-
-    console.error("TRACK REQUEST ERROR:", error);
-
-    result.innerHTML =
-      '<div class="error">تعذر تحميل الطلب: ' +
-      error.message +
-      '</div>';
-  }
+function showMessage(id, message, type = 'error') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = message;
+  el.className = type === 'success' ? 'success-message' : 'error-message';
 }
 
-function setCurrentDateTime(){
+function getSessionToken() {
+  return localStorage.getItem(SESSION_KEY);
+}
 
-
+function setCurrentDateTime() {
   const now = new Date();
+  const date = document.getElementById('requestDate');
+  const time = document.getElementById('requestTime');
 
-  const date =
-    now.toISOString().slice(0,10);
+  if (date && !date.value) {
+    date.value = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, '0'),
+      String(now.getDate()).padStart(2, '0')
+    ].join('-');
+  }
 
-  const time =
-    now.toTimeString().slice(0,5);
-
-  document.getElementById("requestDate").value =
-    date;
-
-  document.getElementById("requestTime").value =
-    time;
+  if (time && !time.value) {
+    time.value = [
+      String(now.getHours()).padStart(2, '0'),
+      String(now.getMinutes()).padStart(2, '0')
+    ].join(':');
+  }
 }
 
 function createTrackingCode() {
   const bytes = new Uint8Array(12);
   crypto.getRandomValues(bytes);
-
   return Array.from(bytes)
-    .map(b => b.toString(16).padStart(2, "0"))
-    .join("")
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
     .toUpperCase();
 }
-async function sendTeacherRequest(){
 
-  const teacherName =
-    document.getElementById("teacherName").value.trim();
+// إنشاء حساب أستاذ
+async function registerTeacher() {
+  const name = document.getElementById('registerTeacherName').value.trim();
+  const invite = document.getElementById('inviteCode').value.trim();
+  const pin = document.getElementById('registerPin').value.trim();
+  const confirmPin = document.getElementById('registerPinConfirm').value.trim();
 
-  const className =
-    document.getElementById("className").value.trim();
-
-  const requestDate =
-    document.getElementById("requestDate").value;
-
-  const requestTime =
-    document.getElementById("requestTime").value;
-
-  const requestText =
-    document.getElementById("requestText").value.trim();
-
-  const tools =
-    document.getElementById("tools").value.trim();
-
-  const notes =
-    document.getElementById("notes").value.trim();
-
-  const message =
-    document.getElementById("message");
-
-
-  if(!teacherName){
-
-    message.innerHTML =
-      '<div class="error">يرجى إدخال اسم الأستاذ.</div>';
-
+  if (name.length < 3) {
+    showMessage('registerMessage', 'يرجى إدخال اسم الأستاذ بشكل صحيح');
     return;
   }
 
-
-  if(!className){
-
-    message.innerHTML =
-      '<div class="error">يرجى إدخال القسم.</div>';
-
+  if (!/^\d{6}$/.test(invite)) {
+    showMessage('registerMessage', 'رمز التسجيل يجب أن يتكون من 6 أرقام');
     return;
   }
 
-
-  if(!requestText){
-
-    message.innerHTML =
-      '<div class="error">يرجى كتابة نص الطلب.</div>';
-
+  if (!/^\d{6}$/.test(pin)) {
+    showMessage('registerMessage', 'الرمز السري يجب أن يتكون من 6 أرقام');
     return;
   }
 
+  if (pin !== confirmPin) {
+    showMessage('registerMessage', 'الرمزان السريان غير متطابقين');
+    return;
+  }
 
-  message.innerHTML =
-    '<div class="small">⏳ جاري إرسال الطلب...</div>';
+  const button = document.querySelector('#authCard button[onclick="registerTeacher()"]');
+  if (button) button.disabled = true;
 
-const trackingCode = createTrackingCode();
-  try{
+  try {
+    const { data, error } = await supabase.rpc('register_teacher', {
+      p_teacher_name: name,
+      p_invite_code: invite,
+      p_pin: pin
+    });
 
-    const { error } =
-      await supabaseClient
-        .from("requests")
-        .insert({
+    if (error) throw error;
 
-          teacher: teacherName,
+    if (!data) {
+      throw new Error('رمز التسجيل غير صحيح أو منتهي الصلاحية أو مستعمل، أو توجد محاولات كثيرة');
+    }
 
-          class_name: className,
-
-          request_date:
-            requestDate ||
-            new Date().toISOString().slice(0,10),
-
-          request_time:
-            requestTime ||
-            new Date().toTimeString().slice(0,5),
-
-          request_text:
-            requestText,
-
-          tools:
-            tools,
-
-          notes:
-            notes,
-
-         status: "جديد",
-
-is_read: false,
-
-tracking_code: trackingCode
-
-        });
-
-
-   if(error){
-
-  console.error("REQUEST ERROR:", error);
-
-  message.innerHTML =
-    '<div class="error">' +
-    '❌ تعذر إرسال الطلب:<br><br>' +
-    error.message +
-    '</div>';
-
-  return;
-}
-
-// حفظ رمز المتابعة تلقائيًا
-localStorage.setItem("LAB_TEACHER_TRACKING_CODE", trackingCode);
-
-// رسالة النجاح
-message.innerHTML = `
-  <div class="success">
-    ✅ تم إرسال طلبك بنجاح إلى المخبري.
-    <br><br>
-    يمكنك متابعة طلبك والاطلاع على الرد بالضغط هنا:
-    <br><br>
-    <button class="primary" onclick="trackTeacherRequest()">
-      🔎 متابعة طلبي
-    </button>
-  </div>
-`;
-
-
-
-    document.getElementById(
-      "requestText"
-    ).value = "";
-
-    document.getElementById(
-      "tools"
-    ).value = "";
-
-    document.getElementById(
-      "notes"
-    ).value = "";
-
-
-    setCurrentDateTime();
-
-
-  }catch(error){
-
-    console.error(
-      "SEND REQUEST ERROR:",
-      error
+    showMessage(
+      'registerMessage',
+      'تم إنشاء الحساب بنجاح. يمكنك الآن تسجيل الدخول.',
+      'success'
     );
 
-    message.innerHTML =
-      '<div class="error">' +
-      '❌ حدث خطأ أثناء إرسال الطلب:<br><br>' +
-      error.message +
-      '</div>';
+    document.getElementById('loginTeacherName').value = name;
+    document.getElementById('loginPin').value = '';
 
+    document.getElementById('inviteCode').value = '';
+    document.getElementById('registerPin').value = '';
+    document.getElementById('registerPinConfirm').value = '';
+
+  } catch (error) {
+    showMessage('registerMessage', error.message || 'تعذر إنشاء الحساب');
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+// تسجيل الدخول
+async function loginTeacher() {
+  const name = document.getElementById('loginTeacherName').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+
+  if (!name || !/^\d{6}$/.test(pin)) {
+    showMessage('loginMessage', 'أدخل اسم الأستاذ والرمز السري المكوّن من 6 أرقام');
+    return;
   }
 
+  const button = document.querySelector('#authCard button[onclick="loginTeacher()"]');
+  if (button) button.disabled = true;
+
+  try {
+    const { data, error } = await supabase.rpc('login_teacher', {
+      p_teacher_name: name,
+      p_pin: pin
+    });
+
+    if (error) throw error;
+
+    if (!data || !data.success || !data.session_token) {
+      throw new Error(data?.message || 'اسم الأستاذ أو الرمز السري غير صحيح');
+    }
+
+    localStorage.setItem(SESSION_KEY, data.session_token);
+    localStorage.setItem(NAME_KEY, data.teacher_name || name);
+
+    document.getElementById('loginPin').value = '';
+
+    showMessage('loginMessage', 'تم تسجيل الدخول بنجاح', 'success');
+    showWorkspace(data.teacher_name || name);
+
+  } catch (error) {
+    showMessage('loginMessage', error.message || 'تعذر تسجيل الدخول');
+  } finally {
+    if (button) button.disabled = false;
+  }
 }
-function clearForm(){
 
-  document.getElementById("teacherName").value = "";
+// إظهار مساحة الأستاذ
+function showWorkspace(name) {
+  document.getElementById('authCard').hidden = true;
+  document.getElementById('teacherWorkspace').hidden = false;
 
-  document.getElementById("className").value = "";
+  const nameBox = document.getElementById('connectedTeacherName');
+  if (nameBox) nameBox.textContent = name || '';
 
-  document.getElementById("requestText").value = "";
+  setCurrentDateTime();
+  loadMyTeacherRequests();
+}
 
-  document.getElementById("tools").value = "";
+// التحقق من الجلسة عند فتح الصفحة
+async function checkTeacherSession() {
+  const token = getSessionToken();
 
-  document.getElementById("notes").value = "";
+  if (!token) return;
 
-  document.getElementById("message").innerHTML = "";
+  try {
+    const { data, error } = await supabase.rpc('verify_teacher_session', {
+      p_session_token: token
+    });
+
+    if (error) throw error;
+
+    if (data && data.success) {
+      const name = data.teacher_name || localStorage.getItem(NAME_KEY) || '';
+      localStorage.setItem(NAME_KEY, name);
+      showWorkspace(name);
+    } else {
+      logoutTeacher(false);
+    }
+  } catch (error) {
+    console.error('خطأ التحقق من الجلسة:', error);
+    // لا نحذف الجلسة عند انقطاع الاتصال المؤقت
+    showMessage('loginMessage', 'تعذر الاتصال للتحقق من الجلسة. أعد تحميل الصفحة عند عودة الاتصال.');
+  }
+}
+
+// تسجيل الخروج
+function logoutTeacher(confirmLogout = true) {
+  if (confirmLogout && !confirm('هل تريد تسجيل الخروج؟')) return;
+
+  localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(NAME_KEY);
+
+  document.getElementById('teacherWorkspace').hidden = true;
+  document.getElementById('authCard').hidden = false;
+
+  const list = document.getElementById('requestsList');
+  if (list) list.replaceChildren();
+
+  showMessage('loginMessage', 'تم تسجيل الخروج', 'success');
+}
+
+// إرسال طلب جديد
+async function sendTeacherRequest() {
+  const token = getSessionToken();
+
+  if (!token) {
+    showMessage('message', 'انتهت الجلسة. يرجى تسجيل الدخول من جديد');
+    return;
+  }
+
+  const className = document.getElementById('className').value.trim();
+  const date = document.getElementById('requestDate').value;
+  const time = document.getElementById('requestTime').value;
+  const requestText = document.getElementById('requestText').value.trim();
+  const tools = document.getElementById('tools').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+
+  if (!className || !date || !time || !requestText) {
+    showMessage('message', 'يرجى ملء القسم والتاريخ والتوقيت ونص الطلب');
+    return;
+  }
+
+  const button = document.querySelector('#teacherWorkspace button[onclick="sendTeacherRequest()"]');
+  if (button) button.disabled = true;
+
+  try {
+    const trackingCode = createTrackingCode();
+
+    const { data, error } = await supabase.rpc('submit_teacher_request', {
+      p_session_token: token,
+      p_class_name: className,
+      p_request_date: date,
+      p_request_time: time,
+      p_request_text: requestText,
+      p_tools: tools,
+      p_notes: notes,
+      p_tracking_code: trackingCode
+    });
+
+    if (error) throw error;
+
+    if (data && data.success === false) {
+      throw new Error(data.message || 'تعذر إرسال الطلب');
+    }
+
+    showMessage('message', 'تم إرسال الطلب بنجاح', 'success');
+    clearForm();
+    await loadMyTeacherRequests();
+
+  } catch (error) {
+    showMessage('message', error.message || 'حدث خطأ أثناء إرسال الطلب');
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+// تفريغ نموذج الطلب
+function clearForm() {
+  ['className', 'requestText', 'tools', 'notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
 
   setCurrentDateTime();
 }
 
+// إنشاء عنصر نصي آمن
+function addRequestField(parent, label, value) {
+  if (value === null || value === undefined || value === '') return;
 
-document.addEventListener(
-  "DOMContentLoaded",
-  function(){
+  const p = document.createElement('p');
+  const strong = document.createElement('strong');
+  strong.textContent = label + ': ';
 
-    setCurrentDateTime();
+  p.appendChild(strong);
+  p.appendChild(document.createTextNode(String(value)));
+  parent.appendChild(p);
+}
 
+// عرض طلبات الأستاذ
+async function loadMyTeacherRequests() {
+  const token = getSessionToken();
+  const list = document.getElementById('requestsList');
+
+  if (!token || !list) return;
+
+  list.textContent = 'جارٍ تحميل الطلبات...';
+
+  try {
+    const { data, error } = await supabase.rpc('get_my_teacher_requests', {
+      p_session_token: token
+    });
+
+    if (error) throw error;
+
+    const requests = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.data)
+        ? data.data
+        : [];
+
+    list.replaceChildren();
+
+    if (requests.length === 0) {
+      list.textContent = 'لا توجد طلبات مسجلة حتى الآن.';
+      return;
+    }
+
+    requests.forEach(request => {
+      const card = document.createElement('div');
+      card.className = 'request-item';
+
+      const heading = document.createElement('h3');
+      heading.textContent = 'طلب رقم ' + request.id;
+      card.appendChild(heading);
+
+      addRequestField(card, 'القسم', request.class_name);
+      addRequestField(card, 'التاريخ', request.request_date);
+      addRequestField(card, 'التوقيت', request.request_time);
+      addRequestField(card, 'الطلب', request.request_text);
+      addRequestField(card, 'العتاد المطلوب', request.tools);
+      addRequestField(card, 'ملاحظات الأستاذ', request.notes);
+      addRequestField(card, 'الحالة', request.status);
+
+      if (request.reply_text) {
+        addRequestField(card, 'رد مسؤول المخبر', request.reply_text);
+      }
+
+      if (request.reply_notes) {
+        addRequestField(card, 'ملاحظات مسؤول المخبر', request.reply_notes);
+      }
+
+      if (request.replied_at) {
+        addRequestField(card, 'تاريخ الرد', request.replied_at);
+      }
+
+      list.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error('خطأ تحميل الطلبات:', error);
+    list.textContent = 'تعذر تحميل الطلبات. يرجى المحاولة مجددًا.';
   }
-);
+}
 
+document.addEventListener('DOMContentLoaded', () => {
+  setCurrentDateTime();
+  checkTeacherSession();
+});
 </script>
-
 
 <style>
 #simulations {
@@ -744,7 +933,6 @@ function filterSimulations() {
 
 filterSimulations();
 </script>
-
 
 </body>
 </html>
