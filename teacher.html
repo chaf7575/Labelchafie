@@ -199,6 +199,16 @@ window.supabase.createClient(
 );
 </script>
 
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('تم تجهيز تطبيق المخبري'))
+      .catch(error => console.error('خطأ في التطبيق:', error));
+  });
+}
+</script>
+
 </head>
 
 <body>
