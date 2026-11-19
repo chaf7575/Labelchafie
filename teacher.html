@@ -254,14 +254,6 @@ window.supabase.createClient(
                  placeholder="الاسم المرتبط برمز التسجيل">
         </label>
 
-        <label>رمز التسجيل الذي استلمته
-          <input id="inviteCode"
-                 type="password"
-                 inputmode="numeric"
-                 maxlength="6"
-                 autocomplete="one-time-code"
-                 placeholder="6 أرقام">
-        </label>
 
         <label>اختر رمزًا سريًا لحسابك
           <input id="registerPin"
@@ -428,9 +420,9 @@ function createTrackingCode() {
 }
 
 // إنشاء حساب أستاذ
+
 async function registerTeacher() {
   const name = document.getElementById('registerTeacherName').value.trim();
-  const invite = document.getElementById('inviteCode').value.trim();
   const pin = document.getElementById('registerPin').value.trim();
   const confirmPin = document.getElementById('registerPinConfirm').value.trim();
 
@@ -439,51 +431,47 @@ async function registerTeacher() {
     return;
   }
 
-  if (!/^\d{6}$/.test(invite)) {
-    showMessage('registerMessage', 'رمز التسجيل يجب أن يتكون من 6 أرقام');
-    return;
-  }
-
   if (!/^\d{6}$/.test(pin)) {
-    showMessage('registerMessage', 'الرمز السري يجب أن يتكون من 6 أرقام');
+    showMessage('registerMessage', 'الرقم السري يجب أن يتكون من 6 أرقام');
     return;
   }
 
   if (pin !== confirmPin) {
-    showMessage('registerMessage', 'الرمزان السريان غير متطابقين');
+    showMessage('registerMessage', 'الرقمان السريان غير متطابقين');
     return;
   }
 
-  const button = document.querySelector('#authCard button[onclick="registerTeacher()"]');
+  const button = document.querySelector(
+    '#authCard button[onclick="registerTeacher()"]'
+  );
+
   if (button) button.disabled = true;
 
-  try {const { data, error } = await supabaseClient.rpc('register_teacher', {
+  try {
+    const { data, error } = await supabaseClient.rpc('register_teacher', {
       p_teacher_name: name,
-      p_invite_code: invite,
       p_pin: pin
     });
 
     if (error) throw error;
-
-    if (!data) {
-      throw new Error('رمز التسجيل غير صحيح أو منتهي الصلاحية أو مستعمل، أو توجد محاولات كثيرة');
-    }
+    if (!data) throw new Error('تعذر إنشاء الحساب');
 
     showMessage(
       'registerMessage',
-      'تم إنشاء الحساب بنجاح. يمكنك الآن تسجيل الدخول.',
+      'تم إنشاء حسابك بنجاح. حسابك الآن بانتظار موافقة مسؤول المخبر.',
       'success'
     );
 
-    document.getElementById('loginTeacherName').value = name;
-    document.getElementById('loginPin').value = '';
-
-    document.getElementById('inviteCode').value = '';
+    document.getElementById('registerTeacherName').value = '';
     document.getElementById('registerPin').value = '';
     document.getElementById('registerPinConfirm').value = '';
 
   } catch (error) {
-    showMessage('registerMessage', error.message || 'تعذر إنشاء الحساب');
+    console.error(error);
+    showMessage(
+      'registerMessage',
+      error.message || 'تعذر إنشاء الحساب'
+    );
   } finally {
     if (button) button.disabled = false;
   }
