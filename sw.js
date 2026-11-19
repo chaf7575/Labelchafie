@@ -1,10 +1,13 @@
 
-const CACHE_NAME = 'lab-teacher-v1';
+const CACHE_NAME = 'lab-platform-v2';
 
 const FILES_TO_CACHE = [
+  './index.html',
   './teacher.html',
   './manifest.json',
-  './icon.svg'
+  './manifest-admin.json',
+  './icon.svg',
+  './icon-admin.svg'
 ];
 
 self.addEventListener('install', event => {
@@ -33,7 +36,6 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
-
   if (url.origin !== self.location.origin) return;
 
   event.respondWith(
