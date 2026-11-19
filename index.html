@@ -2868,6 +2868,21 @@ td {
 
 </style>
 
+<link rel="manifest" href="manifest-admin.json">
+<link rel="icon" href="icon-admin.svg" type="image/svg+xml">
+<meta name="theme-color" content="#123b5d">
+<meta name="description" content="منصة المخبري لإدارة المخبر المدرسي">
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('تم تجهيز تطبيق منصة المخبري'))
+      .catch(error => console.error('خطأ في التطبيق:', error));
+  });
+}
+</script>
+
 </head>
 <body>
 <script>
