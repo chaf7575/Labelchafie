@@ -569,8 +569,29 @@ async function checkTeacherSession() {
 }
 
 // تسجيل الخروج
-function logoutTeacher(confirmLogout = true) {
+
+async function logoutTeacher(confirmLogout = true) {
   if (confirmLogout && !confirm('هل تريد تسجيل الخروج؟')) return;
+
+  const token = getSessionToken();
+
+  if (token) {
+    try {
+      const { error } = await supabaseClient.rpc('logout_teacher', {
+        p_session_token: token
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('خطأ إلغاء الجلسة:', error);
+      showMessage(
+        'loginMessage',
+        'تعذر إلغاء الجلسة من الخادم. تحقق من الاتصال ثم حاول مجددًا.',
+        'error'
+      );
+      return;
+    }
+  }
 
   localStorage.removeItem(SESSION_KEY);
   localStorage.removeItem(NAME_KEY);
@@ -581,7 +602,7 @@ function logoutTeacher(confirmLogout = true) {
   const list = document.getElementById('requestsList');
   if (list) list.replaceChildren();
 
-  showMessage('loginMessage', 'تم تسجيل الخروج', 'success');
+  showMessage('loginMessage', 'تم تسجيل الخروج بنجاح', 'success');
 }
 
 // إرسال طلب جديد
