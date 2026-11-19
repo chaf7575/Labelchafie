@@ -8629,6 +8629,7 @@ await loadChemicalsFromSupabase();
 }
 
 // إنشاء رمز دعوة لأستاذ جديد
+
 async function createTeacherInviteFromAdmin() {
   const name = document.getElementById('newTeacherName').value.trim();
   const result = document.getElementById('teacherInviteResult');
@@ -8648,18 +8649,42 @@ async function createTeacherInviteFromAdmin() {
 
     if (error) throw error;
 
-    result.textContent =
+    result.replaceChildren();
+
+    const message = document.createElement('p');
+    message.textContent =
       'تم إنشاء رمز الدعوة للأستاذ ' + name +
       '، الرمز: ' + data +
       ' — صالح لمدة 24 ساعة.';
 
+    const copyButton = document.createElement('button');
+    copyButton.textContent = '📋 نسخ رمز الدعوة';
+
+    copyButton.onclick = async function () {
+      try {
+        await navigator.clipboard.writeText(String(data));
+        copyButton.textContent = '✅ تم نسخ الرمز';
+      } catch (error) {
+        const temp = document.createElement('textarea');
+        temp.value = String(data);
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        temp.remove();
+        copyButton.textContent = '✅ تم نسخ الرمز';
+      }
+    };
+
+    result.appendChild(message);
+    result.appendChild(copyButton);
+
     document.getElementById('newTeacherName').value = '';
+
   } catch (error) {
     console.error(error);
     result.textContent = 'تعذر إنشاء رمز الدعوة: ' + error.message;
   }
 }
-
 
 // عرض قائمة حسابات الأساتذة
 async function loadTeachersList() {
