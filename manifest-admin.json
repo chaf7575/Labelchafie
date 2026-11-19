@@ -1,0 +1,23 @@
+
+{
+  "id": "/Labelchafie/",
+  "name": "منصة المخبري - مسؤول المخبر",
+  "short_name": "المخبري",
+  "description": "منصة إدارة المخبر المدرسي",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f7fb",
+  "theme_color": "#123b5d",
+  "icons": [
+    {
+      "src": "icon-admin.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
