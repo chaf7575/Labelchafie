@@ -1,0 +1,23 @@
+
+{
+  "id": "/Labelchafie/teacher.html",
+  "name": "منصة المخبري",
+  "short_name": "المخبري",
+  "description": "فضاء الأساتذة - منصة المخبري",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./teacher.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f7fb",
+  "theme_color": "#123b5d",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
