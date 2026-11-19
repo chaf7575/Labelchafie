@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>منصة المخبري</title>
+
+<meta name="theme-color" content="#123b5d">
+<meta name="description" content="منصة المخبري - فضاء الأساتذة">
+
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Tahoma,sans-serif;
+  background:#f4f7fb;
+  color:#172033;
+}
+
+header{
+  background:#123b5d;
+  color:#fff;
+  padding:22px;
+  text-align:center;
+}
+
+.container{
+  max-width:800px;
+  margin:auto;
+  padding:20px;
+}
+
+.card{
+  background:#fff;
+  border-radius:15px;
+  padding:20px;
+  margin:15px 0;
+  box-shadow:0 4px 16px #0001;
+}
+
+h1,h2{margin-top:0}
+
+label{
+  display:block;
+  font-weight:bold;
+  margin-top:14px;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:11px;
+  margin-top:6px;
+  border:1px solid #ccd6e2;
+  border-radius:8px;
+  font:inherit;
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+button{
+  border:0;
+  border-radius:9px;
+  padding:12px 18px;
+  cursor:pointer;
+  font:inherit;
+}
+
+.primary{
+  background:#1769aa;
+  color:#fff;
+}
+
+.success{
+  background:#e8f7ee;
+  color:#17633b;
+  padding:13px;
+  border-radius:8px;
+  margin-top:15px;
+}
+
+.error{
+  background:#fdecec;
+  color:#a11;
+  padding:13px;
+  border-radius:8px;
+  margin-top:15px;
+}
+
+.small{
+  color:#607086;
+  font-size:14px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.auth-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:15px
+}
+
+.auth-panel{
+  border:1px solid #dce5ef;
+  border-radius:12px;
+  padding:16px;
+  background:#fbfdff
+}
+
+.auth-panel h3{
+  margin-top:0;
+  color:#123b5d
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed
+}
+
+.request-item{
+  border:1px solid #dce5ef;
+  border-radius:12px;
+  padding:15px;
+  margin:12px 0;
+  background:#fff
+}
+
+.request-item h3{
+  margin:0 0 10px;
+  color:#123b5d
+}
+
+.request-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 16px;
+  color:#607086;
+  font-size:14px
+}
+
+.request-detail{
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  line-height:1.7
+}
+
+.status-pill{
+  display:inline-block;
+  padding:5px 10px;
+  border-radius:20px;
+  background:#eaf2fb;
+  color:#174d78;
+  font-size:13px
+}
+
+#accountBar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap
+}
+
+#teacherWorkspace[hidden],
+#authCard[hidden]{
+  display:none!important
+}
+
+@media(max-width:500px){
+  .container{padding:12px}
+  .card{padding:16px}
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL =
+"https://niedzlyvricaofqasohe.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_iDvPZL5m8A_bfItO0Q9muA_VHJU5-V_";
+
+const supabaseClient =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('تم تجهيز تطبيق المخبري'))
+      .catch(error => console.error('خطأ في التطبيق:', error));
+  });
+}
+</script>
+
+</head>
+
+<body>
+
+<header>
+  <h1>📨 صفحة الأستاذ</h1>
+  <div>متوسطة قايد أحمد – غليزان</div>
+</header>
+
+<div class="container">
+  <section class="card" id="authCard">
+    <h2>🔐 حساب الأستاذ</h2>
+
+    <p class="small">
+      سجّل الدخول للاطلاع على طلباتك وإرسال طلب جديد.
+      إذا كانت هذه أول مرة، أنشئ حسابك برمز التسجيل
+      الذي تسلّمته من مسؤول المخبر.
+    </p>
+
+    <div class="auth-grid">
+
+      <div class="auth-panel">
+        <h3>تسجيل الدخول</h3>
+
+        <label>اسم الأستاذ
+          <input id="loginTeacherName"
+                 type="text"
+                 autocomplete="username"
+                 placeholder="اكتب اسمك كما سُجّل">
+        </label>
+
+        <label>الرمز السري (6 أرقام)
+          <input id="loginPin"
+                 type="password"
+                 inputmode="numeric"
+                 maxlength="6"
+                 autocomplete="current-password"
+                 placeholder="••••••">
+        </label>
+
+        <div class="actions">
+          <button class="primary"
+                  id="loginButton"
+                  onclick="loginTeacher()">
+            دخول
+          </button>
+        </div>
+
+        <div id="loginMessage" aria-live="polite"></div>
+      </div>
+
+      <div class="auth-panel">
+        <h3>إنشاء حساب لأول مرة</h3>
+
+        <label>اسم الأستاذ
+          <input id="registerTeacherName"
+                 type="text"
+                 autocomplete="name"
+                 placeholder="الاسم المرتبط برمز التسجيل">
+        </label>
+
+
+        <label>اختر رمزًا سريًا لحسابك
+          <input id="registerPin"
+                 type="password"
+                 inputmode="numeric"
+                 maxlength="6"
+                 autocomplete="new-password"
+                 placeholder="6 أرقام">
+        </label>
+
+        <label>تأكيد الرمز السري
+          <input id="registerPinConfirm"
+                 type="password"
+                 inputmode="numeric"
+                 maxlength="6"
+                 autocomplete="new-password"
+                 placeholder="أعد كتابة الرمز">
+        </label>
+
+        <div class="actions">
+          <button class="primary"
+                  id="registerButton"
+                  onclick="registerTeacher()">
+            إنشاء الحساب
+          </button>
+        </div>
+
+        <div id="registerMessage" aria-live="polite"></div>
+      </div>
+
+    </div>
+  </section> 
+</div>
+<div class="container" id="teacherWorkspace" hidden>
+
+  <section class="card">
+    <div id="accountBar">
+      <div>
+        <h2>👋 مرحبًا بك</h2>
+        <strong id="connectedTeacherName"></strong>
+      </div>
+
+      <button onclick="logoutTeacher()">
+        تسجيل الخروج
+      </button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📨 إرسال طلب جديد</h2>
+
+    <p class="small">
+      املأ المعلومات التالية لإرسال طلبك إلى مسؤول المخبر.
+    </p>
+
+    <label>القسم
+      <input id="className"
+             type="text"
+             placeholder="مثال: 4 متوسط 1">
+    </label>
+
+    <label>تاريخ الطلب
+      <input id="requestDate" type="date">
+    </label>
+
+    <label>وقت الطلب
+      <input id="requestTime" type="time">
+    </label>
+
+    <label>نص الطلب
+      <textarea id="requestText"
+                placeholder="اكتب تفاصيل الطلب أو التجربة..."></textarea>
+    </label>
+
+    <label>الأدوات والوسائل المطلوبة
+      <textarea id="tools"
+                placeholder="اكتب الأدوات أو الوسائل المطلوبة..."></textarea>
+    </label>
+
+    <label>ملاحظات إضافية
+      <textarea id="notes"
+                placeholder="ملاحظات إضافية..."></textarea>
+    </label>
+
+    <div class="actions">
+      <button class="primary"
+              id="sendButton"
+              onclick="sendTeacherRequest()">
+        📤 إرسال الطلب
+      </button>
+
+      <button onclick="clearForm()">
+        مسح
+      </button>
+    </div>
+
+    <div id="message" aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <h2>📋 طلباتي السابقة والجديدة</h2>
+
+    <p class="small">
+      تظهر هنا جميع طلباتك وحالاتها وردود مسؤول المخبر وملاحظاته.
+    </p>
+
+    <div class="actions">
+      <button class="primary"
+              id="refreshButton"
+              onclick="loadMyTeacherRequests()">
+        🔄 تحديث الطلبات
+      </button>
+    </div>
+
+    <div id="requestsList" aria-live="polite">
+      <p class="small">جاري التحضير...</p>
+    </div>
+  </section>
+
+</div>
+<script>
+const SESSION_KEY = 'LAB_TEACHER_SESSION_TOKEN';
+const NAME_KEY = 'LAB_TEACHER_NAME';
+
+function showMessage(id, message, type = 'error') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = message;
+  el.className = type === 'success' ? 'success-message' : 'error-message';
+}
+
+function getSessionToken() {
+  return localStorage.getItem(SESSION_KEY);
+}
+
+function setCurrentDateTime() {
+  const now = new Date();
+  const date = document.getElementById('requestDate');
+  const time = document.getElementById('requestTime');
+
+  if (date && !date.value) {
+    date.value = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, '0'),
+      String(now.getDate()).padStart(2, '0')
+    ].join('-');
+  }
+
+  if (time && !time.value) {
+    time.value = [
+      String(now.getHours()).padStart(2, '0'),
+      String(now.getMinutes()).padStart(2, '0')
+    ].join(':');
+  }
+}
+
+function createTrackingCode() {
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes)
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+    .toUpperCase();
+}
+
+// إنشاء حساب أستاذ
+
+async function registerTeacher() {
+  const name = document.getElementById('registerTeacherName').value.trim();
+  const pin = document.getElementById('registerPin').value.trim();
+  const confirmPin = document.getElementById('registerPinConfirm').value.trim();
+
+  if (name.length < 3) {
+    showMessage('registerMessage', 'يرجى إدخال اسم الأستاذ بشكل صحيح');
+    return;
+  }
+
+  if (!/^\d{6}$/.test(pin)) {
+    showMessage('registerMessage', 'الرقم السري يجب أن يتكون من 6 أرقام');
+    return;
+  }
+
+  if (pin !== confirmPin) {
+    showMessage('registerMessage', 'الرقمان السريان غير متطابقين');
+    return;
+  }
+
+  const button = document.querySelector(
+    '#authCard button[onclick="registerTeacher()"]'
+  );
+
+  if (button) button.disabled = true;
+
+  try {
+    const { data, error } = await supabaseClient.rpc('register_teacher', {
+      p_teacher_name: name,
+      p_pin: pin
+    });
+
+    if (error) throw error;
+    if (!data) throw new Error('تعذر إنشاء الحساب');
+
+    showMessage(
+      'registerMessage',
+      'تم إنشاء حسابك بنجاح. حسابك الآن بانتظار موافقة مسؤول المخبر.',
+      'success'
+    );
+
+    document.getElementById('registerTeacherName').value = '';
+    document.getElementById('registerPin').value = '';
+    document.getElementById('registerPinConfirm').value = '';
+
+  } catch (error) {
+    console.error(error);
+    showMessage(
+      'registerMessage',
+      error.message || 'تعذر إنشاء الحساب'
+    );
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+// تسجيل الدخول
+async function loginTeacher() {
+  const name = document.getElementById('loginTeacherName').value.trim();
+  const pin = document.getElementById('loginPin').value.trim();
+
+  if (!name || !/^\d{6}$/.test(pin)) {
+    showMessage('loginMessage', 'أدخل اسم الأستاذ والرمز السري المكوّن من 6 أرقام');
+    return;
+  }
+
+  const button = document.querySelector('#authCard button[onclick="loginTeacher()"]');
+  if (button) button.disabled = true;
+
+  try {
+    const { data, error } = await supabaseClient.rpc('login_teacher', {
+      p_teacher_name: name,
+      p_pin: pin
+    });
+
+    if (error) throw error;
+
+    if (!data || !data.success || !data.session_token) {
+      throw new Error(data?.message || 'اسم الأستاذ أو الرمز السري غير صحيح');
+    }
+
+    localStorage.setItem(SESSION_KEY, data.session_token);
+    localStorage.setItem(NAME_KEY, data.teacher_name || name);
+
+    document.getElementById('loginPin').value = '';
+
+    showMessage('loginMessage', 'تم تسجيل الدخول بنجاح', 'success');
+    showWorkspace(data.teacher_name || name);
+
+  } catch (error) {
+    showMessage('loginMessage', error.message || 'تعذر تسجيل الدخول');
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+// إظهار مساحة الأستاذ
+function showWorkspace(name) {
+  document.getElementById('authCard').hidden = true;
+  document.getElementById('teacherWorkspace').hidden = false;
+
+  const nameBox = document.getElementById('connectedTeacherName');
+  if (nameBox) nameBox.textContent = name || '';
+
+  setCurrentDateTime();
+  loadMyTeacherRequests();
+}
+
+// التحقق من الجلسة عند فتح الصفحة
+async function checkTeacherSession() {
+  const token = getSessionToken();
+
+  if (!token) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc('verify_teacher_session', {
+      p_session_token: token
+    });
+
+    if (error) throw error;
+
+    if (data && data.success) {
+      const name = data.teacher_name || localStorage.getItem(NAME_KEY) || '';
+      localStorage.setItem(NAME_KEY, name);
+      showWorkspace(name);
+    } else {
+      logoutTeacher(false);
+    }
+  } catch (error) {
+    console.error('خطأ التحقق من الجلسة:', error);
+    // لا نحذف الجلسة عند انقطاع الاتصال المؤقت
+    showMessage('loginMessage', 'تعذر الاتصال للتحقق من الجلسة. أعد تحميل الصفحة عند عودة الاتصال.');
+  }
+}
+
+// تسجيل الخروج
+
+async function logoutTeacher(confirmLogout = true) {
+  if (confirmLogout && !confirm('هل تريد تسجيل الخروج؟')) return;
+
+  const token = getSessionToken();
+
+  if (token) {
+    try {
+      const { error } = await supabaseClient.rpc('logout_teacher', {
+        p_session_token: token
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('خطأ إلغاء الجلسة:', error);
+      showMessage(
+        'loginMessage',
+        'تعذر إلغاء الجلسة من الخادم. تحقق من الاتصال ثم حاول مجددًا.',
+        'error'
+      );
+      return;
+    }
+  }
+
+  localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(NAME_KEY);
+
+  document.getElementById('teacherWorkspace').hidden = true;
+  document.getElementById('authCard').hidden = false;
+
+  const list = document.getElementById('requestsList');
+  if (list) list.replaceChildren();
+
+  showMessage('loginMessage', 'تم تسجيل الخروج بنجاح', 'success');
+}
+
+// إرسال طلب جديد
+async function sendTeacherRequest() {
+  const token = getSessionToken();
+
+  if (!token) {
+    showMessage('message', 'انتهت الجلسة. يرجى تسجيل الدخول من جديد');
+    return;
+  }
+
+  const className = document.getElementById('className').value.trim();
+  const date = document.getElementById('requestDate').value;
+  const time = document.getElementById('requestTime').value;
+  const requestText = document.getElementById('requestText').value.trim();
+  const tools = document.getElementById('tools').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+
+  if (!className || !date || !time || !requestText) {
+    showMessage('message', 'يرجى ملء القسم والتاريخ والتوقيت ونص الطلب');
+    return;
+  }
+
+  const button = document.querySelector('#teacherWorkspace button[onclick="sendTeacherRequest()"]');
+  if (button) button.disabled = true;
+
+  try {
+    const trackingCode = createTrackingCode();
+
+    const { data, error } = await supabaseClient.rpc('submit_teacher_request', {
+      p_session_token: token,
+      p_class_name: className,
+      p_request_date: date,
+      p_request_time: time,
+      p_request_text: requestText,
+      p_tools: tools,
+      p_notes: notes,
+      p_tracking_code: trackingCode
+    });
+
+    if (error) throw error;
+
+    if (data && data.success === false) {
+      throw new Error(data.message || 'تعذر إرسال الطلب');
+    }
+
+    showMessage('message', 'تم إرسال الطلب بنجاح', 'success');
+    clearForm();
+    await loadMyTeacherRequests();
+
+  } catch (error) {
+    showMessage('message', error.message || 'حدث خطأ أثناء إرسال الطلب');
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+// تفريغ نموذج الطلب
+function clearForm() {
+  ['className', 'requestText', 'tools', 'notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  setCurrentDateTime();
+}
+
+// إنشاء عنصر نصي آمن
+function addRequestField(parent, label, value) {
+  if (value === null || value === undefined || value === '') return;
+
+  const p = document.createElement('p');
+  const strong = document.createElement('strong');
+  strong.textContent = label + ': ';
+
+  p.appendChild(strong);
+  p.appendChild(document.createTextNode(String(value)));
+  parent.appendChild(p);
+}
+
+// عرض طلبات الأستاذ
+async function loadMyTeacherRequests() {
+  const token = getSessionToken();
+  const list = document.getElementById('requestsList');
+
+  if (!token || !list) return;
+
+  list.textContent = 'جارٍ تحميل الطلبات...';
+
+  try {
+    const { data, error } = await supabaseClient.rpc('get_my_teacher_requests', {
+      p_session_token: token
+    });
+
+    if (error) throw error;
+
+   const requests = Array.isArray(data)
+  ? data
+  : Array.isArray(data?.requests)
+    ? data.requests
+    : Array.isArray(data?.data)
+      ? data.data
+      : [];
+
+    list.replaceChildren();
+
+    if (requests.length === 0) {
+      list.textContent = 'لا توجد طلبات مسجلة حتى الآن.';
+      return;
+    }
+
+    requests.forEach(request => {
+      const card = document.createElement('div');
+      card.className = 'request-item';
+
+      const heading = document.createElement('h3');
+      heading.textContent = 'طلب رقم ' + request.id;
+      card.appendChild(heading);
+
+      addRequestField(card, 'القسم', request.class_name);
+      addRequestField(card, 'التاريخ', request.request_date);
+      addRequestField(card, 'التوقيت', request.request_time);
+      addRequestField(card, 'الطلب', request.request_text);
+      addRequestField(card, 'العتاد المطلوب', request.tools);
+      addRequestField(card, 'ملاحظات الأستاذ', request.notes);
+      addRequestField(card, 'الحالة', request.status);
+
+      if (request.reply_text) {
+        addRequestField(card, 'رد مسؤول المخبر', request.reply_text);
+      }
+
+      if (request.reply_notes) {
+        addRequestField(card, 'ملاحظات مسؤول المخبر', request.reply_notes);
+      }
+
+      if (request.replied_at) {
+        addRequestField(card, 'تاريخ الرد', request.replied_at);
+      }
+
+      list.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error('خطأ تحميل الطلبات:', error);
+    list.textContent = 'تعذر تحميل الطلبات. يرجى المحاولة مجددًا.';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setCurrentDateTime();
+  checkTeacherSession();
+});
+</script>
+
+<style>
+#simulations {
+  background: #fff;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 15px;
+  box-shadow: 0 4px 16px #0001;
+  color: #172033;
+}
+#simulations h2 { color: #123b5d; }
+#simulations .sim-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 15px 0;
+}
+#simulations input,
+#simulations select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccd6e2;
+  border-radius: 8px;
+  font: inherit;
+  background: white;
+}
+#simulations .sim-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 12px;
+}
+#simulations .sim-card {
+  border: 1px solid #dce5ef;
+  background: #f7f9fc;
+  padding: 15px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+#simulations .sim-card h3 { margin: 0; font-size: 18px; }
+#simulations .sim-card p { margin: 0; line-height: 1.7; }
+#simulations .sim-tag {
+  color: #1769aa;
+  font-size: 13px;
+  font-weight: bold;
+}
+#simulations .sim-link {
+  display: inline-block;
+  background: #1769aa;
+  color: white;
+  text-decoration: none;
+  padding: 11px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: auto;
+}
+#simulations .sim-empty {
+  padding: 15px;
+  color: #607086;
+}
+@media(max-width:500px) {
+  #simulations .sim-controls { grid-template-columns: 1fr; }
+}
+</style>
+
+<section id="simulations">
+  <h2>🧪 التجارب بالمحاكاة</h2>
+  <p>اختر تجربة تفاعلية لاستعمالها في القسم.</p>
+
+  <div class="sim-controls">
+    <input
+      id="simSearch"
+      type="search"
+      placeholder="🔎 ابحث عن تجربة..."
+      oninput="filterSimulations()"
+    >
+
+    <select id="simCategory" onchange="filterSimulations()">
+      <option value="all">جميع المجالات</option>
+      <option value="electricity">الكهرباء</option>
+      <option value="magnetism">المغناطيسية</option>
+      <option value="light">الضوء والبصريات</option>
+      <option value="sound">الصوت والموجات</option>
+      <option value="motion">القوى والحركة</option>
+      <option value="matter">المادة والكتلة الحجمية</option>
+    </select>
+  </div>
+
+  <div class="sim-grid" id="simGrid">
+
+    <article class="sim-card" data-category="electricity">
+      <h3>⚡ تركيب الدارات الكهربائية</h3>
+      <span class="sim-tag">الكهرباء</span>
+      <p>ركّب البطاريات والمصابيح والأسلاك والقواطع في دارة افتراضية.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/sims/html/circuit-construction-kit-dc-virtual-lab/latest/circuit-construction-kit-dc-virtual-lab_ar_MA.html"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="electricity">
+      <h3>🔌 المقاومة في سلك</h3>
+      <span class="sim-tag">الكهرباء</span>
+      <p>استكشف تأثير خصائص السلك على مقاومته الكهربائية.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/en/simulations/resistance-in-a-wire"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="magnetism">
+      <h3>🧲 المغناطيس والبوصلة</h3>
+      <span class="sim-tag">المغناطيسية</span>
+      <p>لاحظ اتجاه البوصلة والمجال حول المغناطيس.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/ar_SA/simulations/magnet-and-compass"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="electricity">
+      <h3>🎈 الكهرباء الساكنة</h3>
+      <span class="sim-tag">الكهرباء</span>
+      <p>استكشف الشحنات الكهربائية والتجاذب والتنافر.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/en/simulations/balloons-and-static-electricity"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="light">
+      <h3>🌈 انكسار الضوء</h3>
+      <span class="sim-tag">الضوء والبصريات</span>
+      <p>راقب مسار الضوء عند انتقاله بين أوساط مختلفة.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/en/simulations/bending-light"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="sound">
+      <h3>🔊 الصوت والموجات</h3>
+      <span class="sim-tag">الصوت والموجات</span>
+      <p>استكشف الموجات الصوتية وتغير خصائصها.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/ar_SA/simulations/sound"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="motion">
+      <h3>🏃 القوى والحركة</h3>
+      <span class="sim-tag">القوى والحركة</span>
+      <p>استكشف تأثير القوى والاحتكاك على حركة الأجسام.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/en/simulations/forces-and-motion-basics"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+    <article class="sim-card" data-category="matter">
+      <h3>🧊 الكتلة الحجمية</h3>
+      <span class="sim-tag">المادة والكتلة الحجمية</span>
+      <p>قارن الكتلة والحجم والكثافة وراقب الطفو.</p>
+      <a class="sim-link"
+         href="https://phet.colorado.edu/en/simulations/density"
+         target="_blank" rel="noopener noreferrer">▶ افتح المحاكاة</a>
+    </article>
+
+  </div>
+
+  <p id="simCount" class="sim-empty" aria-live="polite"></p>
+
+  <p style="font-size:13px;color:#607086;line-height:1.7">
+    المحاكيات مرتبطة بموقع PhET الرسمي. لم تُصنّف بعد حسب فصول
+    المنهاج الجزائري؛ يجب مطابقة كل تجربة مع التدرج الرسمي قبل اعتمادها.
+  </p>
+</section>
+
+<script>
+function filterSimulations() {
+  const search = document.getElementById("simSearch")
+    .value.trim().toLocaleLowerCase();
+
+  const category = document.getElementById("simCategory").value;
+  const cards = document.querySelectorAll("#simGrid .sim-card");
+  let visible = 0;
+
+  cards.forEach(function(card) {
+    const text = card.innerText.toLocaleLowerCase();
+    const categoryMatch =
+      category === "all" || card.dataset.category === category;
+    const searchMatch = text.includes(search);
+    const show = categoryMatch && searchMatch;
+
+    card.style.display = show ? "flex" : "none";
+    if (show) visible++;
+  });
+
+  document.getElementById("simCount").textContent =
+    "عدد التجارب المعروضة: " + visible;
+}
+
+filterSimulations();
+</script>
+
+</body>
+</html>
