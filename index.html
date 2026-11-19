@@ -8630,6 +8630,7 @@ await loadChemicalsFromSupabase();
 
 // إنشاء رمز دعوة لأستاذ جديد
 
+
 async function createTeacherInviteFromAdmin() {
   const name = document.getElementById('newTeacherName').value.trim();
   const result = document.getElementById('teacherInviteResult');
@@ -8649,34 +8650,52 @@ async function createTeacherInviteFromAdmin() {
 
     if (error) throw error;
 
+    const code = String(data);
+    const link = 'https://chaf7575.github.io/Labelchafie/teacher.html';
+
+    const message =
+      'السلام عليكم أستاذ/ة ' + name + '،\n\n' +
+      'هذا رابط منصة المخبري الخاص بالأساتذة:\n' +
+      link + '\n\n' +
+      'رمز الدعوة الخاص بك: ' + code + '\n\n' +
+      'افتح الرابط، واختر إنشاء حساب جديد، ثم أدخل اسمك ورمز الدعوة، واختر رقم PIN خاصًا بك من 6 أرقام.\n\n' +
+      'ملاحظة: رمز الدعوة صالح لمدة 24 ساعة ويُستخدم مرة واحدة فقط.';
+
     result.replaceChildren();
 
-    const message = document.createElement('p');
-    message.textContent =
-      'تم إنشاء رمز الدعوة للأستاذ ' + name +
-      '، الرمز: ' + data +
-      ' — صالح لمدة 24 ساعة.';
+    const info = document.createElement('p');
+    info.textContent =
+      'تم إنشاء رمز الدعوة للأستاذ ' + name + ': ' + code;
+    result.appendChild(info);
 
-    const copyButton = document.createElement('button');
-    copyButton.textContent = '📋 نسخ رمز الدعوة';
-
-    copyButton.onclick = async function () {
+    async function copyText(text, button, successText) {
       try {
-        await navigator.clipboard.writeText(String(data));
-        copyButton.textContent = '✅ تم نسخ الرمز';
+        await navigator.clipboard.writeText(text);
       } catch (error) {
         const temp = document.createElement('textarea');
-        temp.value = String(data);
+        temp.value = text;
         document.body.appendChild(temp);
         temp.select();
         document.execCommand('copy');
         temp.remove();
-        copyButton.textContent = '✅ تم نسخ الرمز';
       }
-    };
 
-    result.appendChild(message);
-    result.appendChild(copyButton);
+      button.textContent = successText;
+    }
+
+    const copyCode = document.createElement('button');
+    copyCode.textContent = '📋 نسخ رمز الدعوة';
+    copyCode.onclick = () =>
+      copyText(code, copyCode, '✅ تم نسخ الرمز');
+
+    const copyMessage = document.createElement('button');
+    copyMessage.textContent = '📩 نسخ الرسالة كاملة';
+    copyMessage.style.marginRight = '8px';
+    copyMessage.onclick = () =>
+      copyText(message, copyMessage, '✅ تم نسخ الرسالة');
+
+    result.appendChild(copyCode);
+    result.appendChild(copyMessage);
 
     document.getElementById('newTeacherName').value = '';
 
