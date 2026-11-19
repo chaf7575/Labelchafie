@@ -1,8 +1,8 @@
 
 {
   "id": "/Labelchafie/teacher-app/",
-  "name": "فضاء الأستاذ - منصة المخبري",
-  "short_name": "فضاء الأستاذ",
+ "name": "فضاء الأستاذ",
+"short_name": "فضاء الأستاذ",
   "description": "فضاء الأساتذة لإرسال ومتابعة الطلبات",
   "lang": "ar",
   "dir": "rtl",
