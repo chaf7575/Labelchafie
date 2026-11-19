@@ -8706,16 +8706,13 @@ async function createTeacherInviteFromAdmin() {
 }
 
 // عرض قائمة حسابات الأساتذة
+
 async function loadTeachersList() {
   const list = document.getElementById('teachersList');
-
   list.textContent = 'جارٍ تحميل قائمة الأساتذة...';
 
   try {
-    const { data, error } = await supabaseClient.rpc(
-      'admin_list_teachers'
-    );
-
+    const { data, error } = await supabaseClient.rpc('admin_list_teachers');
     if (error) throw error;
 
     list.replaceChildren();
@@ -8732,14 +8729,30 @@ async function loadTeachersList() {
       const name = document.createElement('strong');
       name.textContent = (index + 1) + '- ' + teacher.teacher_name;
 
+      const status = document.createElement('p');
+      status.textContent = teacher.is_active
+        ? '🟢 الحساب مفعّل'
+        : '🟠 الحساب بانتظار التفعيل أو معطّل';
+
       const date = document.createElement('p');
       date.textContent = teacher.created_at
-        ? 'تاريخ إنشاء الحساب: ' +
+        ? 'تاريخ التسجيل: ' +
           new Date(teacher.created_at).toLocaleDateString('ar-DZ')
         : '';
 
+      const button = document.createElement('button');
+      button.textContent = teacher.is_active
+        ? '🔒 تعطيل الحساب'
+        : '✅ تفعيل الحساب';
+
+      button.onclick = () =>
+        adminSetTeacherActive(teacher.id, !teacher.is_active);
+
       item.appendChild(name);
+      item.appendChild(status);
       item.appendChild(date);
+      item.appendChild(button);
+
       list.appendChild(item);
     });
 
@@ -8748,6 +8761,32 @@ async function loadTeachersList() {
     list.textContent = 'تعذر تحميل قائمة الأساتذة: ' + error.message;
   }
 }
+
+async function adminSetTeacherActive(teacherId, isActive) {
+  const action = isActive ? 'تفعيل' : 'تعطيل';
+
+  if (!confirm('هل تريدين ' + action + ' حساب هذا الأستاذ؟')) return;
+
+  try {
+    const { error } = await supabaseClient.rpc(
+      'admin_set_teacher_active',
+      {
+        p_teacher_id: teacherId,
+        p_is_active: isActive
+      }
+    );
+
+    if (error) throw error;
+
+    alert('تم ' + action + ' الحساب بنجاح.');
+    await loadTeachersList();
+
+  } catch (error) {
+    console.error(error);
+    alert('تعذر ' + action + ' الحساب: ' + error.message);
+  }
+}
+
 
 </script> 
   
