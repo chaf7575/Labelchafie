@@ -2556,25 +2556,25 @@ button[onclick*="Remove"] {
   }
 
   /* تكبير مساحة اللوحة */
-  #home .dashboard-canvas {
-    position: relative !important;
-    width: 200vw !important;
-    min-width: 200vw !important;
-    max-width: none !important;
-    aspect-ratio: 1648 / 928 !important;
-    overflow: hidden !important;
-    background: #dff5ff;
-  }
+#home .dashboard-canvas {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  aspect-ratio: 1648 / 928 !important;
+  overflow: hidden !important;
+  background: #dff5ff;
+}
 
-  /* الصورة الأصلية */
-  #home .dashboard-canvas > img {
-    position: absolute !important;
-    inset: 0 !important;
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: fill !important;
-  }
+/* الصورة الأصلية */
+#home .dashboard-canvas > img {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
 
   /* المحافظة على أماكن الأزرار */
   #home .dash-hotspot {
