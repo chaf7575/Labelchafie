@@ -2936,7 +2936,25 @@ td {
   }
 }
 
+@media screen and (max-width: 768px) {
+  #home .dashboard-wrap,
+  #home .dashboard-canvas {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
 
+  #home .dashboard-canvas {
+    aspect-ratio: auto !important;
+    height: auto !important;
+  }
+
+  #home .mobile-dashboard {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
 </style>
 
 <link rel="manifest" href="manifest-admin.json">
