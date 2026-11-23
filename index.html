@@ -151,11 +151,20 @@ textarea{min-height:80px}
   margin-top:15px
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:800px;
-  background:#fff
+table {
+  width: 100%;
+  min-width: 0 !important;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+@media screen and (max-width: 768px) {
+  table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+  }
 }
 
 th,td{
