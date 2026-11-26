@@ -3106,6 +3106,33 @@ if ('serviceWorker' in navigator) {
   }
 }
 </style> 
+ <style>
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  html, body {
+    width: 100% !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+  }
+
+  body {
+    font-size: 14px !important;
+  }
+
+  #app, main, .main-content, .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+  }
+
+  table {
+    max-width: none !important;
+  }
+}
+</style> 
 </head>
 <body>
 <script>
