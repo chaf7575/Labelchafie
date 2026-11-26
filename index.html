@@ -2980,7 +2980,62 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<style>
+/* تحسين واجهة الهاتف فقط */
+@media (max-width: 768px) {
+  * {
+    box-sizing: border-box;
+  }
 
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    font-size: 15px;
+  }
+
+  button, .btn {
+    min-height: 42px;
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+
+  input, select, textarea {
+    max-width: 100%;
+    width: 100%;
+    min-height: 42px;
+    font-size: 16px;
+  }
+
+  table {
+    min-width: 600px;
+    font-size: 13px;
+  }
+
+  .table-container,
+  .table-responsive {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .container,
+  .content,
+  .main-content {
+    max-width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+</style>
 </head>
 <body>
 <script>
