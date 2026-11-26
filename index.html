@@ -2981,58 +2981,52 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 <style>
-/* تحسين واجهة الهاتف فقط */
-@media (max-width: 768px) {
-  * {
-    box-sizing: border-box;
-  }
-
+@media screen and (max-width: 768px) {
   html, body {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
+    width: 100% !important;
+    min-height: 100% !important;
+    height: auto !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
   }
 
   body {
-    font-size: 15px;
+    position: relative !important;
+    font-size: 15px !important;
   }
 
-  button, .btn {
-    min-height: 42px;
-    padding: 10px 14px;
-    font-size: 15px;
+  #app, main, .main, .container,
+  .main-content, .content, .page,
+  .section, .tab-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
-  input, select, textarea {
-    max-width: 100%;
-    width: 100%;
-    min-height: 42px;
-    font-size: 16px;
-  }
-
-  table {
-    min-width: 600px;
-    font-size: 13px;
-  }
-
-  .table-container,
-  .table-responsive {
-    max-width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  input, select, textarea, button {
+    max-width: 100% !important;
+    font-size: 16px !important;
   }
 
   img {
-    max-width: 100%;
-    height: auto;
+    max-width: 100% !important;
+    height: auto !important;
   }
 
-  .container,
-  .content,
-  .main-content {
-    max-width: 100%;
-    padding-left: 10px;
-    padding-right: 10px;
+  table {
+    min-width: 0 !important;
+    width: 100% !important;
+    font-size: 12px !important;
+  }
+
+  .table-container, .table-responsive {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
   }
 }
 </style>
